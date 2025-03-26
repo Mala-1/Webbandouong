@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+
+        .btn-bg-color{
+            background-color: #cdf7d6;
+        }
+
+        .btn-bg-color:hover {
+            background-color: #bfe4c7;
+        }
+        .ellipsis-2-lines {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;   /* Giới hạn tối đa là 3 dòng */
+            -webkit-box-orient: vertical; /* Đảm bảo rằng các dòng được xếp theo chiều dọc */
+            overflow: hidden;          /* Ẩn phần vượt quá */
+            text-overflow: ellipsis;   /* Hiện dấu "..." */
+            white-space: normal;       /* Cho phép xuống dòng khi cần thiết */
+            word-wrap: break-word;
+            word-break: break-word;
+            
+        }
+
+        .product-item {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .btn-buy {
+            background-color: #d3d2d2;
+        }
+
+        .btn-buy:hover {
+            background-color: #303030;
+            color: white !important;
+        }
+
+        .pag {
+            border: none;
+            background: transparent;
+            width: auto;
+            text-align: center;
+            outline: none; /* bỏ viền khi focus */
+            font-size: inherit;
+            font-family: inherit;
+            padding: 0;
+            width: 25px;
+        }
+
+        .btn-prev,
+        .btn-next {
+            height: 80%;
+        }
+    </style>
+</head>
+    <?php include("../includes/header.php"); ?>
+
+    <div class="container">
+        <div class="border">
+            <div class="row row-cols-3 row-cols-md-4 row-cols-xl-5 p-3 g-0">
+
+                <div class="p-3">
+                    <div class="product-item border">
+                        <img src="../assets/images/thung-12-lon-bia-budweiser-500ml-202202191642579694.jpg" alt="" class="img-fluid object-fit-contain mx-auto">
+                        <div class="mt-2">
+                            <p class="ellipsis-2-lines text-secondary mb-2 ms-2">Thùng 24 lon bia Sài Gòn Export Premium </p>
+                            <p class="fw-medium fs-5 ms-2">366.000đ</p>
+                            <a href="#" class="btn-buy text-decoration-none text-black d-block w-100 text-center py-2">MUA</a>
+                        </div>
+                    </div>
+
+                </div>
+
+                
+                <!--  -->
+                
+                
+            </div>
+            <!-- Phân trnag -->
+            <div class="pagination d-flex justify-content-center m-4 pe-5 gap-4 align-items-center">
+                <button class="btn-prev">
+                    <i class="fa-solid fa-chevron-left"></i>     
+                </button>
+                
+                <div class="border p-2">
+                    <input type="text" class="pag" value="1" size="1">
+                    <span>/</span>
+                    <span class="max-pag mx-2">12</span>
+
+                </div>
+
+                <button class="btn-next">
+                    <i class="fa-solid fa-angle-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+
+
+    <script src="../assets/bootstrap/js/bootstrap.min.js"></script>
+    <script>
+        document.querySelector('.btn-prev').addEventListener('click', function() {
+            let page = document.querySelector('.pag');
+            let i = parseInt(page.value);
+            if(i > 1) {
+                page.value = i - 1;
+            }
+        });
+
+        document.querySelector('.btn-next').addEventListener('click', function() {
+            let page = document.querySelector('.pag');
+            let max_pag = parseInt(document.querySelector('.max-pag').textContent);
+            let i = parseInt(page.value);
+            if(i < max_pag) {
+                page.value = i + 1;
+
+            }
+        });
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if(document.querySelector('.max-pag').textContent === '1') {
+                document.querySelector('.pagination').style.setProperty('display', 'none', 'important');
+            }
+        });
+
+    </script>
+</html>
