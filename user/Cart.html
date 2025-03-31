@@ -8,14 +8,21 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     .product-row {
-      border-bottom: 1px solid #dee2e6;
-      padding: 10px 0;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
     .quantity-btn {
       width: 30px;
       height: 30px;
       text-align: center;
       padding: 0;
+    }
+    .product-img {
+      max-height: 80px;
+      width: auto;
     }
   </style>
 </head>
@@ -51,12 +58,12 @@
     // Biến giả lập trạng thái đăng nhập (thay đổi giá trị này để test)
     let isLoggedIn = false; // false: chưa đăng nhập; true: đã đăng nhập
 
-    // Mảng sản phẩm mẫu (mỗi sản phẩm có id, tên, giá, số lượng)
+    // Mảng sản phẩm mẫu, sử dụng hình ảnh từ thư mục local (assets/images)
     const products = [
-      { id: 1, name: "CocaCoca", price: 15000, quantity: 1, selected: false },
-      { id: 2, name: "PepsiPepsi", price: 20000, quantity: 1, selected: false },
-      { id: 3, name: "Trà đóng lon", price: 18000, quantity: 1, selected: false }
-    ];
+      { id: 1, name: "CocaCoca - 1 lon", price: 15000, quantity: 1, selected: false, image: "../assets/images/coca_1_lon.jpg" },
+      { id: 2, name: "Budweiser - Thùng 12 lon", price: 20000, quantity: 1, selected: false, image: "../assets/images/thung-12-lon-bia-budweiser-500ml-202202191642579694.jpg" },
+      { id: 3, name: "Pepsi - 1 lon", price: 18000, quantity: 1, selected: false, image: "../assets/images/Pepsi_1_lon.jpg" },
+  ]  
 
     // Hiển thị trạng thái đăng nhập
     function renderAuthStatus() {
@@ -82,7 +89,10 @@
           <div class="col-1 text-center">
             <input type="checkbox" data-index="${index}" ${product.selected ? "checked" : ""} class="form-check-input product-checkbox">
           </div>
-          <div class="col-4">
+          <div class="col-2 text-center">
+            <img src="${product.image}" alt="${product.name}" class="img-thumbnail product-img">
+          </div>
+          <div class="col-3">
             <strong>${product.name}</strong>
             <br>
             <small>Giá: ${product.price.toLocaleString()} VND</small>
