@@ -144,9 +144,21 @@
         $db = DBConnect::getInstance();
 
         $categories = $db->select('SELECT * FROM categories', []);
+
+        $sql = 'SELECT 
+                    c.category_id,
+                    c.name AS category_name,
+                    b.brand_id,
+                    b.name AS brand_name,
+                    b.image AS brand_image
+                FROM categories c
+                JOIN products p ON p.category_id = c.category_id
+                JOIN brand b ON p.brand_id = b.brand_id
+                GROUP BY c.category_id, b.brand_id;';
+        $category_brandImage = $db->select($sql, []);
     ?>
     <?php include("../includes/header.php"); ?>
-    <div class="wrap py-4" style="height: 100vh;">
+    <div class="wrap py-4" style="height: 80vh;">
         <div class="container">
             <!-- Thể loại -->
             <div class="user-select-none bg-white rounded">
@@ -214,15 +226,11 @@
                                 <div class="mb-3">
                                     <label class="fw-bold">Chọn thương hiệu</label>
                                     <div class="d-flex flex-wrap gap-2 mt-2 filter-group" data-type="multiple">
+                                        
                                         <img class="brand-option border p-1"
                                             src="https://cdn.tgdd.vn/Brand/11/wonderfarm-05042021173431.jpg"
                                             style="height: 50px; cursor:pointer;" />
-                                        <img class="brand-option border p-1"
-                                            src="https://cdn.tgdd.vn/Brand/11/wonderfarm-05042021173431.jpg"
-                                            style="height: 50px; cursor:pointer;" />
-                                        <img class="brand-option border p-1"
-                                            src="https://cdn.tgdd.vn/Brand/11/wonderfarm-05042021173431.jpg"
-                                            style="height: 50px; cursor:pointer;" />
+                                        
                                     </div>
                                 </div>
                                 <!-- Đóng gói -->
@@ -506,6 +514,8 @@
 
     
     </script>
+
+    <?php include '../includes/footer.php' ?>
 </body>
 
 </html>
