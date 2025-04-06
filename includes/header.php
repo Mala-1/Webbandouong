@@ -1,30 +1,5 @@
-<?php
-session_start();
-$username = $_SESSION['username'] ?? 'Khách';
-?>
-
-<!DOCTYPE html>
-<html lang="vi">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Đồ Uống Pro</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-
-<body>
-
-    <!-- Header -->
+<html>
+<header>
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top px-4 py-2">
         <a class="navbar-brand d-flex align-items-center" href="../index.php">
             <img src="../assets/images/strarbucks.jpg" alt="logo" class="logo-img"> Đồ Uống Pro
@@ -97,10 +72,10 @@ $username = $_SESSION['username'] ?? 'Khách';
             <div class="dropdown">
                 <a href="#" class="btn btn-dark dropdown-toggle" role="button" data-bs-toggle="dropdown"
                     aria-expanded="false">
-                    👤 <?= htmlspecialchars($username) ?>
+                    👤 <?= htmlspecialchars($username ?? 'Khách') ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="../user/profile.php"><i class=" fas fa-user"></i> Hồ sơ</a></li>
+                    <li><a class="dropdown-item" href="../user/profile.php"><i class="fas fa-user"></i> Hồ sơ</a></li>
                     <li><a class="dropdown-item" href="changepassword.php"><i class="fas fa-key"></i> Đổi mật khẩu</a>
                     </li>
                     <li>
@@ -111,7 +86,7 @@ $username = $_SESSION['username'] ?? 'Khách';
                 </ul>
             </div>
         </div>
-
     </nav>
+</header>
 
-    <div class="container mt-4">
+</html>

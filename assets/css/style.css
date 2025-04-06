@@ -112,3 +112,11 @@ cursor: move;
 .alert.hidden {
     opacity: 0; /* Chỉ mờ đi, không thay đổi layout */
 }
+
+.message-container .alert {
+    transition: opacity 0.5s ease-in-out;
+  }
+
+  .message-container .hidden {
+    display: none;
+  }

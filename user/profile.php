@@ -1,5 +1,5 @@
 <?php
-include '../includes/header.php'; 
+session_start();
 
 $upload_message = '';
 $update_message = '';
@@ -62,10 +62,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
     <title>Trang Hồ Sơ</title>
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 
 <body>
+    <?php include '../includes/header.php'; ?>
+
     <div class="container">
         <div class="profile-card">
             <!-- Header -->
@@ -172,6 +181,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
             </div>
         </div>
     </div>
+
+    <?php include '../includes/footer.php'; ?>
+
+    <!-- Script Bootstrap -->
+    <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- JavaScript để ẩn thông báo -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -191,6 +206,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
         hideMessage('updateMessage');
     });
     </script>
+
+    <!-- Hiển thị modal nếu có cập nhật -->
     <?php if ($show_modal): ?>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -202,4 +219,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
 </body>
 
 </html>
-<?php include '../includes/footer.php'; ?>
