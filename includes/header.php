@@ -11,8 +11,8 @@
         <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav ms-auto me-3">
                 <li class="nav-item"><a class="nav-link" href="../index.php">Trang chủ</a></li>
-                <li class="nav-item"><a class="nav-link" href="products.php">Sản phẩm</a></li>
-                <li class="nav-item"><a class="nav-link" href="orders.php">Giỏ hàng</a></li>
+                <li class="nav-item"><a class="nav-link" href="../user/product.php">Sản phẩm</a></li>
+                <li class=" nav-item"><a class="nav-link" href="orders.php">Giỏ hàng</a></li>
             </ul>
 
             <!-- 🔍 Thanh tìm kiếm -->

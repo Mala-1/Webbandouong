@@ -20,7 +20,8 @@
       {
         "ignore": [
           "-webkit-text-size-adjust",
-          "text-align: -webkit-match-parent"
+          "text-align: -webkit-match-parent",
+          "user-select"
         ]
       }
     ]
