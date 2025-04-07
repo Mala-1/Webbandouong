@@ -5,7 +5,6 @@ document.querySelectorAll('.category').forEach(item => {
     item.addEventListener('click', () => {
         document.querySelectorAll('.category').forEach(i => { i.classList.remove('active') });
         item.classList.add('active');
-        loadBrandsByCategory();
     });
 });
 
@@ -68,48 +67,15 @@ function updateScrollButtons() {
     }
 }
 
+// khi load dom xong thì hiển thị nút trái phải của thể loại 
+// + load sản phẩm theo thể loại
 document.addEventListener('DOMContentLoaded', function () {
     updateScrollButtons();
     window.addEventListener('resize', updateScrollButtons);
     window.addEventListener('resize', loadProductsByCategory());
 });
 
-document.querySelector('.brand-wrap').addEventListener('click', function (e) {
-    if (e.target.classList.contains('brand-option')) {
-        e.target.classList.toggle('active');
-    }
-});
 
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".filter-option").forEach(item => {
-        item.addEventListener("click", () => {
-            item.classList.toggle("active");
-        });
-    });
-
-    document.querySelectorAll(".filter-group").forEach(group => {
-        const type = group.getAttribute("data-type");
-
-        group.querySelectorAll(".filter-option").forEach(option => {
-            option.addEventListener("click", () => {
-                if (type === "single") {
-                    group.querySelectorAll(".filter-option").forEach(o => o.classList.remove("active"));
-                    option.classList.add("active");
-                } else {
-                    option.classList.toggle("active");
-                }
-            });
-        });
-    });
-});
-
-document.querySelector('.btn-reset-filters').addEventListener('click', function () {
-    // Bỏ tất cả class 'active' trong form lọc
-    document.querySelectorAll('.active').forEach(el => {
-        el.classList.remove('active');
-    });
-
-});
 
 
 function getActiveCategoryId() {
@@ -130,34 +96,12 @@ function loadProductsByCategory(page = 1) {
             const html = parts[0] || ''; // nếu không có thì dùng chuỗi rỗng
             const pagination = parts[1] || ''; // nếu không có thì dùng chuỗi rỗng
             productWrap.innerHTML = html;
-            if (pagination !== '') {
-                paginationWrap.innerHTML = pagination;
-                // if (typeof initPaginationEvents === "function") {
-                //     initPaginationEvents(); // Gắn lại sự kiện pagination sau khi render
-                // }
-            }
+            paginationWrap.innerHTML = pagination;
+
         })
         .catch(err => console.error('Lỗi:', err));
 }
 
-
-function loadBrandsByCategory() {
-    const categoryId = getActiveCategoryId();
-
-    fetch('../ajax/brand_ajax.php?category_id=' + categoryId)
-        .then(response => response.text())
-        .then(data => {
-            console.log(data)
-            const brandWrap = document.querySelector('.brand-wrap');
-            brandWrap.innerHTML = data;
-        })
-        .catch(err => console.error('Lỗi:', err));
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    loadProductsByCategory();
-    loadBrandsByCategory();
-});
 
 
 document.querySelectorAll('.category').forEach(item => {
@@ -191,3 +135,62 @@ function getResponsiveLimit() {
     if (width < 1200) return 8; // Tablet
     return 10; // Desktop
 }
+
+
+// hàm gán lại sự kiện cho các btn trong bộ lọc
+function attachFilterEvents() {
+    // Thêm sự kiện gán class active khi click vào thương hiệu trong bộ lọc
+    document.querySelector('.brand-wrap').addEventListener('click', function (e) {
+        if (e.target.classList.contains('brand-option')) {
+            e.target.classList.toggle('active');
+        }
+    });
+
+    // Gắn sự kiện cho từng nhóm lọc (packaging, size...)
+    document.querySelectorAll(".filter-group").forEach(group => {
+        const type = group.getAttribute("data-type"); // single / multiple
+
+        group.querySelectorAll(".filter-option").forEach(option => {
+            option.addEventListener("click", () => {
+                if (type === "single") {
+                    // chỉ được chọn 1 => bỏ active các option khác
+                    group.querySelectorAll(".filter-option").forEach(o => o.classList.remove("active"));
+                    option.classList.add("active");
+                } else {
+                    // chọn nhiều => toggle
+                    option.classList.toggle("active");
+                }
+            });
+        });
+    });
+
+    // Gắn sự kiện reset **trong modal**
+    const modal = document.getElementById('advancedFilterModal');
+    const resetBtn = modal.querySelector('.btn-reset-filters');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function () {
+            modal.querySelectorAll('.active').forEach(el => {
+                el.classList.remove('active');
+            });
+        });
+    }
+}
+
+function load_filter_options() {
+    const categoryId = getActiveCategoryId();
+    
+    fetch('../ajax/load_filter_options.php?category_id=' + categoryId)
+        .then(response => response.text())
+        .then(data => {
+            let [brandImageHtml, packagingTypeHtml, sizeHtml] = data.split('SPLIT');
+            document.querySelector('.brand-wrap').innerHTML = brandImageHtml;
+            document.querySelector('.packaging_type-wrap').innerHTML = packagingTypeHtml;
+            document.querySelector('.size-wrap').innerHTML = sizeHtml;
+            attachFilterEvents();
+        })
+        .catch(err => console.error('Lỗi:', err));
+}
+
+document.getElementById('advancedFilterModal').addEventListener('show.bs.modal', function () {
+    load_filter_options();
+});

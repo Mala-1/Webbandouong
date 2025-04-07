@@ -93,37 +93,24 @@
                                     <label class="fw-bold">Chọn thương hiệu</label>
                                     <div class="brand-wrap d-flex flex-wrap gap-2 mt-2 filter-group" data-type="multiple">
 
-
                                     </div>
                                 </div>
                                 <!-- Đóng gói -->
                                 <div class="mb-3">
                                     <label class="fw-bold">Đóng gói</label>
-                                    <div class="d-flex gap-2 mt-2">
-                                        <div class="btn btn-outline-secondary filter-option"
+                                    <div class="packaging_type-wrap d-flex gap-2 mt-2 filter-group" data-type="multiple">
+                                        <!-- <div class="btn btn-outline-secondary filter-option"
                                             style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
-                                            Dạng lon</div>
-                                        <div class="btn btn-outline-secondary filter-option"
-                                            style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
-                                            Dạng chai</div>
-                                        <div class="btn btn-outline-secondary filter-option"
-                                            style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
-                                            Dạng lọc</div>
-                                        <div class="btn btn-outline-secondary filter-option"
-                                            style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
-                                            Dạng thùng</div>
+                                            Dạng lon</div> -->
                                     </div>
                                 </div>
                                 <!-- Thể tích -->
                                 <div class="mb-3">
                                     <label class="fw-bold">Thể tích</label>
-                                    <div class="d-flex gap-2 mt-2">
-                                        <div class="btn btn-outline-secondary filter-option"
+                                    <div class="size-wrap d-flex gap-2 mt-2 filter-group" data-type="multiple">
+                                        <!-- <div class="btn btn-outline-secondary filter-option"
                                             style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
-                                            Dưới 330ml</div>
-                                        <div class="btn btn-outline-secondary filter-option"
-                                            style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
-                                            Từ 330ml–500ml</div>
+                                            330ml</div> -->
                                     </div>
                                 </div>
                             </div>
