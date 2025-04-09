@@ -75,7 +75,7 @@
     ob_start();
     foreach($products as $product): ?>
         <div class="p-1 ps-md-3 mb-3">
-            <div class="product-item border pt-2 shadow">
+            <div class="product-item border border-2 pt-2 shadow">
                 <img alt="<?= $product['name'] ?>" class="img-fluid object-fit-contain mx-auto"
                     src=<?= '../assets/images/SanPham/' . $product['image']?>>
                 <div class="mt-2">
