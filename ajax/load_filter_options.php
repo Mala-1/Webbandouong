@@ -40,9 +40,9 @@ $sizes = $db->select(
 
 ob_start();
 foreach ($category_brandImage as $item): ?>
-    <img class="brand-option border p-1"
+    <img class="brand-option p-1"
         src="<?= '../assets/images/Brand/' . $item['brand_image'] ?>"
-        style="height: 50px; cursor:pointer;" />
+        style="height: 50px; cursor:pointer;" data-brand-id="<?= $item['brand_id'] ?>" />
 <?php endforeach;
 
 $brandImageHtml = ob_get_clean();

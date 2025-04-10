@@ -80,10 +80,10 @@
                                 <div class="mb-3">
                                     <label class="fw-bold">Sắp xếp sản phẩm</label>
                                     <div class="d-flex flex-wrap gap-2 mt-2 filter-group" data-type="single">
-                                        <div class="btn btn-outline-secondary filter-option" data-sort="high-to-low"
+                                        <div class="btn btn-outline-secondary filter-option" data-sort="desc"
                                             style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
                                             Giá cao đến thấp</div>
-                                        <div class="btn btn-outline-secondary filter-option" data-sort="low-to-high"
+                                        <div class="btn btn-outline-secondary filter-option" data-sort="asc"
                                             style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
                                             Giá thấp đến cao</div>
                                     </div>
@@ -91,7 +91,7 @@
                                 <!-- Thương hiệu -->
                                 <div class="mb-3">
                                     <label class="fw-bold">Chọn thương hiệu</label>
-                                    <div class="brand-wrap d-flex flex-wrap gap-2 mt-2 filter-group" data-type="multiple">
+                                    <div class="brand-wrap d-flex flex-wrap gap-3 mt-2 filter-group" data-type="multiple">
 
                                     </div>
                                 </div>
@@ -118,7 +118,7 @@
                                 <div class="btn btn-outline-secondary btn-reset-filters"
                                     style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
                                     Chọn lại</div>
-                                <button class="btn btn-success">Áp dụng</button>
+                                <button class="btn btn-success btn-filter">Áp dụng</button>
                             </div>
                         </div>
                     </div>

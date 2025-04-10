@@ -12,8 +12,45 @@
     // Thể loại
     $categoryId = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
 
-    // Lọc
+    $whereClauses = ['p.category_id = ?'];
+    $params = [$categoryId];
     
+    // Lọc
+    $sort = $_GET['sort'] ?? '';
+    $brands = json_decode($_GET['brands'] ?? '[]');
+    $packaging = json_decode($_GET['packaging'] ?? '[]');
+    $sizes = json_decode($_GET['sizes'] ?? '[]');
+
+    if ($sort == 'desc') {
+        $sapXep = 'ORDER BY price DESC';
+    } else if ($sort == 'asc') {
+        $sapXep = 'ORDER BY price ASC';
+    } else {
+        $sapXep = 'ORDER BY p.product_id, po.packaging_option_id';
+    }
+// Lọc theo thương hiệu
+    if(!empty($brands)) {
+        $placeholders = implode(',', array_fill(0, count($brands), '?'));
+        $whereClauses[] = 'p.brand_id IN (' . $placeholders . ')';
+        $params = array_merge($params, $brands);
+    }
+// Lọc theo loại đóng gói
+    if (!empty($packaging)) {
+        $placeholders = implode(',', array_fill(0, count($packaging), '?'));
+        $whereClauses[] = 'po.packaging_type IN (' . $placeholders . ')';
+        $params = array_merge($params, $packaging);
+    }
+// Lọc theo thể tích (unit_quantity)
+    if (!empty($sizes)) {
+        $placeholders = implode(',', array_fill(0, count($sizes), '?'));
+        $whereClauses[] = 'po.unit_quantity IN (' . $placeholders . ')';
+        $params = array_merge($params, $sizes);
+    }
+
+    // Gộp điều kiện WHERE
+    $whereSql = implode(' AND ', $whereClauses);
+
+
 
     $products = $db->select("SELECT SQL_CALC_FOUND_ROWS
                             p.product_id,
@@ -37,9 +74,9 @@
                             END AS price
                         FROM products p
                         JOIN packaging_options po ON po.product_id = p.product_id
-                        WHERE p.category_id = ?
-                        ORDER BY p.product_id, po.packaging_option_id
-                        LIMIT $limit OFFSET $offset", [$categoryId]);
+                        WHERE $whereSql
+                        $sapXep
+                        LIMIT $limit OFFSET $offset", $params);
 
     
     $totalProductQuery = "SELECT FOUND_ROWS()";

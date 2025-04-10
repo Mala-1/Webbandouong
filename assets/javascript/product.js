@@ -1,13 +1,4 @@
 
-
-// Thêm active khi click vào thể loại
-document.querySelectorAll('.category').forEach(item => {
-    item.addEventListener('click', () => {
-        document.querySelectorAll('.category').forEach(i => { i.classList.remove('active') });
-        item.classList.add('active');
-    });
-});
-
 // nút qua trái phải của thể loại
 function scrollCategories(direction) {
     const container = document.querySelector('.category-scroll');
@@ -89,7 +80,21 @@ function loadProductsByCategory(page = 1) {
     const productWrap = document.querySelector('.product-wrap');
     const paginationWrap = document.querySelector('.pagination-wrap');
 
-    fetch('../ajax/product_ajax.php?category_id=' + categoryId +'&limit=' + limit + '&page=' + page)
+    const selectedSort = document.querySelector('.filter-group[data-type="single"] .filter-option.active')?.dataset.sort || '';
+    const selectedBrands = Array.from(document.querySelectorAll('.brand-wrap .brand-option.active')).map(img => img.getAttribute('data-brand-id') || '');
+    const selectedPackaging = Array.from(document.querySelectorAll('.packaging_type-wrap .filter-option.active')).map(el => el.getAttribute('data-packaging-type') || '');
+    const selectedSizes = Array.from(document.querySelectorAll('.size-wrap .filter-option.active')).map(el => el.getAttribute('data-size') || '');
+
+
+    // ✅ Chuyển mảng sang chuỗi để gửi qua GET (dùng encodeURIComponent để an toàn)
+    const brandsParam = encodeURIComponent(JSON.stringify(selectedBrands));
+    const packagingParam = encodeURIComponent(JSON.stringify(selectedPackaging));
+    const sizesParam = encodeURIComponent(JSON.stringify(selectedSizes));
+    const sortParam = encodeURIComponent(selectedSort);
+
+    const url = `../ajax/product_ajax.php?category_id=${categoryId}&limit=${limit}&page=${page}&sort=${sortParam}&brands=${brandsParam}&packaging=${packagingParam}&sizes=${sizesParam}`;
+
+    fetch(url)
         .then(response => response.text())
         .then(data => {
             const parts = data.split('SPLIT');
@@ -109,6 +114,12 @@ document.querySelectorAll('.category').forEach(item => {
         // Bỏ active cũ
         document.querySelectorAll('.category').forEach(i => i.classList.remove('active'));
         item.classList.add('active');
+
+        // reset lọc
+        document.getElementById('advancedFilterModal').querySelectorAll('.active').forEach(el => {
+            el.classList.remove('active');
+        });
+
         loadProductsByCategory();
 
         // Cập nhật span
@@ -139,32 +150,35 @@ function getResponsiveLimit() {
 
 // hàm gán lại sự kiện cho các btn trong bộ lọc
 function attachFilterEvents() {
+
     // Thêm sự kiện gán class active khi click vào thương hiệu trong bộ lọc
     document.querySelector('.brand-wrap').addEventListener('click', function (e) {
-        if (e.target.classList.contains('brand-option')) {
+        if (e.target && e.target.classList.contains('brand-option')) {
             e.target.classList.toggle('active');
+            console.log('click brand');
         }
     });
 
-    // Gắn sự kiện cho từng nhóm lọc (packaging, size...)
+    // Gắn sự kiện cho từng nhóm lọc (dùng event delegation)
     document.querySelectorAll(".filter-group").forEach(group => {
         const type = group.getAttribute("data-type"); // single / multiple
 
-        group.querySelectorAll(".filter-option").forEach(option => {
-            option.addEventListener("click", () => {
-                if (type === "single") {
-                    // chỉ được chọn 1 => bỏ active các option khác
-                    group.querySelectorAll(".filter-option").forEach(o => o.classList.remove("active"));
-                    option.classList.add("active");
-                } else {
-                    // chọn nhiều => toggle
-                    option.classList.toggle("active");
-                }
-            });
+        group.addEventListener("click", (e) => {
+            const option = e.target.closest(".filter-option");
+            if (!option) return; // click không phải vào .filter-option thì bỏ qua
+
+            if (type === "single") {
+                // chỉ được chọn 1 => bỏ active các option khác
+                group.querySelectorAll(".filter-option").forEach(o => o.classList.remove("active"));
+                option.classList.add("active");
+            } else {
+                // chọn nhiều => toggle
+                option.classList.toggle("active");
+            }
         });
     });
 
-    // Gắn sự kiện reset **trong modal**
+    // Gắn sự kiện reset trong modal (giữ nguyên vì hợp lý)
     const modal = document.getElementById('advancedFilterModal');
     const resetBtn = modal.querySelector('.btn-reset-filters');
     if (resetBtn) {
@@ -174,11 +188,31 @@ function attachFilterEvents() {
             });
         });
     }
+
+
+    document.querySelector('.btn-filter').addEventListener('click', function () {
+        loadProductsByCategory();
+
+        // Đóng modal Bootstrap
+        const modalEl = document.getElementById('advancedFilterModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+
+    });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    attachFilterEvents();
+});
+
+let loadedCategoryId = null;
 
 function load_filter_options() {
     const categoryId = getActiveCategoryId();
-    
+    if (loadedCategoryId === categoryId) {
+        console.log(`Filter options for category ${categoryId} đã được load rồi.`);
+        return;
+    }
     fetch('../ajax/load_filter_options.php?category_id=' + categoryId)
         .then(response => response.text())
         .then(data => {
@@ -186,7 +220,8 @@ function load_filter_options() {
             document.querySelector('.brand-wrap').innerHTML = brandImageHtml;
             document.querySelector('.packaging_type-wrap').innerHTML = packagingTypeHtml;
             document.querySelector('.size-wrap').innerHTML = sizeHtml;
-            attachFilterEvents();
+            
+            loadedCategoryId = categoryId;
         })
         .catch(err => console.error('Lỗi:', err));
 }
