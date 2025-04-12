@@ -8,7 +8,7 @@
     $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
     $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $offset = ($page - 1) * $limit;
-
+    
     // Thể loại
     $categoryId = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
 
@@ -113,15 +113,16 @@
     foreach($products as $product): ?>
         <div class="p-1 ps-md-3 mb-3">
             <div class="product-item border border-2 pt-2 shadow">
-                <img alt="<?= $product['name'] ?>" class="img-fluid object-fit-contain mx-auto"
-                    src=<?= '../assets/images/SanPham/' . $product['image']?>>
-                <div class="mt-2">
-                    <p class="ellipsis-2-lines text-secondary mb-2 ms-2">
+                <img alt="<?= $product['name'] ?>" class="img-fluid object-fit-contain mx-auto product-clickable"
+                    src=<?= '../assets/images/SanPham/' . $product['image']?>
+                    data-packaging-option-id="<?= $product['packaging_option_id'] ?>" loading="lazy">
+                <div class="mt-3">
+                    <p class="ellipsis-2-lines text-secondary mb-2 ms-2 product-clickable" data-packaging-option-id="<?= $product['packaging_option_id'] ?>">
                         <?= formatProductName($product['packaging_type'], $product['unit_quantity'], $product['name']) ?>
                     </p>
                     <p class="fw-medium fs-5 ms-2"><?= number_format($product['price']) .'đ' ?></p>
                     <a class="btn-buy text-decoration-none text-black d-block w-100 text-center py-2"
-                        href="#">MUA</a>
+                        href="product_detail.php?id=<?= $product['packaging_option_id'] ?>">MUA</a>
                 </div>
             </div>
         </div>
@@ -130,7 +131,4 @@
     $productsHtml = ob_get_clean();
 
     echo $productsHtml . ($totalPages > 1 ? 'SPLIT' . $pagination->render([], 'pageproduct') : '');
-    
-
-    
 ?>

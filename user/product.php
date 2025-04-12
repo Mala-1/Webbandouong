@@ -125,8 +125,7 @@
                 </div>
             </div>
 
-
-            <div class="border bg-white">
+            <div id="productScrollWrapper" class="border bg-white">
                 <div class="product-wrap row row-cols-2 row-cols-md-4 row-cols-xl-5 p-3 g-0">
 
                     <!-- <div class="p-1 ps-md-3">

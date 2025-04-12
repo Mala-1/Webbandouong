@@ -35,7 +35,7 @@ class Pagination
                 -moz-appearance: textfield;
             }
         </style>
-        <section class="phantrang py-4 data-target="' . $target . '"">
+        <section class="phantrang py-3" data-target="' . $target . '">
             <div class="">
                 <div class="row justify-content-center">
                     <div class="col-auto text-center d-flex align-items-center gap-3">
@@ -57,7 +57,7 @@ class Pagination
                     </div>
                 </div>
             </div>
-        </section> ';
+        </section>';
         return $html;
     }
 }

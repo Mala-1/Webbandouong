@@ -74,39 +74,29 @@ function getActiveCategoryId() {
     return activeItem ? activeItem.getAttribute('data-category-id') : 1;
 }
 
-function loadProductsByCategory(page = 1) {
+function loadProductsByCategory(page = 1, params = "") {
     const categoryId = getActiveCategoryId();
     const limit = getResponsiveLimit();
     const productWrap = document.querySelector('.product-wrap');
     const paginationWrap = document.querySelector('.pagination-wrap');
 
-    const selectedSort = document.querySelector('.filter-group[data-type="single"] .filter-option.active')?.dataset.sort || '';
-    const selectedBrands = Array.from(document.querySelectorAll('.brand-wrap .brand-option.active')).map(img => img.getAttribute('data-brand-id') || '');
-    const selectedPackaging = Array.from(document.querySelectorAll('.packaging_type-wrap .filter-option.active')).map(el => el.getAttribute('data-packaging-type') || '');
-    const selectedSizes = Array.from(document.querySelectorAll('.size-wrap .filter-option.active')).map(el => el.getAttribute('data-size') || '');
+    productWrap.innerHTML = '<div class="text-center py-5 d-flex align-items-center justify-content-center"><div class="spinner-border me-2"></div>Đang tải dữ liệu</div>';
 
 
-    // ✅ Chuyển mảng sang chuỗi để gửi qua GET (dùng encodeURIComponent để an toàn)
-    const brandsParam = encodeURIComponent(JSON.stringify(selectedBrands));
-    const packagingParam = encodeURIComponent(JSON.stringify(selectedPackaging));
-    const sizesParam = encodeURIComponent(JSON.stringify(selectedSizes));
-    const sortParam = encodeURIComponent(selectedSort);
+    setTimeout(() => {
+        fetch('../ajax/product_ajax.php?category_id=' + categoryId + '&limit=' + limit + '&page=' + page + params)
+            .then(response => response.text())
+            .then(data => {
+                const parts = data.split('SPLIT');
+                productWrap.innerHTML = parts[0] || '';
+                paginationWrap.innerHTML = parts[1] || '';
 
-    const url = `../ajax/product_ajax.php?category_id=${categoryId}&limit=${limit}&page=${page}&sort=${sortParam}&brands=${brandsParam}&packaging=${packagingParam}&sizes=${sizesParam}`;
-
-    fetch(url)
-        .then(response => response.text())
-        .then(data => {
-            const parts = data.split('SPLIT');
-            const html = parts[0] || ''; // nếu không có thì dùng chuỗi rỗng
-            const pagination = parts[1] || ''; // nếu không có thì dùng chuỗi rỗng
-            productWrap.innerHTML = html;
-            paginationWrap.innerHTML = pagination;
-
-        })
-        .catch(err => console.error('Lỗi:', err));
+            })
+            .catch(err => console.error('Lỗi:', err));
+    }, 100); // 1000ms = 1 giây
 }
 
+// loadProductsByCategory();
 
 
 document.querySelectorAll('.category').forEach(item => {
@@ -191,7 +181,20 @@ function attachFilterEvents() {
 
 
     document.querySelector('.btn-filter').addEventListener('click', function () {
-        loadProductsByCategory();
+        const selectedSort = document.querySelector('.filter-group[data-type="single"] .filter-option.active')?.dataset.sort || '';
+        const selectedBrands = Array.from(document.querySelectorAll('.brand-wrap .brand-option.active')).map(img => img.getAttribute('data-brand-id') || '');
+        const selectedPackaging = Array.from(document.querySelectorAll('.packaging_type-wrap .filter-option.active')).map(el => el.getAttribute('data-packaging-type') || '');
+        const selectedSizes = Array.from(document.querySelectorAll('.size-wrap .filter-option.active')).map(el => el.getAttribute('data-size') || '');
+
+
+        // ✅ Chuyển mảng sang chuỗi để gửi qua GET (dùng encodeURIComponent để an toàn)
+        const brandsParam = encodeURIComponent(JSON.stringify(selectedBrands));
+        const packagingParam = encodeURIComponent(JSON.stringify(selectedPackaging));
+        const sizesParam = encodeURIComponent(JSON.stringify(selectedSizes));
+        const sortParam = encodeURIComponent(selectedSort);
+
+        let params = '&sort=' + sortParam + '&brands=' + brandsParam + ' &packaging=' + packagingParam + '&sizes=' + sizesParam;
+        loadProductsByCategory(1, params);
 
         // Đóng modal Bootstrap
         const modalEl = document.getElementById('advancedFilterModal');
@@ -203,6 +206,7 @@ function attachFilterEvents() {
 
 document.addEventListener('DOMContentLoaded', function () {
     attachFilterEvents();
+
 });
 
 let loadedCategoryId = null;
@@ -220,7 +224,7 @@ function load_filter_options() {
             document.querySelector('.brand-wrap').innerHTML = brandImageHtml;
             document.querySelector('.packaging_type-wrap').innerHTML = packagingTypeHtml;
             document.querySelector('.size-wrap').innerHTML = sizeHtml;
-            
+
             loadedCategoryId = categoryId;
         })
         .catch(err => console.error('Lỗi:', err));
@@ -228,4 +232,22 @@ function load_filter_options() {
 
 document.getElementById('advancedFilterModal').addEventListener('show.bs.modal', function () {
     load_filter_options();
+});
+
+
+// click sản phẩm
+const productWrap = document.querySelector('.product-wrap');
+
+productWrap.addEventListener('click', function (event) {
+    // Kiểm tra xem phần tử được click hoặc phần tử cha gần nhất có class .product-clickable không
+    const target = event.target.closest('.product-clickable');
+
+    // Nếu có và nằm trong productWrap thì xử lý
+    if (target && productWrap.contains(target)) {
+        const packaging_option_id = target.getAttribute('data-packaging-option-id');
+        if (packaging_option_id) {
+            console.log('h')
+            window.location.href = 'login.php';
+        }
+    }
 });

@@ -1,49 +1,46 @@
 // pagination.js
 
-function initPaginationEvents() {
+let paginationHandlerAttached = false;
+
+function attachGlobalPaginationEvents() {
+  if (paginationHandlerAttached) return; // Chặn gắn trùng
+  paginationHandlerAttached = true;
+
+  document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".page-link-custom");
     const container = document.querySelector(".phantrang");
-    if (!container) return;
-  
-    container.querySelectorAll(".page-link-custom").forEach(link => {
-      link.addEventListener("click", function (e) {
-        e.preventDefault();
-        const page = parseInt(this.dataset.page);
-        const target = container.dataset.target || "pageproduct";
-  
-        document.dispatchEvent(new CustomEvent("pagination:change", {
-          detail: { page, target }
-        }));
-      });
-    });
-  
-    const input = container.querySelector("#pageInput");
-    if (input) {
-      input.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          let page = parseInt(this.value);
-          const max = parseInt(this.max);
-          if (isNaN(page) || page < 1) page = 1;
-          if (page > max) page = max;
-  
-          const target = container.dataset.target || "pageproduct";
-  
-          document.dispatchEvent(new CustomEvent("pagination:change", {
-            detail: { page, target }
-          }));
-        }
-      });
+
+    if (btn && container && container.contains(btn)) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const page = parseInt(btn.dataset.page || "1");
+      const target = container.dataset.target || "pageproduct";
+
+      console.log("[DEBUG] Delegated click:", page);
+
+      document.dispatchEvent(new CustomEvent("pagination:change", {
+        detail: { page, target }
+      }));
     }
-  }
-  
-  // Tự động kích hoạt sau khi DOM load hoặc sau khi innerHTML render lại
-  function autoInitPagination() {
-    initPaginationEvents();
-    const observer = new MutationObserver(() => {
-      initPaginationEvents();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
-  
-  document.addEventListener("DOMContentLoaded", autoInitPagination);
-  
+  }, true);
+
+  document.addEventListener("keypress", function (e) {
+    if (e.target && e.target.id === "pageInput" && e.key === "Enter") {
+      e.preventDefault();
+      const page = parseInt(e.target.value);
+      const max = parseInt(e.target.max);
+      const validPage = isNaN(page) || page < 1 ? 1 : (page > max ? max : page);
+
+      const container = document.querySelector(".phantrang");
+      const target = container?.dataset.target || "pageproduct";
+
+      document.dispatchEvent(new CustomEvent("pagination:change", {
+        detail: { page: validPage, target }
+      }));
+    }
+  });
+}
+
+// Gắn 1 lần duy nhất khi DOM ready
+document.addEventListener("DOMContentLoaded", attachGlobalPaginationEvents);

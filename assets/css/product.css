@@ -28,11 +28,19 @@ body {
 }
 
 .product-item {
-    cursor: pointer;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
+}
+
+.product-item img {
+    cursor: pointer;
+}
+
+.product-item p:first-child:hover {
+    cursor: pointer;
+    color: #1a1919 !important;
 }
 
 .btn-buy {
