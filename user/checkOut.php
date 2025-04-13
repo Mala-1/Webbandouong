@@ -6,16 +6,8 @@
   <title>Thanh toán đơn hàng</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { background-color: #f8f9fa; }
-    .payment-card {
-      max-width: 800px; margin: 40px auto;
-      padding: 20px; border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      background-color: #fff;
-    }
-    .product-img { max-width: 80px; height: auto; }
-  </style>
+  <!-- Custom CSS -->
+  <link href="../assets/css/checkOut.css" rel="stylesheet">
 </head>
 <body>
   <div class="container">
@@ -80,48 +72,7 @@
 
   <!-- Bootstrap JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // 1. Lấy dữ liệu từ localStorage
-      const itemsJson = localStorage.getItem("checkoutItems");
-      if (!itemsJson) {
-        alert("Không tìm thấy thông tin đơn hàng. Vui lòng quay lại giỏ hàng.");
-        window.location.href = "cart.html";
-        return;
-      }
-      const items = JSON.parse(itemsJson);
-
-      // 2. Render bảng đơn hàng
-      const tbody = document.getElementById("order-table");
-      let total = 0;
-      items.forEach((item, idx) => {
-        total += item.subtotal;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><img src="${item.image}" alt="${item.name}" class="img-thumbnail product-img"></td>
-          <td>${item.name}</td>
-          <td>${item.quantity}</td>
-          <td>${item.price.toLocaleString()} VND</td>
-          <td><strong>${item.subtotal.toLocaleString()} VND</strong></td>
-        `;
-        tbody.appendChild(tr);
-
-        // Tạo hidden inputs để gửi lên server
-        const hiddenDiv = document.getElementById("hidden-items");
-        hiddenDiv.innerHTML += `
-          <input type="hidden" name="items[${idx}][id]" value="${item.id}">
-          <input type="hidden" name="items[${idx}][name]" value="${item.name}">
-          <input type="hidden" name="items[${idx}][price]" value="${item.price}">
-          <input type="hidden" name="items[${idx}][quantity]" value="${item.quantity}">
-        `;
-      });
-
-      // 3. Hiển thị tổng
-      document.getElementById("order-total").innerText = total.toLocaleString();
-
-      // 4. (Tuỳ chọn) Xoá dữ liệu giỏ hàng đã chuyển
-      // localStorage.removeItem("checkoutItems");
-    });
-  </script>
+  <!-- Custom JS -->
+  <script src="../assets/javascript/checkOut.js"></script>
 </body>
 </html>

@@ -110,6 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     localStorage.setItem("checkoutItems", JSON.stringify(itemsToCheckout));
-    window.location.href = "payment.html";
+    window.location.href = "checkOut.php";
   });
 });
