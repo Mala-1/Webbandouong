@@ -138,7 +138,7 @@ body {
 }
 
 .filter-option.active {
-    background-color: #007bff;
+    background-color: #27282b;
     color: white;
-    border-color: #007bff;
+    border-color: #27282b;
 }

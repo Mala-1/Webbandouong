@@ -14,7 +14,7 @@
 
 <body>
     <?php
-    require_once '../includes/DBConnect.php';
+    require_once './includes/DBConnect.php';
 
     $db = DBConnect::getInstance();
 
@@ -22,7 +22,6 @@
 
 
     ?>
-    <?php include("../includes/header.php"); ?>
     <div class="wrap flex-grow-1 py-4">
         <div class="container">
             <!-- Thể loại -->
@@ -151,12 +150,9 @@
             </div>
         </div>
     </div>
-
-    <script src="../assets/bootstrap/js/bootstrap.min.js"> </script>
+    
     <script src="../assets/javascript/product.js"></script>
     <script src="../assets/javascript/pagination.js"></script>
-
-    <?php include '../includes/footer.php' ?>
 </body>
 
 </html>

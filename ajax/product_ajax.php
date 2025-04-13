@@ -73,7 +73,7 @@
                                 ELSE po.price
                             END AS price
                         FROM products p
-                        JOIN packaging_options po ON po.product_id = p.product_id
+                        LEFT JOIN packaging_options po ON po.product_id = p.product_id
                         WHERE $whereSql
                         $sapXep
                         LIMIT $limit OFFSET $offset", $params);
@@ -95,14 +95,13 @@
 
     function formatProductName($packaging_type, $unit_quantity,$product_name) {
         $packaging = trim($packaging_type . ' ' . $unit_quantity);
-    
         // Loại trùng nếu packaging_type đã nằm trong unit_quantity
         if (stripos($unit_quantity, $packaging_type) !== false) {
             $packaging = $unit_quantity;
         }
-    
+        
         // Với unit_quantity là "1 lon", "1 chai", có thể tối giản
-        if (preg_match('/^1\s+\w+$/', $unit_quantity)) {
+        if (preg_match('/^1\s+[[:alpha:]]+$/u', $unit_quantity)) {
             $packaging = $packaging_type; // chỉ in "Lon" hoặc "Chai"
         }
     
@@ -117,7 +116,7 @@
                     src=<?= '../assets/images/SanPham/' . $product['image']?>
                     data-packaging-option-id="<?= $product['packaging_option_id'] ?>" loading="lazy">
                 <div class="mt-3">
-                    <p class="ellipsis-2-lines text-secondary mb-2 ms-2 product-clickable" data-packaging-option-id="<?= $product['packaging_option_id'] ?>">
+                    <p class="text-capitalize ellipsis-2-lines text-secondary mb-2 mx-2 product-clickable" data-packaging-option-id="<?= $product['packaging_option_id'] ?>">
                         <?= formatProductName($product['packaging_type'], $product['unit_quantity'], $product['name']) ?>
                     </p>
                     <p class="fw-medium fs-5 ms-2"><?= number_format($product['price']) .'đ' ?></p>

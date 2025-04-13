@@ -74,6 +74,8 @@ function getActiveCategoryId() {
     return activeItem ? activeItem.getAttribute('data-category-id') : 1;
 }
 
+let currentFilterParams = "";
+
 function loadProductsByCategory(page = 1, params = "") {
     const categoryId = getActiveCategoryId();
     const limit = getResponsiveLimit();
@@ -122,7 +124,7 @@ document.addEventListener("pagination:change", function (e) {
     const { page, target } = e.detail;
 
     if (target === "pageproduct") {
-        loadProductsByCategory(page);
+        loadProductsByCategory(page, currentFilterParams);
     }
 
     // Add more targets as needed
@@ -193,8 +195,8 @@ function attachFilterEvents() {
         const sizesParam = encodeURIComponent(JSON.stringify(selectedSizes));
         const sortParam = encodeURIComponent(selectedSort);
 
-        let params = '&sort=' + sortParam + '&brands=' + brandsParam + ' &packaging=' + packagingParam + '&sizes=' + sizesParam;
-        loadProductsByCategory(1, params);
+        currentFilterParams = '&sort=' + sortParam + '&brands=' + brandsParam + ' &packaging=' + packagingParam + '&sizes=' + sizesParam;
+        loadProductsByCategory(1, currentFilterParams);
 
         // Đóng modal Bootstrap
         const modalEl = document.getElementById('advancedFilterModal');
@@ -203,6 +205,7 @@ function attachFilterEvents() {
 
     });
 }
+
 
 document.addEventListener('DOMContentLoaded', function () {
     attachFilterEvents();
