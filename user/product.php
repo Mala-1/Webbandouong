@@ -79,10 +79,10 @@
                                 <div class="mb-3">
                                     <label class="fw-bold">Sắp xếp sản phẩm</label>
                                     <div class="d-flex flex-wrap gap-2 mt-2 filter-group" data-type="single">
-                                        <div class="btn btn-outline-secondary filter-option" data-sort="desc"
+                                        <div class="btn filter-option" data-sort="desc"
                                             style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
                                             Giá cao đến thấp</div>
-                                        <div class="btn btn-outline-secondary filter-option" data-sort="asc"
+                                        <div class="btn filter-option" data-sort="asc"
                                             style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
                                             Giá thấp đến cao</div>
                                     </div>
@@ -106,10 +106,18 @@
                                 <!-- Thể tích -->
                                 <div class="mb-3">
                                     <label class="fw-bold">Thể tích</label>
-                                    <div class="size-wrap d-flex gap-2 mt-2 filter-group" data-type="multiple">
-                                        <!-- <div class="btn btn-outline-secondary filter-option"
+                                    <div class="size-wrap d-flex gap-2 mt-2 filter-group" data-type="single">
+                                        <div class="btn filter-option" data-size="1"
                                             style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
-                                            330ml</div> -->
+                                            Dưới 500ml</div>
+
+                                        <div class="btn filter-option" data-size="2"
+                                            style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
+                                            500ml - 1 lít</div>
+
+                                        <div class="btn filter-option" data-size="3"
+                                            style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
+                                            Trên 1 lít</div>
                                     </div>
                                 </div>
                             </div>
@@ -150,7 +158,7 @@
             </div>
         </div>
     </div>
-    
+
     <script src="../assets/javascript/product.js"></script>
     <script src="../assets/javascript/pagination.js"></script>
 </body>

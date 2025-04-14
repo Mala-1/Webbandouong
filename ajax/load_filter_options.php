@@ -29,19 +29,11 @@ $packagingTypes = $db->select(
     [$categoryId]
 );
 
-// Lấy các size khác nhau
-$sizes = $db->select(
-    "SELECT DISTINCT p.size
-     FROM products p
-     WHERE p.category_id = ?", 
-    [$categoryId]
-);
-
 
 ob_start();
 foreach ($category_brandImage as $item): ?>
     <img class="brand-option p-1"
-        src="<?= '../assets/images/Brand/' . $item['brand_image'] ?>"
+        src="<?= '../assets/images/Brand/' . $item['brand_image'] ?>" alt="<?= $item['brand_name'] ?>"
         style="height: 50px; cursor:pointer;" data-brand-id="<?= $item['brand_id'] ?>" />
 <?php endforeach;
 
@@ -49,7 +41,7 @@ $brandImageHtml = ob_get_clean();
 
 ob_start();
 foreach($packagingTypes as $p): ?>
-    <div class="btn btn-outline-secondary filter-option" data-packaging-type="<?= $p['packaging_type'] ?>"
+    <div class="btn filter-option" data-packaging-type="<?= $p['packaging_type'] ?>"
     style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
         Dạng <?= $p['packaging_type'] ?>
     </div>
@@ -57,16 +49,6 @@ foreach($packagingTypes as $p): ?>
 
 $packagingTypeHtml = ob_get_clean();
 
-ob_start();
-foreach($sizes as $s): ?>
-    <div class="btn btn-outline-secondary filter-option" data-size="<?= $s['size'] ?>"
-        style="cursor:pointer; border:1px solid #ccc; padding:6px 12px; border-radius:4px; display:inline-block;">
-        <?= $s['size'] ?>
-    </div>
-<?php endforeach;
-
-$sizeHtml = ob_get_clean();
-
-echo $brandImageHtml . 'SPLIT' . $packagingTypeHtml . 'SPLIT' . $sizeHtml;
+echo $brandImageHtml . 'SPLIT' . $packagingTypeHtml;
 
 ?>

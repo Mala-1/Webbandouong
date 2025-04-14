@@ -119,8 +119,6 @@ body {
     border: 2.5px solid #2e3135 !important;
     box-shadow: 0 0 10px rgba(73, 80, 87, 0.3) !important;
     border-radius: 4px;
-    transition: all 0.15s ease;
-    transform: scale(1.02);
 }
 
 
@@ -141,4 +139,5 @@ body {
     background-color: #27282b;
     color: white;
     border-color: #27282b;
+    font-weight: 600;
 }

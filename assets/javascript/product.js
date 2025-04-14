@@ -226,7 +226,6 @@ function load_filter_options() {
             let [brandImageHtml, packagingTypeHtml, sizeHtml] = data.split('SPLIT');
             document.querySelector('.brand-wrap').innerHTML = brandImageHtml;
             document.querySelector('.packaging_type-wrap').innerHTML = packagingTypeHtml;
-            document.querySelector('.size-wrap').innerHTML = sizeHtml;
 
             loadedCategoryId = categoryId;
         })
