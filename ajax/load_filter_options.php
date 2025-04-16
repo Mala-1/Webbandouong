@@ -11,8 +11,7 @@ $categoryId = isset($_GET['category_id']) ? (int)$_GET['category_id'] : 1;
 
 $sql = "SELECT DISTINCT
             b.brand_id,
-            b.name AS brand_name,
-            b.image AS brand_image
+            b.name AS brand_name
         FROM products p
         JOIN brand b ON p.brand_id = b.brand_id
         WHERE p.category_id = ?";
