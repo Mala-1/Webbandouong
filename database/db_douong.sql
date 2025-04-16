@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 13, 2025 at 06:32 PM
+-- Generation Time: Apr 16, 2025 at 04:09 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -100,10 +100,51 @@ INSERT INTO `brand` (`brand_id`, `name`, `image`) VALUES
 (60, 'nescafe', 'nescafe-14032021235351.jpg'),
 (61, 'vinacafe', 'vinacafe-13032021142756.jpg'),
 (62, 'g7', 'g7-05042021145038.jpg'),
-(63, 'wake-up', 'wake-up-1503202185914.jpg-1503202185914.jpg'),
+(63, 'wake-up', 'wake-up-1503202185914.jpg'),
 (64, 'trung-nguyen', 'trung-nguyen-0504202116614.jpg'),
 (65, 'maccoffee', 'maccoffee-13032021225237.jpg'),
 (66, 'ong-bau', 'ong-bau-22032021132457.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart`
+--
+
+CREATE TABLE `cart` (
+  `cart_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cart`
+--
+
+INSERT INTO `cart` (`cart_id`, `user_id`, `created_at`) VALUES
+(1, 7, '2025-04-16 09:08:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cart_details`
+--
+
+CREATE TABLE `cart_details` (
+  `cart_detail_id` int(11) NOT NULL,
+  `cart_id` int(11) DEFAULT NULL,
+  `packaging_option_id` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
+  `total_price` decimal(10,2) GENERATED ALWAYS AS (`price` * `quantity`) STORED
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cart_details`
+--
+
+INSERT INTO `cart_details` (`cart_detail_id`, `cart_id`, `packaging_option_id`, `quantity`, `price`) VALUES
+(1, 1, 2, 12, 110000.00);
 
 -- --------------------------------------------------------
 
@@ -1604,7 +1645,12 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `phone`, `addre
 (3, 'staff3', '$2y$10$AKcM35.6o7Dk0Jd5ujbQdOyaT9aS2o1X6Fh5TOLZDPjUkB4ScwArW', 'staff3@example.com', '0900000003', 'Đà Nẵng', 4),
 (4, 'staff4', '$2y$10$Ru6hDniEHFZsQT7EVWeRReGRQZcK4UeS81n3qsNYBb6FxmdTXxU6a', 'staff4@example.com', '0900000004', 'Cần Thơ', 4),
 (5, 'staff5', '$2y$10$9z8hF1DJE1E2zJ0k7OZLqOYKUfxksTI7Hg3mN8KyULfxy27RlVOt2', 'staff5@example.com', '0900000005', 'Hải Phòng', 4),
-(6, 'staff6', '$2y$10$SxN81AxBejC/dEgeU5Tfqu0fzqlFEGRkxFgmCkKPvWIv97XYLRi8K', 'staff6@example.com', '0900000006', 'Huế', 4);
+(6, 'staff6', '$2y$10$SxN81AxBejC/dEgeU5Tfqu0fzqlFEGRkxFgmCkKPvWIv97XYLRi8K', 'staff6@example.com', '0900000006', 'Huế', 4),
+(7, 'user1', '$2y$10$qGUuz0BD.7XtKHXLc03nDOa1tMHPgVDEkU4BiwCTKQ1YZJQHURtJK', 'user1@example.com', '0123456781', 'Address 1', 1),
+(8, 'user2', '$2y$10$D0jTe9e2zEvM7BIrCPvBpeXqkSfx1GhI/1twRaLZ7DfnHqX6SGgZW', 'user2@example.com', '0123456782', 'Address 2', 1),
+(9, 'user3', '$2y$10$TScOEql3UvUfzUEXrclmB.tvD3nVtLBN2aL0TmWQYr1PvVYJJYl5y', 'user3@example.com', '0123456783', 'Address 3', 1),
+(10, 'user4', '$2y$10$P2UE7KiONH3Ggz.9Hn9GP..Crk7SxqJ/kQ27fBkJRMj.PY9fTpmjq', 'user4@example.com', '0123456784', 'Address 4', 1),
+(11, 'user5', '$2y$10$LVY2huOvFZlpeAFESn7R4eA0r2nWHClWnCKrPCgkN99ZB0Bvdyff2', 'user5@example.com', '0123456785', 'Address 5', 1);
 
 --
 -- Indexes for dumped tables
@@ -1615,6 +1661,21 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `phone`, `addre
 --
 ALTER TABLE `brand`
   ADD PRIMARY KEY (`brand_id`);
+
+--
+-- Indexes for table `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`cart_id`),
+  ADD KEY `idx_user_id` (`user_id`);
+
+--
+-- Indexes for table `cart_details`
+--
+ALTER TABLE `cart_details`
+  ADD PRIMARY KEY (`cart_detail_id`),
+  ADD KEY `idx_cart_id` (`cart_id`),
+  ADD KEY `idx_packaging_option_id` (`packaging_option_id`);
 
 --
 -- Indexes for table `categories`
@@ -1728,6 +1789,18 @@ ALTER TABLE `brand`
   MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
+-- AUTO_INCREMENT for table `cart`
+--
+ALTER TABLE `cart`
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `cart_details`
+--
+ALTER TABLE `cart_details`
+  MODIFY `cart_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
@@ -1809,11 +1882,24 @@ ALTER TABLE `supplier`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `cart`
+--
+ALTER TABLE `cart`
+  ADD CONSTRAINT `fk_cart_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `cart_details`
+--
+ALTER TABLE `cart_details`
+  ADD CONSTRAINT `fk_cart_detail_cart` FOREIGN KEY (`cart_id`) REFERENCES `cart` (`cart_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_cart_detail_packaging` FOREIGN KEY (`packaging_option_id`) REFERENCES `packaging_options` (`packaging_option_id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `import_order`
