@@ -32,6 +32,12 @@
                         Đơn Hàng
                     </a>
                 </li>
+                <li class="nav-item fs-5">
+                    <a class="nav-link active" href="?page=donhang">
+                        <i class="fas fa-file-invoice me-2"></i>
+                        Nhà cung cấp
+                    </a>
+                </li>
                 <!-- Thêm các mục khác -->
             </ul>
         </div>
