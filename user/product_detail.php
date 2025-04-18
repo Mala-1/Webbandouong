@@ -11,11 +11,8 @@ $packagingOptionId = $_GET['packaging_option_id'] ?? 0;
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <!-- CSS riêng -->
-    <link rel="stylesheet" href="assets/css/style.css">
     <style>
         body { font-family: Arial; background: #f9f9f9; margin: 0; padding: 0; }
         .product-container { max-width: 1200px; margin: 40px auto; padding: 20px; background: #fff; display: flex; gap: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -36,7 +33,7 @@ $packagingOptionId = $_GET['packaging_option_id'] ?? 0;
 <script>
     const packagingOptionId = <?= (int)$packagingOptionId ?>;
 
-    fetch('product_detail_ajax.php', {
+    fetch('../ajax/product_detail_ajax.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'packaging_option_id=' + packagingOptionId
@@ -51,7 +48,6 @@ $packagingOptionId = $_GET['packaging_option_id'] ?? 0;
                 <div class="product-info">
                     <h1>${data.name}</h1>
                     <p class="product-price">${data.price} đ</p>
-                    <p>${data.description || 'Không có mô tả.'}</p>
                     <button class="buy-button">Thêm vào giỏ</button>
                 </div>
             `;

@@ -1,5 +1,11 @@
 <?php
+ini_set('display_errors', 1);
+
+ini_set('display_startup_errors', 1);
+
+error_reporting(E_ALL);
 require_once '../includes/DBConnect.php';
+require_once '../includes/pagination.php';
 $db = DBConnect::getInstance();
 
 $packagingOptionId = $_POST['packaging_option_id'] ?? 0;
