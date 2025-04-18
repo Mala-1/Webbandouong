@@ -46,7 +46,7 @@
         <div class="flex-fill">
             <?php
                 $page = $_GET['page'] ?? 'dashboard';
-                $allowedPages = ['dashboard', 'sanpham', 'donhang'];
+                $allowedPages = ['dashboard', 'sanpham', 'donhang', 'NCC'];
                 if (in_array($page, $allowedPages)) {
                     include "pages/{$page}.php";
                 } else {
