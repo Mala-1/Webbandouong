@@ -179,7 +179,7 @@ LIMIT 5;
                     </div>
                     <div class="col-md-6">
                         <label>Size</label>
-                        <input type="text" name="price" class="form-control" required>
+                        <input type="text" name="size" class="form-control" required>
                     </div>
                     <div class="col-md-6 d-flex flex-column">
                         <label>Loại sản phẩm</label>
@@ -193,7 +193,10 @@ LIMIT 5;
                     <div class="col-md-6 d-flex flex-column">
                         <label>Thương hiệu</label>
                         <select class="brand form-select" name="brand">
-                            <option value="0"></option>
+                            <option value=""></option>
+                            <?php foreach ($brands as $brand): ?>
+                                <option value="<?= $brand['brand_id'] ?>"><?= $brand['name'] ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="col-12">
@@ -218,14 +221,14 @@ LIMIT 5;
                             </div>
 
                             <!-- input ẩn, chỉ dùng để nhận file -->
-                            <input type="file" id="fileInput" name="images[]" multiple hidden>
+                            <input type="file" id="fileInput" name="images_hidden[]" multiple hidden accept="image/*">
                         </div>
-                        <input type="file" id="fileInputOutside" class="mt-2" multiple>
+                        <input type="file" id="fileInputOutside" class="mt-2" name="images_outside[]" multiple accept="image/*">
                     </div>
 
                     <div class="col-6">
                         <label>Đơn vị đóng gói</label>
-                        <input type="text" class="form-control">
+                        <input type="text" class="form-control" name="unit">
                     </div>
 
                     <div class="col-6">
@@ -287,6 +290,110 @@ LIMIT 5;
     </div>
 </div>
 
+<!-- Modal sửa sản phẩm -->
+<div class="modal fade" id="modalSuaSanPham" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <form class="modal-content" id="formSuaSanPham" method="POST" enctype="multipart/form-data">
+            <div class="modal-header">
+                <h5 class="modal-title">Sửa sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" name="product_id" id="sua_product_id">
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label>Tên sản phẩm</label>
+                        <input type="text" name="name" id="sua_name" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Size</label>
+                        <input type="text" name="size" id="sua_size" class="form-control" required>
+                    </div>
+
+                    <div class="col-md-6 d-flex flex-column">
+                        <label>Loại sản phẩm</label>
+                        <select class="category form-select" name="category" id="sua_category">
+                            <!-- Options sẽ được render lại -->
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 d-flex flex-column">
+                        <label>Thương hiệu</label>
+                        <select class="brand form-select" name="brand" id="sua_brand">
+                            <!-- Options sẽ được render lại -->
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label>Mô tả</label>
+                        <textarea name="description" id="sua_description" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="col-12 p-2">
+                        <div id="drop-zone-sua" class="border border-secondary border-dashed text-center p-4 rounded">
+                            <div id="drop-message-sua">
+                                <i class="fas fa-cloud-upload-alt fa-3x mb-2 text-muted"></i>
+                                <p class="text-muted m-0">Kéo thả ảnh vào đây</p>
+                            </div>
+                            <ul id="fileListSua" class="list-unstyled mt-3"></ul>
+                            <div id="imagePreviewContainerSua" class="mt-3">
+                                <img id="imagePreviewSua" src="" alt="Xem ảnh" class="img-fluid rounded shadow"
+                                    style="max-height: 300px; display: none;">
+                            </div>
+                            <input type="file" id="fileInputSua" name="images_hidden[]" multiple hidden accept="image/*">
+                        </div>
+                        <input type="file" id="fileInputOutsideSua" class="mt-2" name="images_outside[]" multiple accept="image/*">
+                    </div>
+
+                    <div class="col-6">
+                        <label>Đơn vị đóng gói</label>
+                        <input type="text" class="form-control" name="unit" id="sua_unit">
+                    </div>
+
+                    <div class="col-6">
+                        <label>Nơi sản xuất</label>
+                        <input type="text" name="origin" id="sua_origin" class="form-control">
+                    </div>
+
+                    <div class="col-12">
+                        <label>Kiểu đóng gói</label>
+                        <table class="table align-middle table-bordered">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th scope="col">Tên kiểu đóng gói</th>
+                                    <th scope="col">Số lượng trên đơn vị đóng gói</th>
+                                    <th scope="col">Ảnh</th>
+                                </tr>
+                            </thead>
+                            <tbody id="packagingBodySua">
+                                <!-- sẽ render động các dòng ở đây -->
+                                <tr id="addRowTriggerSua">
+                                    <td colspan="3">
+                                        <button class="btn btn-success" id="btnAddRowSua" type="button">
+                                            <i class="fa-solid fa-circle-plus"></i>
+                                            Thêm
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Cập nhật sản phẩm</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
 
 
 
@@ -296,6 +403,9 @@ LIMIT 5;
 <script src="../../assets/javascript/pagination.js"></script>
 
 <script>
+    const categories = <?= json_encode($categories) ?>;
+    const brands = <?= json_encode($brands) ?>;
+
     // Kích hoạt tìm kiếm trong select
     $(document).ready(function() {
         $('.categorySearch').select2({
@@ -320,51 +430,19 @@ LIMIT 5;
             allowClear: true,
             dropdownParent: $('#modalThemSanPham')
         });
+
+        $('#modalSuaSanPham .category').select2({
+            placeholder: "Chọn loại sản phẩm",
+            allowClear: true,
+            dropdownParent: $('#modalSuaSanPham')
+        });
+        $('#modalSuaSanPham .brand').select2({
+            placeholder: "Chọn thương hiệu",
+            allowClear: true,
+            dropdownParent: $('#modalSuaSanPham')
+        });
     });
 
-    $('.categorySearch').on('change', function() {
-        const categoryId = $(this).val();
-
-        fetch('ajax/get_brands_by_category.php?category_id=' + categoryId)
-            .then(res => res.json())
-            .then(brands => {
-                console.log(brands);
-                const brandSelect = document.querySelector('.brandSearch');
-                brandSelect.innerHTML = '<option value=""></option>';
-
-                brands.forEach(brand => {
-                    const option = document.createElement('option');
-                    option.value = brand.brand_id;
-                    option.textContent = brand.name;
-                    brandSelect.appendChild(option);
-                });
-
-                // Gọi lại Select2 nếu cần
-                $('.brand').val(null).trigger('change');
-            });
-    });
-
-    $('.category').on('change', function() {
-        const categoryId = $(this).val();
-
-        fetch('ajax/get_brands_by_category.php?category_id=' + categoryId)
-            .then(res => res.json())
-            .then(brands => {
-                console.log(brands);
-                const brandSelect = document.querySelector('.brand');
-                brandSelect.innerHTML = '<option value=""></option>';
-
-                brands.forEach(brand => {
-                    const option = document.createElement('option');
-                    option.value = brand.brand_id;
-                    option.textContent = brand.name;
-                    brandSelect.appendChild(option);
-                });
-
-                // Gọi lại Select2 nếu cần
-                $('.brand').val(null).trigger('change');
-            });
-    });
 
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('fileInput');
@@ -481,17 +559,21 @@ LIMIT 5;
         }
     });
 
-    document.getElementById('btnAddRow').addEventListener('click', function() {
-        const newRow = document.createElement('tr');
-        newRow.innerHTML = `
-            <td><input type="text" name="packaging_name[]" class="form-control" placeholder="Nhập kiểu đóng gói"></td>
-            <td><input type="number" name="unit_quantity[]" class="form-control" placeholder="Số lượng"></td>
-            <td><input type="file" name="packaging_image[]" class="form-control" accept="image/*"></td>
-        `;
+    document.getElementById('packagingBody').addEventListener('click', function(e) {
+        if (e.target && e.target.closest('#btnAddRow')) {
+            // ✅ Click đúng vào nút "Thêm"
 
-        const tbody = document.getElementById('packagingBody');
-        const addRowTrigger = document.getElementById('addRowTrigger');
-        tbody.insertBefore(newRow, addRowTrigger);
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><input type="text" name="packaging_name[]" class="form-control" placeholder="Nhập kiểu đóng gói"></td>
+                <td><input type="number" name="unit_quantity[]" class="form-control" placeholder="Số lượng"></td>
+                <td><input type="file" name="packaging_image[]" class="form-control" accept="image/*"></td>
+            `;
+
+            const tbody = document.getElementById('packagingBody');
+            const addRowTrigger = document.getElementById('addRowTrigger');
+            tbody.insertBefore(newRow, addRowTrigger);
+        }
     });
 
     let currentFilterParams = "";
@@ -639,19 +721,58 @@ LIMIT 5;
         e.preventDefault();
 
         const form = e.target;
-        const formData = new FormData(form);
+        const dataTransfer = new DataTransfer();
+        currentFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
 
+        const formData = new FormData(form);
         fetch('ajax/add_product.php', {
                 method: 'POST',
                 body: formData
             })
             .then(res => res.json())
             .then(data => {
+                console.log(data)
+                if (data.debug) {
+                    alert("Debug ảnh: " + data.filename);
+                    return;
+                }
                 if (data.success) {
                     alert('Thêm sản phẩm thành công!');
                     const modal = bootstrap.Modal.getInstance(document.getElementById('modalThemSanPham'));
                     modal.hide();
-                    form.reset();
+
+                    form.reset(); // Reset các input chuẩn
+
+                    // ✅ Reset vùng kéo thả ảnh
+                    currentFiles = [];
+                    fileInput.value = ""; // clear input file hidden
+                    fileList.innerHTML = "";
+                    imagePreviewContainer.style.display = "none"; // nếu bạn có hiển thị ảnh
+
+                    // ✅ Reset vùng input ngoài
+                    document.getElementById('fileInputOutside').value = "";
+
+                    // ✅ Reset drop message
+                    updateDropMessage();
+
+                    // ✅ Reset packaging table nếu có
+                    const packagingBody = document.getElementById('packagingBody');
+                    packagingBody.innerHTML = `
+                        <tr id="addRowTrigger">
+                            <td colspan="3">
+                                <button class="btn btn-success" id="btnAddRow" type="button">
+                                    <i class="fa-solid fa-circle-plus"></i> Thêm
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+
+
+                    // ✅ Reset Select2 hoặc các plugin select khác nếu có
+                    $('.category').val('').trigger('change');
+                    $('.brand').val('').trigger('change');
+
                     loadProducts(1);
                 } else {
                     alert('Thêm thất bại: ' + data.message);
@@ -661,4 +782,242 @@ LIMIT 5;
                 alert('Lỗi khi thêm: ' + err.message);
             });
     });
+
+    // Vùng xử lý kéo thả ảnh cho modal sửa
+    const dropZoneSua = document.getElementById('drop-zone-sua');
+    const fileInputSua = document.getElementById('fileInputSua');
+    const fileListSua = document.getElementById('fileListSua');
+    const dropMessageSua = document.getElementById('drop-message-sua');
+    const imagePreviewSua = document.getElementById('imagePreviewSua');
+    const imagePreviewContainerSua = document.getElementById('imagePreviewContainerSua');
+    let currentFilesSua = [];
+
+    // Kéo thả ảnh sửa
+    dropZoneSua.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZoneSua.classList.add('dragover');
+    });
+    dropZoneSua.addEventListener('dragleave', () => {
+        dropZoneSua.classList.remove('dragover');
+    });
+    dropZoneSua.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZoneSua.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        handleFilesSua(files);
+    });
+
+    function handleFilesSua(files) {
+        currentFilesSua = [];
+        fileListSua.innerHTML = '';
+        Array.from(files).forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            currentFilesSua.push(file);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreviewSua.src = e.target.result;
+                imagePreviewSua.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+        dropMessageSua.style.display = 'none';
+    }
+
+    function removeFileSua(index) {
+        // Nếu bạn muốn xoá trong `currentFilesSua` thì thêm xử lý tại đây
+        // Với ảnh đã có sẵn thì chỉ cần xoá khỏi giao diện thôi
+        const listItems = fileListSua.querySelectorAll('li');
+        if (listItems[index]) listItems[index].remove();
+    }
+
+
+    // Click nút chi tiết sản phẩm (icon sửa)
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-sua-sanpham');
+        if (!btn) return;
+
+        const categoryId = btn.dataset.category;
+        const brandId = btn.dataset.brand;
+
+        // --- Gán danh sách category ---
+        const categorySelect = document.getElementById('sua_category');
+        categorySelect.innerHTML = '<option value=""></option>';
+        categories.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.category_id;
+            opt.textContent = c.name;
+            categorySelect.appendChild(opt);
+        });
+        // Gán giá trị + trigger Select2
+        $('#sua_category').val(categoryId).trigger('change');
+
+        // --- Gán danh sách brand ---
+        const brandSelect = document.getElementById('sua_brand');
+        brandSelect.innerHTML = '<option value=""></option>';
+        brands.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.brand_id;
+            opt.textContent = b.name;
+            brandSelect.appendChild(opt);
+        });
+        // Gán giá trị + trigger Select2
+        $('#sua_brand').val(brandId).trigger('change');
+
+
+        let packaging = [];
+        try {
+            packaging = JSON.parse(btn.dataset.packaging || "[]");
+            console.log("packaging decoded:", packaging);
+        } catch (e) {
+            console.error("Không thể parse packaging:", e);
+        }
+        const tbody = document.getElementById('packagingBodySua');
+        tbody.innerHTML = ''; // Clear cũ
+        // console.log("raw data-packaging = ", btn.dataset.packaging);
+        console.log("packaging decoded:", packaging);
+
+
+        packaging.forEach(option => {
+            // Tách số và chữ ra
+            const raw = option.unit_quantity + '';
+            const number = parseInt(raw); // Lấy phần số
+            const unit = raw.replace(/\d+/g, '').trim(); // Lấy phần chữ (nếu có)
+            if(number !== 1) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <input type="hidden" name="packaging_option_id[]" value="${option.packaging_option_id}">
+                    <td><input type="text" name="packaging_name[]" class="form-control" value="${option.packaging_type}"></td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <input type="number" name="unit_quantity[]" class="form-control" value="${number}">
+                        </div>
+                    </td>
+                    <td class="d-flex">
+                        ${option.image ? `<img src="/assets/images/SanPham/${option.image}" style="width: 50px;">` : ''}
+                        <input type="file" name="packaging_image[]" class="form-control mt-2">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+
+            }
+        });
+
+        const addRowTrigger = document.createElement('tr');
+        addRowTrigger.id = 'addRowTriggerSua';
+        addRowTrigger.innerHTML = `<td colspan="3"><button class="btn btn-success" id="btnAddRowSua" type="button"><i class="fa-solid fa-circle-plus"></i> Thêm</button></td>`;
+        tbody.appendChild(addRowTrigger);
+
+
+        // Gán các input còn lại
+        document.getElementById('sua_product_id').value = btn.dataset.id;
+        document.getElementById('sua_name').value = btn.dataset.name;
+        document.getElementById('sua_size').value = btn.dataset.size;
+        document.getElementById('sua_origin').value = btn.dataset.origin;
+        document.getElementById('sua_description').value = btn.dataset.description;
+        document.getElementById('sua_unit').value = btn.dataset.unit;
+
+        // Reset ảnh cũ
+        currentFilesSua = [];
+        fileInputSua.value = "";
+        fileListSua.innerHTML = "";
+        imagePreviewSua.style.display = 'none';
+        dropMessageSua.style.display = 'block';
+
+        const images = JSON.parse(btn.dataset.images || '[]');
+        if (images.length > 0) {
+            images.forEach((imgName, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                <input type="hidden" name="old_images[]" value="${imgName}">
+                <a href="#" class="file-link text-primary text-decoration-underline" data-src="/assets/images/SanPham/${imgName}">
+                    ${imgName}
+                </a>
+                <button type="button" class="btn btn-close" onclick="removeFileSua(${index})"></button>
+            `;
+                fileListSua.appendChild(li);
+            });
+        }
+
+        // Mở modal sửa
+        const modal = new bootstrap.Modal(document.getElementById('modalSuaSanPham'));
+        modal.show();
+    });
+
+
+    // Gán sự kiện thêm dòng đóng gói (event delegation)
+    document.getElementById('packagingBodySua').addEventListener('click', function(e) {
+        if (e.target.closest('#btnAddRowSua')) {
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+      <td><input type="text" name="packaging_name[]" class="form-control"></td>
+      <td><input type="text" name="unit_quantity[]" class="form-control"></td>
+      <td><input type="file" name="packaging_image[]" class="form-control" accept="image/*"></td>
+    `;
+            this.insertBefore(newRow, document.getElementById('addRowTriggerSua'));
+        }
+    });
+
+    // Submit form sửa
+    document.getElementById('formSuaSanPham').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Gán lại file kéo thả vào input ẩn
+        const dt = new DataTransfer();
+        currentFilesSua.forEach(file => dt.items.add(file));
+        fileInputSua.files = dt.files;
+
+        const formData = new FormData(this);
+
+        fetch('ajax/update_product.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Cập nhật thành công!');
+                    bootstrap.Modal.getInstance(document.getElementById('modalSuaSanPham')).hide();
+                    this.reset();
+                    currentFilesSua = [];
+                    loadProducts(1); // Cập nhật lại danh sách sản phẩm
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(err => {
+                alert('Lỗi khi gửi form: ' + err.message);
+            });
+    });
+
+    document.getElementById('fileInputOutsideSua').addEventListener('change', function() {
+        handleFilesSua(this.files);
+    });
+
+    function handleFilesSua(files) {
+        Array.from(files).forEach((file, index) => {
+            if (!file.type.startsWith('image/')) return;
+
+            currentFilesSua.push(file);
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                <a href="#" class="file-link text-primary text-decoration-underline" data-src="${e.target.result}">
+                    ${file.name}
+                </a>
+                <button type="button" class="btn btn-close" onclick="removeFileSua(${currentFilesSua.length - 1})"></button>
+            `;
+                fileListSua.appendChild(li);
+
+                // Chỉ hiển thị preview nếu chưa có ảnh hiển thị
+                if (imagePreviewSua.style.display === 'none') {
+                    imagePreviewSua.src = e.target.result;
+                    // imagePreviewSua.style.display = 'block';
+                    // dropMessageSua.style.display = 'none';
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 </script>
