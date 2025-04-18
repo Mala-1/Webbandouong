@@ -111,8 +111,8 @@ $grandTotal = $_SESSION['grandTotal'] ?? 0;
         // Hiển thị thông báo thanh toán thành công
         alert('Bạn đã thanh toán thành công!');
 
-        // Tùy chọn: Reset form hoặc thực hiện hành động khác
-        this.reset();
+        // Chuyển hướng về trang giỏ hàng
+        window.location.href = 'Cart.php';
     });
   </script>
 </body>
