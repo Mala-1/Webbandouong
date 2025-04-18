@@ -1,4 +1,3 @@
-
 <link href="../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
 <!-- Font Awesome -->
@@ -24,7 +23,8 @@
             <ul class="navbar-nav ms-auto me-3">
                 <li class="nav-item"><a class="nav-link" href="../index.php">Trang chủ</a></li>
                 <li class="nav-item"><a class="nav-link" href="../user/product.php">Sản phẩm</a></li>
-                <li class=" nav-item"><a class="nav-link" href="orders.php">Giỏ hàng</a></li>
+                <li class="nav-item"><a class="nav-link" href="orders.php">Giỏ hàng</a></li>
+                <li class="nav-item"><a class="nav-link" href="user/Cart.php">Giỏ hàng</a></li>
             </ul>
 
             <!-- 🔍 Thanh tìm kiếm -->
