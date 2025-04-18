@@ -12,8 +12,35 @@ $offset = ($page - 1) * $limit;
 // Thể loại
 $categoryId = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
 
-$whereClauses = ['p.category_id = ?'];
-$params = [$categoryId];
+$product_name = trim($_GET['product_name'] ?? '');
+$categoryFilter = $_GET['category'] ?? '';
+$minPrice = $_GET['min_price'] ?? '';
+$maxPrice = $_GET['max_price'] ?? '';
+
+
+$whereClauses = [];
+$params = [];
+
+$effectiveCategory = !empty($categoryFilter) ? $categoryFilter : $categoryId;
+if (!empty($effectiveCategory)) {
+    $whereClauses[] = 'p.category_id = ?';
+    $params[] = $effectiveCategory;
+}
+
+if (!empty($product_name)) {
+    $whereClauses[] = '(p.name LIKE ?)';
+    $params[] = "%$product_name%";
+}
+
+if (is_numeric($minPrice)) {
+    $whereClauses[] = '(CASE WHEN po.price > 0 THEN po.price ELSE p.price END) >= ?';
+    $params[] = $minPrice;
+}
+
+if (is_numeric($maxPrice)) {
+    $whereClauses[] = '(CASE WHEN po.price > 0 THEN po.price ELSE p.price END) <= ?';
+    $params[] = $maxPrice;
+}
 
 // Lọc
 $sort = $_GET['sort'] ?? '';
