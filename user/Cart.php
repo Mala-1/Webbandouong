@@ -1,42 +1,39 @@
 <?php
+session_start(); // Start session to store cart data
 require_once '../includes/config.php'; // Kết nối DB
 
-// Đường dẫn file dữ liệu mẫu
-$filePath   = __DIR__ . '/duLieuMau.txt';
 $cartItems  = [];
 $grandTotal = 0;
 
-if (file_exists($filePath)) {
-    $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        list($prodId, $qty) = array_map('trim', explode(',', $line));
-        $prodId = (int)$prodId;
-        $qty    = (int)$qty;
-        if ($prodId <= 0 || $qty <= 0) continue;
+// Fetch cart details for user_id = 7
+$userId = 7;
+$stmt = $pdo->prepare(
+    'SELECT cd.cart_detail_id, cd.quantity, CONCAT(po.packaging_type, " ", po.unit_quantity, " ", p.name) AS product_name, po.price, pi.image
+     FROM cart c
+     JOIN cart_details cd ON c.cart_id = cd.cart_id
+     JOIN packaging_options po ON cd.packaging_option_id = po.packaging_option_id
+     JOIN products p ON po.product_id = p.product_id
+     JOIN product_images pi ON p.product_id = pi.product_id
+     WHERE c.user_id = ?'
+);
+$stmt->execute([$userId]);
+$cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Lấy thông tin sản phẩm và 1 ảnh đầu tiên từ product_images
-        $stmt = $pdo->prepare(
-            'SELECT p.product_id AS id, p.name, p.price,
-                    pi.image
-             FROM products p
-             LEFT JOIN product_images pi
-               ON pi.product_id = p.product_id
-             WHERE p.product_id = ?
-             ORDER BY pi.image_id ASC
-             LIMIT 1'
-        );
-        $stmt->execute([$prodId]);
-        $product = $stmt->fetch();
-
-        if ($product) {
-            // Xây đường dẫn tới file ảnh trong folder images/SanPham
-            $product['image_path'] = '../assets/images/SanPham/' . $product['image'];
-            $product['quantity']   = $qty;
-            $product['total']      = $product['price'] * $qty;
-            $grandTotal += $product['total'];
-            $cartItems[] = $product;
-        }
+// Ensure unique packaging_option_id for each product
+$uniqueCartItems = [];
+foreach ($cartItems as $item) {
+    $uniqueKey = $item['product_name'] . '-' . $item['cart_detail_id'];
+    if (!isset($uniqueCartItems[$uniqueKey])) {
+        $item['total'] = $item['price'] * $item['quantity'];
+        $grandTotal += $item['total'];
+        $uniqueCartItems[$uniqueKey] = $item;
     }
+}
+$cartItems = array_values($uniqueCartItems);
+
+if (!empty($cartItems)) {
+    $_SESSION['cartItems'] = $cartItems;
+    $_SESSION['grandTotal'] = $grandTotal;
 }
 ?>
 <!DOCTYPE html>
@@ -53,44 +50,69 @@ if (file_exists($filePath)) {
         <?php if (empty($cartItems)): ?>
             <p>Không có sản phẩm trong giỏ.</p>
         <?php else: ?>
-            <table id="cartTable">
-                <thead>
-                    <tr>
-                        <th>Hình ảnh</th>       <!-- Cột hiển thị ảnh -->
-                        <th>ID</th>
-                        <th>Tên sản phẩm</th>
-                        <th>Giá (VNĐ)</th>
-                        <th>Số lượng</th>
-                        <th>Tổng (VNĐ)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($cartItems as $item): ?>
+            <form action="checkOut.php" method="POST">
+                <table id="cartTable">
+                    <thead>
                         <tr>
-                            <!-- Phần hiển thị hình ảnh sản phẩm -->
-                            <td>
-                                <img
-                                  src="<?= htmlspecialchars($item['image_path']) ?>"
-                                  alt="<?= htmlspecialchars($item['name']) ?>"
-                                  class="product-image"
-                                >
-                            </td>
-                            <td><?= htmlspecialchars($item['id']) ?></td>
-                            <td><?= htmlspecialchars($item['name']) ?></td>
-                            <td><?= number_format($item['price']) ?></td>
-                            <td><?= $item['quantity'] ?></td>
-                            <td><?= number_format($item['total']) ?></td>
+                            <th>Chọn</th>
+                            <th>Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Giá (VNĐ)</th>
+                            <th>Số lượng</th>
+                            <th>Tổng (VNĐ)</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="5" class="text-right">Tổng cộng:</td>
-                        <td><?= number_format($grandTotal) ?></td>
-                    </tr>
-                </tfoot>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($cartItems as $item): ?>
+                            <tr>
+                                <td><input type="checkbox" name="selected_items[]" value="<?= $item['cart_detail_id'] ?>"></td>
+                                <td><img src="../assets/images/SanPham/<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['product_name']) ?>" style="width: 50px; height: auto;"></td>
+                                <td><?= htmlspecialchars($item['product_name']) ?></td>
+                                <td><?= number_format($item['price']) ?></td>
+                                <td><?= $item['quantity'] ?></td>
+                                <td class="row-total"><?= number_format($item['total']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5" class="text-right">Tổng cộng:</td>
+                            <td id="grandTotal"><?= number_format($grandTotal) ?></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="text-right">
+                                <button type="submit" class="btn btn-primary">Thanh toán</button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </form>
         <?php endif; ?>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkboxes = document.querySelectorAll('input[name="selected_items[]"]');
+            const totalElement = document.getElementById('grandTotal');
+
+            function updateTotal() {
+                let total = 0;
+                checkboxes.forEach(cb => {
+                    if (cb.checked) {
+                        const row = cb.closest('tr');
+                        const rowTotal = parseInt(row.querySelector('.row-total').textContent.replace(/,/g, ''));
+                        total += rowTotal;
+                    }
+                });
+                totalElement.textContent = total.toLocaleString();
+            }
+
+            // Reset total to 0 on page load
+            totalElement.textContent = '0';
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateTotal);
+            });
+        });
+    </script>
 </body>
 </html>

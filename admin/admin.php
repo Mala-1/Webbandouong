@@ -33,7 +33,7 @@
                     </a>
                 </li>
                 <li class="nav-item fs-5">
-                    <a class="nav-link active" href="?page=donhang">
+                    <a class="nav-link active" href="?page=NCC">
                         <i class="fas fa-file-invoice me-2"></i>
                         Nhà cung cấp
                     </a>
