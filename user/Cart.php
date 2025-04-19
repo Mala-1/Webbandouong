@@ -262,6 +262,14 @@ if (!empty($cartItems)) {
             // Reset total to 0 on page load
             updateGrandTotal();
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.target.classList.contains('productQuantity')) {
+                    e.preventDefault();
+                }
+            });
+        });
     </script>
 </body>
 
