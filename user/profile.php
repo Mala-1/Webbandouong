@@ -6,49 +6,31 @@ $update_message = '';
 $show_modal = false;
 
 // Giả lập dữ liệu người dùng
-$user = isset($_SESSION['user']) ? $_SESSION['user'] : [
-    'name' => 'Nguyễn Văn A',
-    'email' => 'nguyenvana@example.com',
-    'phone' => '0123 456 789',
-    'address' => '123 Đường ABC, Quận XYZ, TP HCM',
-    'joined' => '01/01/2023',
-    'avatar' => 'https://via.placeholder.com/120'
-];
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : [];
 
-// Xử lý upload avatar
-if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] == 0) {
-    $target_dir = "uploads/";
-    if (!file_exists($target_dir)) {
-        mkdir($target_dir, 0777, true);
-    }
-    $target_file = $target_dir . basename($_FILES["avatar"]["name"]);
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-    $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
+require_once '../includes/DBConnect.php';
+$db = DBConnect::getInstance();
 
-    if (in_array($imageFileType, $allowed_types) && $_FILES["avatar"]["size"] <= 5000000) {
-        if (move_uploaded_file($_FILES["avatar"]["tmp_name"], $target_file)) {
-            $user['avatar'] = $target_file;
-            $_SESSION['user'] = $user;
-        } else {
-            $upload_message = '<div class="alert alert-danger" id="uploadMessage">Lỗi khi upload avatar.</div>';
-        }
-    } else {
-        $upload_message = '<div class="alert alert-danger" id="uploadMessage">File không hợp lệ (chỉ chấp nhận JPG, PNG, GIF, dưới 5MB).</div>';
-    }
-}
+$user = $db->selectOne('SELECT * FROM users WHERE user_id = ?', [$user_id]);
 
 // Xử lý cập nhật thông tin
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
     // Cập nhật thông tin
-    $user['name'] = htmlspecialchars($_POST['name']);
-    $user['email'] = htmlspecialchars($_POST['email']);
-    $user['phone'] = htmlspecialchars($_POST['phone']);
-    $user['address'] = htmlspecialchars($_POST['address']);
-    $_SESSION['user'] = $user;
+    $email = htmlspecialchars($_POST['email']);
+    $phone = htmlspecialchars($_POST['phone']);
+    $address = htmlspecialchars($_POST['address']);
 
-    // Gán thông báo và hiển thị lại modal
-    $update_message = '<div class="alert alert-success" id="updateMessage">Cập nhật thông tin thành công!</div>';
-    $show_modal = true;
+    // Cập nhật vào CSDL
+    $updateSuccess = $db->execute(
+        "UPDATE users SET email = ?, phone = ?, address = ? WHERE user_id = ?",
+        [$email, $phone, $address, $user_id]
+    );
+
+    if ($updateSuccess) {
+        echo "<script>alert('Cập nhật hồ sơ thành công!');</script>";
+    } else {
+        echo "<script>alert('Cập nhật hồ sơ thất bại!');</script>";
+    }
 }
 
 ?>
@@ -59,162 +41,97 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_profile'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Hồ Sơ</title>
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Bootstrap -->
+    <title>Hồ Sơ Người Dùng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <?php include '../includes/header.php'; ?>
+<body class="bg-light m-0">
+    <div class="d-flex flex-column min-vh-100">
+        <?php include '../includes/header.php'; ?>
 
-    <div class="container">
-        <div class="profile-card">
-            <!-- Header -->
-            <div class="profile-header">
-                <h2>Hồ Sơ Người Dùng</h2>
-            </div>
+        <div class="container py-5 flex-fill">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-warning text-white">
+                            <h4 class="mb-0">Hồ Sơ Người Dùng</h4>
+                        </div>
+                        <div class="card-body">
+                            <?php if ($upload_message) echo $upload_message; ?>
 
-            <!-- Body -->
-            <div class="profile-body">
-                <!-- Container cho thông báo upload -->
-                <div class="message-container">
-                    <?php if ($upload_message) echo $upload_message; ?>
-                </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong><i class="fas fa-user me-2"></i>Username:</strong> <?= $user['username'] ?>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong><i class="fas fa-envelope me-2"></i>Email:</strong> <?= $user['email'] ?>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong><i class="fas fa-phone me-2"></i>Số điện thoại:</strong> <?= $user['phone'] ?>
+                                </li>
+                                <li class="list-group-item">
+                                    <strong><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ:</strong> <?= $user['address'] ?>
+                                </li>
+                            </ul>
 
-                <!-- Avatar -->
-                <div class="text-center">
-                    <img src="<?php echo $user['avatar']; ?>" alt="Avatar" class="profile-avatar">
-                </div>
-
-                <!-- Thông tin -->
-                <div class="mt-4">
-                    <div class="info-item">
-                        <strong><i class="fas fa-user me-2"></i> Họ tên:</strong>
-                        <span><?php echo $user['name']; ?></span>
+                            <div class="text-end mt-3">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                    <i class="fas fa-edit me-1"></i> Chỉnh sửa hồ sơ
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="info-item">
-                        <strong><i class="fas fa-envelope me-2"></i> Email:</strong>
-                        <span><?php echo $user['email']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <strong><i class="fas fa-phone me-2"></i> Số điện thoại:</strong>
-                        <span><?php echo $user['phone']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <strong><i class="fas fa-map-marker-alt me-2"></i> Địa chỉ:</strong>
-                        <span><?php echo $user['address']; ?></span>
-                    </div>
-                    <div class="info-item">
-                        <strong><i class="fas fa-calendar-alt me-2"></i> Ngày tham gia:</strong>
-                        <span><?php echo $user['joined']; ?></span>
-                    </div>
-                </div>
-
-                <!-- Nút chỉnh sửa -->
-                <div class="text-end mt-4">
-                    <button type="button" class="btn edit-btn text-white" data-bs-toggle="modal"
-                        data-bs-target="#editProfileModal">
-                        <i class="fas fa-edit me-2"></i>Chỉnh sửa hồ sơ
-                    </button>
                 </div>
             </div>
         </div>
+
         <!-- Modal chỉnh sửa -->
-        <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="editProfileModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editProfileModalLabel">Chỉnh sửa hồ sơ</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form method="POST" enctype="multipart/form-data" id="profileForm">
+                    <form method="POST">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Chỉnh sửa hồ sơ</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
                         <div class="modal-body">
-                            <!-- Container cho thông báo cập nhật -->
-                            <div class="message-container">
-                                <?php if ($update_message) echo $update_message; ?>
-                            </div>
+                            <?php if ($update_message) echo $update_message; ?>
 
-                            <!-- Upload avatar -->
-                            <div class="mb-3">
-                                <label for="avatar" class="form-label">Ảnh đại diện</label>
-                                <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
-                            </div>
-
-                            <!-- Thông tin -->
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Họ tên</label>
-                                <input type="text" class="form-control" id="name" name="name"
-                                    value="<?php echo htmlspecialchars($user['name']); ?>" required>
-                            </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email"
-                                    value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                                <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
                             </div>
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Số điện thoại</label>
-                                <input type="text" class="form-control" id="phone" name="phone"
-                                    value="<?php echo htmlspecialchars($user['phone']); ?>">
+                                <input type="text" class="form-control" id="phone" name="phone" value="<?= htmlspecialchars($user['phone']) ?>">
                             </div>
                             <div class="mb-3">
                                 <label for="address" class="form-label">Địa chỉ</label>
-                                <input type="text" class="form-control" id="address" name="address"
-                                    value="<?php echo htmlspecialchars($user['address']); ?>">
+                                <input type="text" class="form-control" id="address" name="address" value="<?= htmlspecialchars($user['address']) ?>">
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                            <button type="submit" name="update_profile" class="btn edit-btn text-white">Lưu thay
-                                đổi</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" name="update_profile" class="btn btn-warning">Lưu thay đổi</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+
+        <?php include '../includes/footer.php'; ?>
+
     </div>
 
-    <?php include '../includes/footer.php'; ?>
-
-    <!-- Script Bootstrap -->
-    <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- JavaScript để ẩn thông báo -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const hideMessage = (id) => {
-            const message = document.getElementById(id);
-            if (message) {
-                setTimeout(() => {
-                    message.style.opacity = '0'; // Mờ dần
-                    setTimeout(() => {
-                        message.classList.add('hidden'); // Thêm class hidden sau khi mờ
-                    }, 500); // Thời gian khớp với transition
-                }, 3000); // Thời gian hiển thị thông báo
-            }
-        };
-
-        hideMessage('uploadMessage');
-        hideMessage('updateMessage');
-    });
-    </script>
-
-    <!-- Hiển thị modal nếu có cập nhật -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <?php if ($show_modal): ?>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var myModal = new bootstrap.Modal(document.getElementById('editProfileModal'));
-        myModal.show();
-    });
-    </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                new bootstrap.Modal(document.getElementById('editProfileModal')).show();
+            });
+            
+        </script>
     <?php endif; ?>
 </body>
 

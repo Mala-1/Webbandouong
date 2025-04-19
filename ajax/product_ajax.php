@@ -12,8 +12,35 @@ $offset = ($page - 1) * $limit;
 // Thể loại
 $categoryId = isset($_GET['category_id']) ? (int)$_GET['category_id'] : null;
 
-$whereClauses = ['p.category_id = ?'];
-$params = [$categoryId];
+$product_name = trim($_GET['product_name'] ?? '');
+$categoryFilter = $_GET['category'] ?? '';
+$minPrice = $_GET['min_price'] ?? '';
+$maxPrice = $_GET['max_price'] ?? '';
+
+
+$whereClauses = [];
+$params = [];
+
+$effectiveCategory = !empty($categoryFilter) ? $categoryFilter : $categoryId;
+if (!empty($effectiveCategory)) {
+    $whereClauses[] = 'p.category_id = ?';
+    $params[] = $effectiveCategory;
+}
+
+if (!empty($product_name)) {
+    $whereClauses[] = '(p.name LIKE ?)';
+    $params[] = "%$product_name%";
+}
+
+if (is_numeric($minPrice)) {
+    $whereClauses[] = '(CASE WHEN po.price > 0 THEN po.price ELSE p.price END) >= ?';
+    $params[] = $minPrice;
+}
+
+if (is_numeric($maxPrice)) {
+    $whereClauses[] = '(CASE WHEN po.price > 0 THEN po.price ELSE p.price END) <= ?';
+    $params[] = $maxPrice;
+}
 
 // Lọc
 $sort = $_GET['sort'] ?? '';
@@ -143,14 +170,15 @@ foreach ($products as $product): ?>
         <div class="product-item border border-2 pt-2 shadow">
             <img alt="<?= $product['name'] ?>" class="img-fluid object-fit-contain mx-auto product-clickable"
                 src=<?= '../assets/images/SanPham/' . $product['image'] ?>
-                data-packaging-option-id="<?= $product['packaging_option_id'] ?>" loading="lazy">
+                data-packaging-option-id="<?= $product['packaging_option_id'] ?>"
+                data-product-id="<?= $product['product_id'] ?>" loading="lazy">
             <div class="mt-3">
                 <p class="text-capitalize ellipsis-2-lines text-secondary mb-2 mx-2 product-clickable" data-packaging-option-id="<?= $product['packaging_option_id'] ?>">
                     <?= formatProductName($product['packaging_type'], $product['unit_quantity'], $product['name']) ?>
                 </p>
                 <p class="fw-medium fs-5 ms-2"><?= number_format($product['price']) . 'đ' ?></p>
                 <a class="btn-buy text-decoration-none text-black d-block w-100 text-center py-2"
-                    href="product_detail.php?id=<?= $product['packaging_option_id'] ?>">MUA</a>
+                    href="product_detail.php?product_id=<?= $product['product_id'] ?>&packaging_option_id=<?= $product['packaging_option_id'] ?>">MUA</a>
             </div>
         </div>
     </div>

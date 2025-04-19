@@ -87,3 +87,39 @@ td img {
     background-color: #f4f4f4;
     font-weight: bold;
 }
+
+.quantity-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.quantity-controls button {
+    width: 25px;
+    height: 25px;
+    font-size: 14px;
+    text-align: center;
+    line-height: 1;
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.quantity-controls input {
+    width: 40px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}

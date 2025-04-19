@@ -1,4 +1,5 @@
 
+
 // nút qua trái phải của thể loại
 function scrollCategories(direction) {
     const container = document.querySelector('.category-scroll');
@@ -62,8 +63,11 @@ function updateScrollButtons() {
 // + load sản phẩm theo thể loại
 document.addEventListener('DOMContentLoaded', function () {
     updateScrollButtons();
-    window.addEventListener('resize', updateScrollButtons);
-    window.addEventListener('resize', loadProductsByCategory());
+    window.addEventListener('resize', function () {
+        updateScrollButtons();
+        loadProductsByCategory();
+    });
+    loadProductsByCategory();
 });
 
 
@@ -75,6 +79,20 @@ function getActiveCategoryId() {
 }
 
 let currentFilterParams = "";
+
+if (searchKeyword && searchKeyword.trim() !== "") {
+    currentFilterParams += '&product_name=' + encodeURIComponent(searchKeyword);
+}
+if (searchCategory && searchCategory !== "") {
+    currentFilterParams += '&category_filter=' + encodeURIComponent(searchCategory);
+}
+if (searchMinPrice && searchMinPrice !== "") {
+    currentFilterParams += '&min_price=' + encodeURIComponent(searchMinPrice);
+}
+if (searchMaxPrice && searchMaxPrice !== "") {
+    currentFilterParams += '&max_price=' + encodeURIComponent(searchMaxPrice);
+}
+
 
 function loadProductsByCategory(page = 1, params = "") {
     const categoryId = getActiveCategoryId();
@@ -241,15 +259,80 @@ document.getElementById('advancedFilterModal').addEventListener('show.bs.modal',
 const productWrap = document.querySelector('.product-wrap');
 
 productWrap.addEventListener('click', function (event) {
-    // Kiểm tra xem phần tử được click hoặc phần tử cha gần nhất có class .product-clickable không
+    // Tìm phần tử gần nhất có class product-clickable
     const target = event.target.closest('.product-clickable');
 
-    // Nếu có và nằm trong productWrap thì xử lý
+    // Nếu tồn tại và nằm trong .product-wrap
     if (target && productWrap.contains(target)) {
         const packaging_option_id = target.getAttribute('data-packaging-option-id');
-        if (packaging_option_id) {
-            console.log('h')
-            window.location.href = 'login.php';
+        const product_id = target.getAttribute('data-product-id');
+
+        if (product_id && packaging_option_id) {
+            // Chuyển hướng đến trang chi tiết sản phẩm
+            window.location.href = `../user/product_detail.php?product_id=${product_id}&packaging_option_id=${packaging_option_id}`;
         }
     }
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('headerSearchForm');
+
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+        });
+
+        form.addEventListener('click', function (e) {
+            const clickedButton = e.target.closest('.filterButton');
+            if (!clickedButton) return;
+
+            const formData = new FormData(form);
+            const productName = formData.get('product_name') || '';
+            const category = formData.get('category') || '';
+            const min = formData.get('min') || '';
+            const max = formData.get('max') || '';
+
+            if (category) {
+                document.querySelectorAll('.category').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('data-category-id') == category) {
+                        item.classList.add('active');
+            
+                        const name = item.getAttribute('data-name');
+                        if (name) {
+                            document.getElementById('categoryNameSpan').textContent = name;
+                        }
+                    }
+                });
+            }
+
+            currentFilterParams = '';
+            if (productName.trim()) {
+                currentFilterParams += '&product_name=' + encodeURIComponent(productName.trim());
+            }
+            if (category) {
+                currentFilterParams += '&category=' + encodeURIComponent(category);
+            }
+            if (min) {
+                currentFilterParams += '&min_price=' + encodeURIComponent(min);
+            }
+            if (max) {
+                currentFilterParams += '&max_price=' + encodeURIComponent(max);
+            }
+
+            loadProductsByCategory(1, currentFilterParams);
+
+            const dropdown = clickedButton.closest('.dropdown-menu');
+            if (dropdown) {
+                const dropdownToggle = document.querySelector('[data-bs-toggle="dropdown"]');
+                if (dropdownToggle) {
+                    const bsDropdown = bootstrap.Dropdown.getInstance(dropdownToggle);
+                    if (bsDropdown) bsDropdown.hide();
+                }
+            }
+        });
+    }
+
+    
 });

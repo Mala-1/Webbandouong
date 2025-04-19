@@ -158,6 +158,13 @@ $products = $db->select('
         </div>
     </div>
 
+    <script>
+        const searchKeyword = <?= json_encode($_GET['product_name'] ?? '') ?>;
+        const searchCategory = <?= json_encode($_GET['category'] ?? '') ?>;
+        const searchMinPrice = <?= json_encode($_GET['min'] ?? '') ?>;
+        const searchMaxPrice = <?= json_encode($_GET['max'] ?? '') ?>;  
+        const initialCategoryId = <?= json_encode($_GET['category'] ?? '') ?>;
+    </script>
     <script src="../assets/javascript/product.js"></script>
     <script src="../assets/javascript/pagination.js"></script>
 </body>
