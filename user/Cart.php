@@ -60,6 +60,7 @@ if (!empty($cartItems)) {
                             <th>Giá (VNĐ)</th>
                             <th>Số lượng</th>
                             <th>Tổng (VNĐ)</th>
+                            <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -69,8 +70,17 @@ if (!empty($cartItems)) {
                                 <td><img src="../assets/images/SanPham/<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['product_name']) ?>" style="width: 50px; height: auto;"></td>
                                 <td><?= htmlspecialchars($item['product_name']) ?></td>
                                 <td><?= number_format($item['price']) ?></td>
-                                <td><?= $item['quantity'] ?></td>
+                                <td>
+                                    <div class="quantity-controls">
+                                        <button type="button" class="btn btn-secondary decreaseQuantity">-</button>
+                                        <input type="number" class="productQuantity" value="1" min="1">
+                                        <button type="button" class="btn btn-secondary increaseQuantity">+</button>
+                                    </div>
+                                </td>
                                 <td class="row-total"><?= number_format($item['total']) ?></td>
+                                <td>
+                                    <button type="button" class="btn btn-danger deleteProduct">Xóa</button>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -93,6 +103,10 @@ if (!empty($cartItems)) {
         document.addEventListener('DOMContentLoaded', function () {
             const checkboxes = document.querySelectorAll('input[name="selected_items[]"]');
             const totalElement = document.getElementById('grandTotal');
+            const decreaseButtons = document.querySelectorAll('.decreaseQuantity');
+            const increaseButtons = document.querySelectorAll('.increaseQuantity');
+            const quantityInputs = document.querySelectorAll('.productQuantity');
+            const deleteButtons = document.querySelectorAll('.deleteProduct');
 
             function updateTotal() {
                 let total = 0;
@@ -100,7 +114,7 @@ if (!empty($cartItems)) {
                     if (cb.checked) {
                         const row = cb.closest('tr');
                         const rowTotal = parseInt(row.querySelector('.row-total').textContent.replace(/,/g, ''));
-                        total += rowTotal;
+                        total += rowTotal * parseInt(quantityInputs[Array.from(checkboxes).indexOf(cb)].value);
                     }
                 });
                 totalElement.textContent = total.toLocaleString();
@@ -112,6 +126,77 @@ if (!empty($cartItems)) {
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', updateTotal);
             });
+
+            decreaseButtons.forEach((button, index) => {
+                button.addEventListener('click', function () {
+                    const quantityInput = quantityInputs[index];
+                    if (quantityInput.value > 1) {
+                        quantityInput.value = parseInt(quantityInput.value) - 1;
+                        updateTotal();
+                    }
+                });
+            });
+
+            increaseButtons.forEach((button, index) => {
+                button.addEventListener('click', function () {
+                    const quantityInput = quantityInputs[index];
+                    quantityInput.value = parseInt(quantityInput.value) + 1;
+                    updateTotal();
+                });
+            });
+
+            quantityInputs.forEach(input => {
+                input.addEventListener('input', function () {
+                    if (input.value < 1) {
+                        input.value = 1;
+                    }
+                    updateTotal();
+                });
+            });
+
+            deleteButtons.forEach((button) => {
+                button.addEventListener('click', function () {
+                    const row = button.closest('tr');
+                    const cartDetailId = row.querySelector('input[name="selected_items[]"]').value;
+
+                    fetch('../admin/ajax/delete_product.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ cart_detail_id: cartDetailId }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            row.remove();
+                            updateGrandTotal();
+                            alert('Sản phẩm đã được xóa khỏi giỏ hàng.');
+                        } else {
+                            alert('Không thể xóa sản phẩm. Vui lòng thử lại.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+                    });
+                });
+            });
+
+            function updateGrandTotal() {
+                const rows = document.querySelectorAll('#cartTable tbody tr');
+                let grandTotal = 0;
+
+                rows.forEach(row => {
+                    const rowTotal = row.querySelector('.row-total');
+                    if (rowTotal) {
+                        grandTotal += parseInt(rowTotal.textContent.replace(/,/g, ''));
+                    }
+                });
+
+                const totalElement = document.getElementById('grandTotal');
+                totalElement.textContent = grandTotal.toLocaleString();
+            }
         });
     </script>
 </body>
