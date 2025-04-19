@@ -1,7 +1,6 @@
 <?php
 session_start();
 require_once '../includes/DBConnect.php';
-$db = DBConnect::getInstance();
 
 header('Content-Type: application/json');
 

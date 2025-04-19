@@ -254,8 +254,7 @@
 
                             <!-- Thêm vào giỏ -->
                             <button
-                                class="add-to-cart btn w-100 w-md-50 bg-black text-white d-flex align-items-center justify-content-center"
-                                onclick="addToCart()">
+                                class="add-to-cart btn w-100 w-md-50 bg-black text-white d-flex align-items-center justify-content-center">
                                 <i class="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ hàng
                             </button>
                         </div>
@@ -488,6 +487,7 @@
                 })
                 .then(res => res.json())
                 .then(data => {
+                    console.log(data)
                     if (data.success) {
                         // Hiện popup đã thêm thành công
                         let popup = document.querySelector(".notice-add-to-cart");

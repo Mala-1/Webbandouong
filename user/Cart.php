@@ -1,35 +1,72 @@
 <?php
 session_start(); // Start session to store cart data
-require_once '../includes/config.php'; // Kết nối DB
+require_once '../includes/DBConnect.php'; // Kết nối DB
+$db = DBConnect::getInstance();
 
 $cartItems  = [];
 $grandTotal = 0;
 
-// Fetch cart details for user_id = 7
-$userId = 7;
-$stmt = $pdo->prepare(
-    'SELECT cd.cart_detail_id, cd.quantity, CONCAT(po.packaging_type, " ", po.unit_quantity, " ", p.name) AS product_name, po.price, pi.image
-     FROM cart c
-     JOIN cart_details cd ON c.cart_id = cd.cart_id
-     JOIN packaging_options po ON cd.packaging_option_id = po.packaging_option_id
-     JOIN products p ON po.product_id = p.product_id
-     JOIN product_images pi ON p.product_id = pi.product_id
-     WHERE c.user_id = ?'
-);
-$stmt->execute([$userId]);
-$cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$userId = $_SESSION['user_id'] ?? null;
+
+$sql = 'SELECT 
+    c.cart_id,
+    c.user_id,
+    c.created_at,
+    cd.cart_detail_id,
+    cd.packaging_option_id,
+    cd.quantity,
+    cd.price,
+    cd.total_price as total,
+    p.product_id,
+    p.name AS product_name,
+    po.packaging_type,
+    po.unit_quantity,
+    COALESCE(
+        po.image,
+        (
+            SELECT pi.image
+            FROM product_images pi
+            WHERE pi.product_id = p.product_id
+            ORDER BY pi.image ASC
+            LIMIT 1
+        )
+    ) AS image
+FROM cart c
+JOIN cart_details cd ON c.cart_id = cd.cart_id
+LEFT JOIN packaging_options po ON cd.packaging_option_id = po.packaging_option_id
+LEFT JOIN products p ON po.product_id = p.product_id
+WHERE c.user_id = ? -- truyền user_id nếu cần lọc theo người mua
+ORDER BY c.created_at DESC;';
+
+$cartItems = $db->select($sql, [$userId]);
+
+function formatProductName($packaging_type, $unit_quantity, $product_name)
+{
+    $packaging = trim($packaging_type . ' ' . $unit_quantity);
+    // Loại trùng nếu packaging_type đã nằm trong unit_quantity
+    if (stripos($unit_quantity, $packaging_type) !== false) {
+        $packaging = $unit_quantity;
+    }
+
+    // Với unit_quantity là "1 lon", "1 chai", có thể tối giản
+    if (preg_match('/^1\s+[[:alpha:]]+$/u', $unit_quantity)) {
+        $packaging = $packaging_type; // chỉ in "Lon" hoặc "Chai"
+    }
+
+    return "{$packaging} {$product_name}";
+}
 
 // Ensure unique packaging_option_id for each product
-$uniqueCartItems = [];
-foreach ($cartItems as $item) {
-    $uniqueKey = $item['product_name'] . '-' . $item['cart_detail_id'];
-    if (!isset($uniqueCartItems[$uniqueKey])) {
-        $item['total'] = $item['price'] * $item['quantity'];
-        $grandTotal += $item['total'];
-        $uniqueCartItems[$uniqueKey] = $item;
-    }
-}
-$cartItems = array_values($uniqueCartItems);
+// $uniqueCartItems = [];
+// foreach ($cartItems as $item) {
+//     $uniqueKey = $item['product_name'] . '-' . $item['cart_detail_id'];
+//     if (!isset($uniqueCartItems[$uniqueKey])) {
+//         $item['total'] = $item['price'] * $item['quantity'];
+//         $grandTotal += $item['total'];
+//         $uniqueCartItems[$uniqueKey] = $item;
+//     }
+// }
+// $cartItems = array_values($uniqueCartItems);
 
 if (!empty($cartItems)) {
     $_SESSION['cartItems'] = $cartItems;
@@ -38,14 +75,18 @@ if (!empty($cartItems)) {
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giỏ hàng</title>
     <link rel="stylesheet" href="../assets/css/cart.css">
 </head>
+
 <body>
-    <div class="container">
+    <?php include '../includes/header.php'; ?>
+
+    <div class="container mt-3">
         <h1>Giỏ hàng</h1>
         <?php if (empty($cartItems)): ?>
             <p>Không có sản phẩm trong giỏ.</p>
@@ -66,9 +107,9 @@ if (!empty($cartItems)) {
                     <tbody>
                         <?php foreach ($cartItems as $item): ?>
                             <tr>
-                                <td><input type="checkbox" name="selected_items[]" value="<?= $item['cart_detail_id'] ?>"></td>
+                                <td><input type="checkbox" name="selected_items[]" value="<?= $item['cart_detail_id'] ?>" checked></td>
                                 <td><img src="../assets/images/SanPham/<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['product_name']) ?>" style="width: 50px; height: auto;"></td>
-                                <td><?= htmlspecialchars($item['product_name']) ?></td>
+                                <td class="text-capitalize"><?= formatProductName($item['packaging_type'], $item['unit_quantity'], $item['product_name']) ?></td>
                                 <td class="productPrice"><?= number_format($item['price']) ?></td>
                                 <td>
                                     <div class="quantity-controls">
@@ -99,15 +140,18 @@ if (!empty($cartItems)) {
             </form>
         <?php endif; ?>
     </div>
+
+    <?php include '../includes/footer.php'; ?>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const decreaseButtons = document.querySelectorAll('.decreaseQuantity');
             const increaseButtons = document.querySelectorAll('.increaseQuantity');
             const deleteButtons = document.querySelectorAll('.deleteProduct');
             const quantityInputs = document.querySelectorAll('.productQuantity');
 
             decreaseButtons.forEach((button, index) => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function() {
                     const quantityInput = quantityInputs[index];
                     const cartDetailId = quantityInput.dataset.cartDetailId;
                     if (quantityInput.value > 1) {
@@ -118,7 +162,7 @@ if (!empty($cartItems)) {
             });
 
             increaseButtons.forEach((button, index) => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function() {
                     const quantityInput = quantityInputs[index];
                     const cartDetailId = quantityInput.dataset.cartDetailId;
                     const newQuantity = parseInt(quantityInput.value) + 1;
@@ -127,7 +171,7 @@ if (!empty($cartItems)) {
             });
 
             deleteButtons.forEach((button) => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function() {
                     const row = button.closest('tr');
                     const cartDetailId = row.querySelector('.productQuantity').dataset.cartDetailId;
                     updateCart('delete', cartDetailId, null, null, row);
@@ -136,31 +180,35 @@ if (!empty($cartItems)) {
 
             function updateCart(action, cartDetailId, quantity, quantityInput, row = null) {
                 fetch('../ajax for cart/update_cart.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ action, cart_detail_id: cartDetailId, quantity }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        if (action === 'update' && quantityInput) {
-                            quantityInput.value = quantity;
-                            updateRowTotal(quantityInput.closest('tr'));
-                            updateGrandTotal();
-                        } else if (action === 'delete' && row) {
-                            row.remove();
-                            updateGrandTotal();
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            action,
+                            cart_detail_id: cartDetailId,
+                            quantity
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (action === 'update' && quantityInput) {
+                                quantityInput.value = quantity;
+                                updateRowTotal(quantityInput.closest('tr'));
+                                updateGrandTotal();
+                            } else if (action === 'delete' && row) {
+                                row.remove();
+                                updateGrandTotal();
+                            }
+                        } else {
+                            alert(data.message || 'Không thể cập nhật giỏ hàng. Vui lòng thử lại.');
                         }
-                    } else {
-                        alert(data.message || 'Không thể cập nhật giỏ hàng. Vui lòng thử lại.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Đã xảy ra lỗi. Vui lòng thử lại.');
-                });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+                    });
             }
 
             function updateRowTotal(row) {
@@ -175,19 +223,23 @@ if (!empty($cartItems)) {
                 let grandTotal = 0;
 
                 rows.forEach(row => {
-                    const rowTotal = row.querySelector('.row-total');
-                    if (rowTotal) {
-                        grandTotal += parseInt(rowTotal.textContent.replace(/,/g, ''));
+                    const checkbox = row.querySelector('input[type="checkbox"]');
+                    if (checkbox && checkbox.checked) {
+                        const rowTotal = row.querySelector('.row-total');
+                        if (rowTotal) {
+                            grandTotal += parseInt(rowTotal.textContent.replace(/,/g, ''));
+                        }
                     }
                 });
 
                 const totalElement = document.getElementById('grandTotal');
                 totalElement.textContent = grandTotal.toLocaleString();
             }
+
         });
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const checkboxes = document.querySelectorAll('input[name="selected_items[]"]');
             const totalElement = document.getElementById('grandTotal');
 
@@ -212,4 +264,5 @@ if (!empty($cartItems)) {
         });
     </script>
 </body>
+
 </html>
