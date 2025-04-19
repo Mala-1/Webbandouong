@@ -259,14 +259,17 @@ document.getElementById('advancedFilterModal').addEventListener('show.bs.modal',
 const productWrap = document.querySelector('.product-wrap');
 
 productWrap.addEventListener('click', function (event) {
-    // Kiểm tra xem phần tử được click hoặc phần tử cha gần nhất có class .product-clickable không
+    // Tìm phần tử gần nhất có class product-clickable
     const target = event.target.closest('.product-clickable');
 
-    // Nếu có và nằm trong productWrap thì xử lý
+    // Nếu tồn tại và nằm trong .product-wrap
     if (target && productWrap.contains(target)) {
         const packaging_option_id = target.getAttribute('data-packaging-option-id');
-        if (packaging_option_id) {
-            window.location.href = '../user/product_detail.php';
+        const product_id = target.getAttribute('data-product-id');
+
+        if (product_id && packaging_option_id) {
+            // Chuyển hướng đến trang chi tiết sản phẩm
+            window.location.href = `../user/product_detail.php?product_id=${product_id}&packaging_option_id=${packaging_option_id}`;
         }
     }
 });

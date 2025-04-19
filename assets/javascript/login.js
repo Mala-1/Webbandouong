@@ -6,7 +6,8 @@ const switchToLogin = document.getElementById('switchToLogin');
 const switchToRegister = document.getElementById('switchToRegister');
 
 closeBtn.addEventListener('click', () => {
-  popup.style.display = 'none';
+  window.location.href = redirectBack;
+
 });
 
 switchToLogin.addEventListener('click', () => {

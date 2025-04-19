@@ -170,14 +170,15 @@ foreach ($products as $product): ?>
         <div class="product-item border border-2 pt-2 shadow">
             <img alt="<?= $product['name'] ?>" class="img-fluid object-fit-contain mx-auto product-clickable"
                 src=<?= '../assets/images/SanPham/' . $product['image'] ?>
-                data-packaging-option-id="<?= $product['packaging_option_id'] ?>" loading="lazy">
+                data-packaging-option-id="<?= $product['packaging_option_id'] ?>"
+                data-product-id="<?= $product['product_id'] ?>" loading="lazy">
             <div class="mt-3">
                 <p class="text-capitalize ellipsis-2-lines text-secondary mb-2 mx-2 product-clickable" data-packaging-option-id="<?= $product['packaging_option_id'] ?>">
                     <?= formatProductName($product['packaging_type'], $product['unit_quantity'], $product['name']) ?>
                 </p>
                 <p class="fw-medium fs-5 ms-2"><?= number_format($product['price']) . 'đ' ?></p>
                 <a class="btn-buy text-decoration-none text-black d-block w-100 text-center py-2"
-                    href="product_detail.php?id=<?= $product['packaging_option_id'] ?>">MUA</a>
+                    href="product_detail.php?product_id=<?= $product['product_id'] ?>&packaging_option_id=<?= $product['packaging_option_id'] ?>">MUA</a>
             </div>
         </div>
     </div>

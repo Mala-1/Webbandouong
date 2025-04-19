@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (!isset($_SESSION['user_id']) && !isset($_SESSION['redirect_back'])) {
+  if (!isset($_POST['login']) && !isset($_POST['register'])) {
+    $_SESSION['redirect_back'] = $_SERVER['HTTP_REFERER'] ?? '../index.php';
+  }
+}
 
 // Kết nối CSDL
 $host = "localhost";
@@ -47,7 +52,13 @@ if (isset($_POST['login'])) {
   if ($user && password_verify($password, $user['password'])) {
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['username'] = $user['username'];
-    header("Location: ../index.php");
+
+    // 👇 Lưu thông báo vào session
+    $_SESSION['login_success'] = 'Đăng nhập thành công!';
+
+    $redirect = $_SESSION['redirect_back'] ?? '../index.php';
+    unset($_SESSION['redirect_back']);
+    header("Location: $redirect");
     exit();
   } else {
     $message = "Sai tên đăng nhập hoặc mật khẩu!";
@@ -56,10 +67,12 @@ if (isset($_POST['login'])) {
 
 // Đăng xuất
 if (isset($_GET['logout'])) {
+  $redirect = $_GET['redirect'] ?? '../index.php';
   session_destroy();
-  header("Location: ../index.php");
+  header("Location: $redirect");
   exit();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -84,7 +97,7 @@ if (isset($_GET['logout'])) {
         <?php endif; ?>
 
         <!-- Form Đăng ký -->
-        <form id="registerForm" method="POST" style="display:block;">
+        <form id="registerForm" method="POST" style="display:none;">
           <h2>Đăng ký</h2>
           <div class="form-group"><input type="text" name="username" placeholder="Username" required></div>
           <div class="form-group"><input type="text" name="diachi" placeholder="Địa chỉ" required></div>
@@ -96,7 +109,7 @@ if (isset($_GET['logout'])) {
         </form>
 
         <!-- Form Đăng nhập -->
-        <form id="loginForm" method="POST" style="display:none;">
+        <form id="loginForm" method="POST" style="display:block;">
           <h2>Đăng nhập</h2>
           <div class="form-group"><input type="text" name="username" placeholder="Tên đăng nhập" required></div>
           <div class="form-group"><input type="password" name="password" placeholder="Mật khẩu" required></div>
@@ -105,11 +118,11 @@ if (isset($_GET['logout'])) {
         </form>
       </div>
     </div>
-  <?php else: ?>
-    <h2>Chào, <?= $_SESSION['username'] ?>!</h2>
-    <a href="?logout=true">Đăng xuất</a>
   <?php endif; ?>
 
+  <script>
+    const redirectBack = "<?= $_SESSION['redirect_back'] ?? '../index.php' ?>";
+  </script>
   <script src="../assets/javascript/login.js"></script>
 </body>
 

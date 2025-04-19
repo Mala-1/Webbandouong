@@ -20,6 +20,12 @@
         session_start();
     }
     ?>
+    <?php if (isset($_SESSION['login_success'])): ?>
+        <div class="alert alert-success text-center">
+            <?= $_SESSION['login_success'] ?>
+        </div>
+        <?php unset($_SESSION['login_success']); ?>
+    <?php endif; ?>
     <?php include 'includes/header.php'; ?>
 
     <!-- Nội dung trang -->

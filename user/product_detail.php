@@ -91,6 +91,19 @@
 </head>
 
 <body>
+    <?php
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    ?>
+
+    <?php if (isset($_SESSION['login_success'])): ?>
+        <div class="alert alert-success text-center">
+            <?= $_SESSION['login_success'] ?>
+        </div>
+        <?php unset($_SESSION['login_success']); ?>
+    <?php endif; ?>
+
 
     <?php
     require_once '../includes/DBConnect.php';
@@ -106,6 +119,7 @@
                             po.packaging_type,
                             po.unit_quantity,
                             p.description,
+                            po.stock,
                             COALESCE(
                                 po.image,
                                 (
@@ -228,13 +242,13 @@
 
                         <div class="my-3 d-flex align-items-center gap-2">
                             <label>Số lượng</label>
-                            <input type="number" value="1" class="form-control w-auto">
+                            <input type="number" value="1" min="1" class="quantity form-control w-auto">
                         </div>
 
                         <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-between align-items-center">
                             <!-- Mua ngay -->
                             <a href="#"
-                                class="btn btn-outline-dark btn w-100 w-md-50 d-flex align-items-center justify-content-center">
+                                class="btn btn-outline-dark btnBuyNow w-100 w-md-50 d-flex align-items-center justify-content-center">
                                 <i class="fa-solid fa-bolt me-2"></i> Mua ngay
                             </a>
 
@@ -244,6 +258,30 @@
                                 onclick="addToCart()">
                                 <i class="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ hàng
                             </button>
+                        </div>
+                        <!-- modal thêm thành công -->
+                        <div class="notice-add-to-cart position-absolute top-50 start-50 d-flex flex-column justify-content-center align-items-center p-5 rounded w-auto opacity-0" style="background-color: rgba(0, 0, 0, 0.8);">
+                            <i class="fa-solid fa-circle-check fa-3x mb-2" style="color: #ffffff;"></i>
+                            <span class="text-white text-center">Đã thêm vào giỏ hàng</span>
+                        </div>
+
+
+                        <!-- Modal yêu cầu đăng nhập -->
+                        <div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginRequiredModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content text-center">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title w-100" id="loginRequiredModalLabel">Thông báo</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng.
+                                    </div>
+                                    <div class="modal-footer justify-content-center">
+                                        <a href="../user/login.php" class="btn btn-primary">Đăng nhập</a>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
@@ -262,6 +300,24 @@
     </div>
 
     <?php include '../includes/footer.php'; ?>
+    <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
+        const packagingStocks = {
+            <?php foreach ($products as $product): ?>
+                <?= $product['packaging_option_id'] ?>: <?= $product['stock'] ?? 0 ?>,
+            <?php endforeach; ?>
+        };
+
+        const price = <?php
+                        foreach ($products as $product) {
+                            if ($product['packaging_option_id'] == $packaging_option_id) {
+                                echo $product['price'];
+                                break;
+                            }
+                        }
+                        ?>;
+    </script>
     <script>
         function scrollPackagingOption(direction) {
             const container = document.querySelector('.packagion_option_scroll');
@@ -336,7 +392,7 @@
             } else if (items.length === 1) {
                 itemWidth = items[0].offsetWidth;
             }
-            
+
 
             container.scrollBy({
                 left: direction * itemWidth,
@@ -392,6 +448,105 @@
             });
             clickedItem.classList.add('selected');
         });
+
+        document.querySelector(".add-to-cart").addEventListener("click", function() {
+            if (!isLoggedIn) {
+                // Hiện modal yêu cầu đăng nhập
+                const loginModal = new bootstrap.Modal(document.getElementById('loginRequiredModal'));
+                loginModal.show();
+                return;
+            }
+
+            const quantityInput = document.querySelector(".quantity");
+            const quantity = parseInt(quantityInput.value);
+            const selectedOptionId = <?= $packaging_option_id ?>;
+
+            if (!quantity || quantity <= 0) {
+                alert("Vui lòng nhập số lượng hợp lệ.");
+                return;
+            }
+
+            const availableStock = packagingStocks[selectedOptionId] ?? 0;
+
+            if (quantity > availableStock) {
+                alert(`Chỉ còn ${availableStock} sản phẩm trong kho.`);
+                return;
+            }
+
+            const packaging_option_id = <?= $packaging_option_id ?>;
+
+            fetch('../ajax/add_to_cart.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        packaging_option_id: packaging_option_id,
+                        quantity: quantity,
+                        price: price
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Hiện popup đã thêm thành công
+                        let popup = document.querySelector(".notice-add-to-cart");
+                        popup.classList.add("show");
+                        setTimeout(() => {
+                            popup.classList.remove("show");
+                        }, 2000);
+                    } else {
+                        alert(data.message || "Có lỗi xảy ra!");
+                    }
+                });
+        });
+
+        document.querySelector(".btnBuyNow").addEventListener("click", function() {
+            if (!isLoggedIn) {
+                // Hiện modal yêu cầu đăng nhập
+                const loginModal = new bootstrap.Modal(document.getElementById('loginRequiredModal'));
+                loginModal.show();
+                return;
+            }
+
+            const quantityInput = document.querySelector(".quantity");
+            const quantity = parseInt(quantityInput.value);
+            const selectedOptionId = <?= $packaging_option_id ?>;
+
+            if (!quantity || quantity <= 0) {
+                alert("Vui lòng nhập số lượng hợp lệ.");
+                return;
+            }
+
+            const availableStock = packagingStocks[selectedOptionId] ?? 0;
+
+            if (quantity > availableStock) {
+                alert(`Chỉ còn ${availableStock} sản phẩm trong kho.`);
+                return;
+            }
+
+            const packaging_option_id = <?= $packaging_option_id ?>;
+
+            fetch('../ajax/add_to_cart.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        packaging_option_id: packaging_option_id,
+                        quantity: quantity,
+                        price: price
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = "../user/cart.php";  
+                    }    
+                });
+        });
+
+       
     </script>
 </body>
 
