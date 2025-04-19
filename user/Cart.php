@@ -69,11 +69,11 @@ if (!empty($cartItems)) {
                                 <td><input type="checkbox" name="selected_items[]" value="<?= $item['cart_detail_id'] ?>"></td>
                                 <td><img src="../assets/images/SanPham/<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['product_name']) ?>" style="width: 50px; height: auto;"></td>
                                 <td><?= htmlspecialchars($item['product_name']) ?></td>
-                                <td><?= number_format($item['price']) ?></td>
+                                <td class="productPrice"><?= number_format($item['price']) ?></td>
                                 <td>
                                     <div class="quantity-controls">
                                         <button type="button" class="btn btn-secondary decreaseQuantity">-</button>
-                                        <input type="number" class="productQuantity" value="1" min="1">
+                                        <input type="number" class="productQuantity" value="<?= $item['quantity'] ?>" min="1" data-cart-detail-id="<?= $item['cart_detail_id'] ?>">
                                         <button type="button" class="btn btn-secondary increaseQuantity">+</button>
                                     </div>
                                 </td>
@@ -101,38 +101,18 @@ if (!empty($cartItems)) {
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const checkboxes = document.querySelectorAll('input[name="selected_items[]"]');
-            const totalElement = document.getElementById('grandTotal');
             const decreaseButtons = document.querySelectorAll('.decreaseQuantity');
             const increaseButtons = document.querySelectorAll('.increaseQuantity');
-            const quantityInputs = document.querySelectorAll('.productQuantity');
             const deleteButtons = document.querySelectorAll('.deleteProduct');
-
-            function updateTotal() {
-                let total = 0;
-                checkboxes.forEach(cb => {
-                    if (cb.checked) {
-                        const row = cb.closest('tr');
-                        const rowTotal = parseInt(row.querySelector('.row-total').textContent.replace(/,/g, ''));
-                        total += rowTotal * parseInt(quantityInputs[Array.from(checkboxes).indexOf(cb)].value);
-                    }
-                });
-                totalElement.textContent = total.toLocaleString();
-            }
-
-            // Reset total to 0 on page load
-            totalElement.textContent = '0';
-
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateTotal);
-            });
+            const quantityInputs = document.querySelectorAll('.productQuantity');
 
             decreaseButtons.forEach((button, index) => {
                 button.addEventListener('click', function () {
                     const quantityInput = quantityInputs[index];
+                    const cartDetailId = quantityInput.dataset.cartDetailId;
                     if (quantityInput.value > 1) {
-                        quantityInput.value = parseInt(quantityInput.value) - 1;
-                        updateTotal();
+                        const newQuantity = parseInt(quantityInput.value) - 1;
+                        updateCart('update', cartDetailId, newQuantity, quantityInput);
                     }
                 });
             });
@@ -140,48 +120,55 @@ if (!empty($cartItems)) {
             increaseButtons.forEach((button, index) => {
                 button.addEventListener('click', function () {
                     const quantityInput = quantityInputs[index];
-                    quantityInput.value = parseInt(quantityInput.value) + 1;
-                    updateTotal();
-                });
-            });
-
-            quantityInputs.forEach(input => {
-                input.addEventListener('input', function () {
-                    if (input.value < 1) {
-                        input.value = 1;
-                    }
-                    updateTotal();
+                    const cartDetailId = quantityInput.dataset.cartDetailId;
+                    const newQuantity = parseInt(quantityInput.value) + 1;
+                    updateCart('update', cartDetailId, newQuantity, quantityInput);
                 });
             });
 
             deleteButtons.forEach((button) => {
                 button.addEventListener('click', function () {
                     const row = button.closest('tr');
-                    const cartDetailId = row.querySelector('input[name="selected_items[]"]').value;
-
-                    fetch('../admin/ajax/delete_product.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ cart_detail_id: cartDetailId }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            row.remove();
-                            updateGrandTotal();
-                            alert('Sản phẩm đã được xóa khỏi giỏ hàng.');
-                        } else {
-                            alert('Không thể xóa sản phẩm. Vui lòng thử lại.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Đã xảy ra lỗi. Vui lòng thử lại.');
-                    });
+                    const cartDetailId = row.querySelector('.productQuantity').dataset.cartDetailId;
+                    updateCart('delete', cartDetailId, null, null, row);
                 });
             });
+
+            function updateCart(action, cartDetailId, quantity, quantityInput, row = null) {
+                fetch('../ajax for cart/update_cart.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action, cart_detail_id: cartDetailId, quantity }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (action === 'update' && quantityInput) {
+                            quantityInput.value = quantity;
+                            updateRowTotal(quantityInput.closest('tr'));
+                            updateGrandTotal();
+                        } else if (action === 'delete' && row) {
+                            row.remove();
+                            updateGrandTotal();
+                        }
+                    } else {
+                        alert(data.message || 'Không thể cập nhật giỏ hàng. Vui lòng thử lại.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+                });
+            }
+
+            function updateRowTotal(row) {
+                const quantity = parseInt(row.querySelector('.productQuantity').value);
+                const price = parseFloat(row.querySelector('.productPrice').textContent.replace(/,/g, ''));
+                const rowTotal = row.querySelector('.row-total');
+                rowTotal.textContent = (quantity * price).toLocaleString();
+            }
 
             function updateGrandTotal() {
                 const rows = document.querySelectorAll('#cartTable tbody tr');
@@ -197,6 +184,31 @@ if (!empty($cartItems)) {
                 const totalElement = document.getElementById('grandTotal');
                 totalElement.textContent = grandTotal.toLocaleString();
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkboxes = document.querySelectorAll('input[name="selected_items[]"]');
+            const totalElement = document.getElementById('grandTotal');
+
+            function updateGrandTotal() {
+                let grandTotal = 0;
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        const row = checkbox.closest('tr');
+                        const rowTotal = parseInt(row.querySelector('.row-total').textContent.replace(/,/g, ''));
+                        grandTotal += rowTotal;
+                    }
+                });
+                totalElement.textContent = grandTotal.toLocaleString();
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateGrandTotal);
+            });
+
+            // Reset total to 0 on page load
+            updateGrandTotal();
         });
     </script>
 </body>
