@@ -16,13 +16,10 @@
     require_once './includes/DBConnect.php';
 
     $db = DBConnect::getInstance();
-    $categories = $db->select('SELECT * FROM categories', []);
-$products = $db->select('
-    SELECT po.packaging_option_id, p.name, po.price, po.image
-    FROM packaging_options po
-    JOIN products p ON po.product_id = p.product_id
-    LIMIT 20
-', []);
+
+    $categories = $db->select('SELECT * FROM categories WHERE is_deleted = 0', []);
+
+
     ?>
     <div class="wrap flex-grow-1 py-4">
         <div class="container">

@@ -1,4 +1,10 @@
 <?php
+session_start();
+$permissions = $_SESSION['permissions'] ?? [];
+$productPermissions = $permissions['Quản lý sản phẩm'] ?? [];
+$canWrite = in_array('write', $productPermissions);
+$canDelete = in_array('delete', $productPermissions);
+
 require_once '../../includes/DBConnect.php';
 require_once '../../includes/pagination.php';
 $db = DBConnect::getInstance();
@@ -129,12 +135,12 @@ foreach ($product_images as $img) {
 
 
 ob_start();
-foreach ($products as $product): 
+foreach ($products as $product):
     $packaging_options = $db->select('SELECT * FROM packaging_options WHERE product_id = ?', [$product['product_id']]);
     $dataPackaging = htmlspecialchars(json_encode($packaging_options), ENT_QUOTES, 'UTF-8');
 
     $images = $productImageMap[$product['product_id']] ?? [];
-    $dataImages = htmlspecialchars(json_encode($images), ENT_QUOTES, 'UTF-8');?>
+    $dataImages = htmlspecialchars(json_encode($images), ENT_QUOTES, 'UTF-8'); ?>
 
     <tr>
         <td><?= $product['product_id'] ?></td>
@@ -148,23 +154,35 @@ foreach ($products as $product):
         <td class="text-capitalize"><?= $product['packaging_type'] ?></td>
         <td class="text-capitalize"><?= $product['origin'] ?></td>
         <td class="ellipsis" style="max-width: 150px;"><?= $product['description'] ?></td>
-        <td>
-            <a href="#" class="text-primary me-3 btn-sua-sanpham text-decoration-none"
-                data-id="<?= $product['product_id'] ?>"
-                data-name="<?= htmlspecialchars($product['name']) ?>"
-                data-size="<?= $product['size'] ?>"
-                data-price="<?= $product['price'] ?>"
-                data-category="<?= $product['category_id'] ?>"
-                data-brand="<?= $product['brand_id'] ?>"
-                data-origin="<?= $product['origin'] ?>"
-                data-unit="<?= $product['packaging_type'] ?>"
-                data-description="<?= htmlspecialchars($product['description']) ?>"
-                data-images="<?= $dataImages ?>"
-                data-packaging="<?= $dataPackaging ?>">
-                <i class="fas fa-pen fa-lg"></i>
-            </a>
-            <a href="#" class="text-danger btn-delete-product" data-id="<?= $product['product_id'] ?>" data-bs-toggle="modal" data-bs-target="#modalXoaSanPham"><i class="fas fa-trash fa-lg"></i></a>
-        </td>
+        <?php if ($canWrite || $canDelete): ?>
+            <td>
+                <?php if (in_array('write', $productPermissions)): ?>
+                    <a href="#" class="text-primary me-3 btn-sua-sanpham text-decoration-none"
+                        data-id="<?= $product['product_id'] ?>"
+                        data-name="<?= htmlspecialchars($product['name']) ?>"
+                        data-size="<?= $product['size'] ?>"
+                        data-price="<?= $product['price'] ?>"
+                        data-category="<?= $product['category_id'] ?>"
+                        data-brand="<?= $product['brand_id'] ?>"
+                        data-origin="<?= $product['origin'] ?>"
+                        data-unit="<?= $product['packaging_type'] ?>"
+                        data-description="<?= htmlspecialchars($product['description']) ?>"
+                        data-images="<?= $dataImages ?>"
+                        data-packaging="<?= $dataPackaging ?>">
+                        <i class="fas fa-pen fa-lg"></i>
+                    </a>
+                <?php endif; ?>
+
+                <?php if (in_array('delete', $productPermissions)): ?>
+                    <a href="#" class="text-danger btn-delete-product"
+                        data-id="<?= $product['product_id'] ?>"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalXoaSanPham">
+                        <i class="fas fa-trash fa-lg"></i>
+                    </a>
+                <?php endif; ?>
+            </td>
+        <?php endif; ?>
     </tr>
 <?php endforeach;
 

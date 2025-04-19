@@ -62,9 +62,13 @@
 require_once '../includes/DBConnect.php';
 $db = DBConnect::getInstance();
 
-$categories = $db->select('SELECT * FROM categories');
+$productPermissions = $_SESSION['permissions']['Quản lý sản phẩm'] ?? [];
+$canWrite = in_array('write', $productPermissions);
+$canDelete = in_array('delete', $productPermissions);
 
-$brands = $db->select('SELECT * FROM brand');
+$categories = $db->select('SELECT * FROM categories WHERE is_deleted = 0');
+
+$brands = $db->select('SELECT * FROM brand WHERE is_deleted = 0');
 
 $products = $db->select('
 SELECT 
@@ -98,10 +102,12 @@ LIMIT 5;
 ?>
 <div>
     <div class="p-3 d-flex align-items-center rounded" style="background-color: #f0f0f0; height: 80px;">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalThemSanPham">
-            <i class="fa-solid fa-plus me-1"></i>
-            THÊM
-        </button>
+        <?php if (in_array('write', $productPermissions)): ?>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalThemSanPham">
+                <i class="fa-solid fa-plus me-1"></i> THÊM
+            </button>
+        <?php endif; ?>
+
 
         <!-- Thanh tìm kiếm -->
         <div class="flex-grow-1">
@@ -149,7 +155,9 @@ LIMIT 5;
                     <th scope="col">Đơn vị đóng gói</th>
                     <th scope="col">Nơi sản xuất</th>
                     <th scope="col">Mô tả</th>
-                    <th scope="col">Chức năng</th>
+                    <?php if ($canWrite || $canDelete): ?>
+                        <th scope="col">Chức năng</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody class="product-wrap text-center align-middle">
@@ -881,7 +889,7 @@ LIMIT 5;
             const raw = option.unit_quantity + '';
             const number = parseInt(raw); // Lấy phần số
             const unit = raw.replace(/\d+/g, '').trim(); // Lấy phần chữ (nếu có)
-            if(number !== 1) {
+            if (number !== 1) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <input type="hidden" name="packaging_option_id[]" value="${option.packaging_option_id}">

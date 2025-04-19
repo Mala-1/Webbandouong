@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 19, 2025 at 04:59 AM
+-- Generation Time: Apr 19, 2025 at 12:56 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -30,80 +30,84 @@ SET time_zone = "+00:00";
 CREATE TABLE `brand` (
   `brand_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `image` varchar(255) DEFAULT NULL
+  `image` varchar(255) DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `brand`
 --
 
-INSERT INTO `brand` (`brand_id`, `name`, `image`) VALUES
-(1, '333', '333.png'),
-(2, 'bivina', 'bivina.jpg'),
-(3, 'budweiser', 'budweiser.jpg'),
-(4, 'corona', 'corona.jpg'),
-(5, 'heineken', 'heineken.png'),
-(6, 'hoegaarden', 'hoegaarden.jpg'),
-(7, 'huda', 'huda.jpg'),
-(8, 'kronenbourg-1664-blanc', 'kronenbourg-1664-blanc.jpg'),
-(9, 'larue', 'larue.png'),
-(10, 'sai-gon', 'sai-gon.jpg'),
-(11, 'san-migue', 'san-migue.jpg'),
-(12, 'somersby', 'somersby.jpg'),
-(13, 'strongbow', 'strongbow.jpg'),
-(14, 'tiger', 'tiger.jpg'),
-(15, 'Coca cola', 'coca-cola-2309202010534.png'),
-(16, 'Pepsi', 'pepsi-2307202415540.png'),
-(17, 'fanta', 'fanta-15032021112040.jpg'),
-(18, '7 up', 'frame-2_202503121056045336.jpg'),
-(19, 'mirinda', 'mirinda_202411270859187901.jpg'),
-(20, 'schweppes', 'schweppes-0504202194054.jpg'),
-(21, 'sprite', 'sprite-24092020111818.png'),
-(22, 'trà ô long', 'tea_202411270905119668.jpg'),
-(23, 'Trà dr.thanh', 'drthanh-0504202113325.jpg'),
-(24, '0 độ', 'khong-do-0604202113025.jpg'),
-(25, 'c2', 'c2-14032021212318.jpg'),
-(26, 'wonderfarm', 'wonderfarm-05042021173431.jpg'),
-(27, 'boncha', '38142-id_202503251036372570.jpg'),
-(28, 'red bull', 'redbull-04042021224712.jpg'),
-(29, 'sting', 'sting-1509202216502.jpg'),
-(30, 'revive', 'revice_202411270902102658.jpg'),
-(31, 'lipovitan', 'lipovitan-0404202118632.jpg'),
-(32, 'monster', 'monster-energy-14032021225816.jpg'),
-(33, 'number 1', 'number1-150320219153.jpg'),
-(34, 'aquafina', 'aquafina-15092022164854.jpg'),
-(35, 'lavie', 'la-vie-16012023163848.jpg'),
-(36, 'dasani', 'dasani-0404202118112.jpg'),
-(37, 'good-mood', 'good-mood-15092022164718.jpg'),
-(38, 'khanh-hoa', 'khanh-hoa-0604202103456.jpg'),
-(39, 'sai-gon-anpha', 'sai-gon-anpha-0504202191210.jpg'),
-(40, 'song-yen', 'song-yen-13032021151130.jpg'),
-(41, 'green-bird', 'green-bird-05042021133923.jpg'),
-(42, 'winsnest', 'winsnest-05042021173323.jpg'),
-(43, 'nunest', 'nunest-1503202191439.jpg'),
-(44, 'rice', 'rice-08122023134310.jpg'),
-(45, 'twister', 'twister_202411270859599776.jpg'),
-(46, 'vinamilk', 'vinamilk-12072023161451.jpg'),
-(47, 'ice', 'ice-060420210170.jpg'),
-(48, 'jele', 'jele-0604202103444.jpg'),
-(49, 'teppy', 'teppy-230920209348.png'),
-(50, 'a1-food', 'a1-food-2010202162610.jpg'),
-(51, 'minute-maid', 'minute-maid-1403202122447.jpg'),
-(52, 'mogu-mogu', 'mogu-mogu-14032021223718.jpg'),
-(53, 'woongjin', 'woongjin-05042021173535.jpg'),
-(54, 'deedo-fruitku', 'deedo-fruitku-1503202122850.jpg'),
-(55, 'nutriboost', 'nutriboost-12032021113715.jpg'),
-(56, 'yomost', 'yomost-0504202122036.jpg'),
-(57, 'kirin', 'kirin-140320210131.jpg'),
-(58, 'oggi', 'oggi-2025-03-18t101304016_202503181013127329.jpg'),
-(59, 'kun', '23201-id_202501171604047009.jpg'),
-(60, 'nescafe', 'nescafe-14032021235351.jpg'),
-(61, 'vinacafe', 'vinacafe-13032021142756.jpg'),
-(62, 'g7', 'g7-05042021145038.jpg'),
-(63, 'wake-up', 'wake-up-1503202185914.jpg'),
-(64, 'trung-nguyen', 'trung-nguyen-0504202116614.jpg'),
-(65, 'maccoffee', 'maccoffee-13032021225237.jpg'),
-(66, 'ong-bau', 'ong-bau-22032021132457.jpg');
+INSERT INTO `brand` (`brand_id`, `name`, `image`, `is_deleted`) VALUES
+(1, '333', '333.png', 0),
+(2, 'bivina', 'bivina.jpg', 0),
+(3, 'budweiser', 'budweiser.jpg', 0),
+(4, 'corona', 'corona.jpg', 0),
+(5, 'heineken', 'heineken.png', 0),
+(6, 'hoegaarden', 'hoegaarden.jpg', 0),
+(7, 'huda', 'huda.jpg', 0),
+(8, 'kronenbourg-1664-blanc', 'kronenbourg-1664-blanc.jpg', 0),
+(9, 'larue', 'larue.png', 0),
+(10, 'sai-gon', 'sai-gon.jpg', 0),
+(11, 'san-migue', 'san-migue.jpg', 0),
+(12, 'somersby', 'somersby.jpg', 0),
+(13, 'strongbow', 'strongbow.jpg', 0),
+(14, 'tiger', 'tiger.jpg', 0),
+(15, 'Coca cola', 'coca-cola-2309202010534.png', 0),
+(16, 'Pepsi', 'pepsi-2307202415540.png', 0),
+(17, 'fanta', 'fanta-15032021112040.jpg', 0),
+(18, '7 up', 'frame-2_202503121056045336.jpg', 0),
+(19, 'mirinda', 'mirinda_202411270859187901.jpg', 0),
+(20, 'schweppes', 'schweppes-0504202194054.jpg', 0),
+(21, 'sprite', 'sprite-24092020111818.png', 0),
+(22, 'trà ô long', 'tea_202411270905119668.jpg', 0),
+(23, 'Trà dr.thanh', 'drthanh-0504202113325.jpg', 0),
+(24, '0 độ', 'khong-do-0604202113025.jpg', 0),
+(25, 'c2', 'c2-14032021212318.jpg', 0),
+(26, 'wonderfarm', 'wonderfarm-05042021173431.jpg', 0),
+(27, 'boncha', '38142-id_202503251036372570.jpg', 0),
+(28, 'red bull', 'redbull-04042021224712.jpg', 0),
+(29, 'sting', 'sting-1509202216502.jpg', 0),
+(30, 'revive', 'revice_202411270902102658.jpg', 0),
+(31, 'lipovitan', 'lipovitan-0404202118632.jpg', 0),
+(32, 'monster', 'monster-energy-14032021225816.jpg', 0),
+(33, 'number 1', 'number1-150320219153.jpg', 0),
+(34, 'aquafina', 'aquafina-15092022164854.jpg', 0),
+(35, 'lavie', 'la-vie-16012023163848.jpg', 0),
+(36, 'dasani', 'dasani-0404202118112.jpg', 0),
+(37, 'good-mood', 'good-mood-15092022164718.jpg', 0),
+(38, 'khanh-hoa', 'khanh-hoa-0604202103456.jpg', 0),
+(39, 'sai-gon-anpha', 'sai-gon-anpha-0504202191210.jpg', 0),
+(40, 'song-yen', 'song-yen-13032021151130.jpg', 0),
+(41, 'green-bird', 'green-bird-05042021133923.jpg', 0),
+(42, 'winsnest', 'winsnest-05042021173323.jpg', 0),
+(43, 'nunest', 'nunest-1503202191439.jpg', 0),
+(44, 'rice', 'rice-08122023134310.jpg', 0),
+(45, 'twister', 'twister_202411270859599776.jpg', 0),
+(46, 'vinamilk', 'vinamilk-12072023161451.jpg', 0),
+(47, 'ice', 'ice-060420210170.jpg', 0),
+(48, 'jele', 'jele-0604202103444.jpg', 0),
+(49, 'teppy', 'teppy-230920209348.png', 0),
+(50, 'a1-food', 'a1-food-2010202162610.jpg', 0),
+(51, 'minute-maid', 'minute-maid-1403202122447.jpg', 0),
+(52, 'mogu-mogu', 'mogu-mogu-14032021223718.jpg', 0),
+(53, 'woongjin', 'woongjin-05042021173535.jpg', 0),
+(54, 'deedo-fruitku', 'deedo-fruitku-1503202122850.jpg', 0),
+(55, 'nutriboost', 'nutriboost-12032021113715.jpg', 0),
+(56, 'yomost', 'yomost-0504202122036.jpg', 0),
+(57, 'kirin', 'kirin-140320210131.jpg', 0),
+(58, 'oggi', 'oggi-2025-03-18t101304016_202503181013127329.jpg', 0),
+(59, 'kun', '23201-id_202501171604047009.jpg', 0),
+(60, 'nescafe', 'nescafe-14032021235351.jpg', 0),
+(61, 'vinacafe', 'vinacafe-13032021142756.jpg', 0),
+(62, 'g7', 'g7-05042021145038.jpg', 0),
+(63, 'wake-up', 'wake-up-1503202185914.jpg', 0),
+(64, 'trung-nguyen', 'trung-nguyen-0504202116614.jpg', 0),
+(65, 'maccoffee', 'maccoffee-13032021225237.jpg', 0),
+(66, 'ong-bau', 'ong-bau-22032021132457.jpg', 0),
+(71, 'kkk', '10f24jac005-silver-birch-ao-khoac-nam-1-jpg-3nvj.jpg', 1),
+(72, 'kkk', '10f24jac005-black-ao-khoac-nam-1-jpg-x1gs.jpg', 1),
+(73, 'kkk', '10f24jac005-dried-sage-ao-khoac-nam-1-jpg-7q20.jpg', 1);
 
 -- --------------------------------------------------------
 
@@ -122,7 +126,8 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`cart_id`, `user_id`, `created_at`) VALUES
-(1, 7, '2025-04-16 09:08:32');
+(1, 7, '2025-04-16 09:08:32'),
+(30, 12, '2025-04-19 10:50:55');
 
 -- --------------------------------------------------------
 
@@ -144,7 +149,13 @@ CREATE TABLE `cart_details` (
 --
 
 INSERT INTO `cart_details` (`cart_detail_id`, `cart_id`, `packaging_option_id`, `quantity`, `price`) VALUES
-(1, 1, 2, 12, 110000.00);
+(1, 1, 2, 13, 110000.00),
+(2, 30, 98, 9, 175000.00),
+(3, 30, 282, 16, 36500.00),
+(4, 30, 317, 23, 44000.00),
+(5, 30, 374, 17, 300000.00),
+(6, 30, 140, 1, 39000.00),
+(7, 30, 96, 1, 7800.00);
 
 -- --------------------------------------------------------
 
@@ -155,24 +166,28 @@ INSERT INTO `cart_details` (`cart_detail_id`, `cart_id`, `packaging_option_id`, 
 CREATE TABLE `categories` (
   `category_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `image` varchar(255) DEFAULT NULL
+  `image` varchar(255) DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `categories`
 --
 
-INSERT INTO `categories` (`category_id`, `name`, `image`) VALUES
-(1, 'Nước ngọt', 'nuoc-ngot.png'),
-(2, 'Cà phê hòa tan', 'ca-phe-hoa-tan.png'),
-(3, 'Nước ép trái cây', 'nuoc-ep-trai-cay.png'),
-(4, 'Bia, nước có cồn', 'bia.png'),
-(5, 'Nước suối', 'nuoc-suoi.png'),
-(6, 'Nước tăng lực', 'nuoc-tang-luc.png'),
-(7, 'Nước trà', 'nuoc-tra.png'),
-(8, 'Nước yến', 'nuoc-yen.jpg'),
-(9, 'Rượu', 'ruou.png'),
-(10, 'Sữa', 'sua.png');
+INSERT INTO `categories` (`category_id`, `name`, `image`, `is_deleted`) VALUES
+(1, 'Nước ngọt', 'nuoc-ngot.png', 0),
+(2, 'Cà phê hòa tan', 'ca-phe-hoa-tan.png', 0),
+(3, 'Nước ép trái cây', 'nuoc-ep-trai-cay.png', 0),
+(4, 'Bia, nước có cồn', 'bia.png', 0),
+(5, 'Nước suối', 'nuoc-suoi.png', 0),
+(6, 'Nước tăng lực', 'nuoc-tang-luc.png', 0),
+(7, 'Nước trà', 'nuoc-tra.png', 0),
+(8, 'Nước yến', 'nuoc-yen.jpg', 0),
+(9, 'Rượu', 'ruou.png', 0),
+(10, 'Sữa', 'sua.png', 0),
+(11, 'kkk', '10F23SWE001_BLACK_ao-sweater-nam-3-nmkb.jpg', 1),
+(12, 'kkk', '10F23SWE001_BLACK_ao-sweater-nam-3-nmkb.jpg', 1),
+(13, 'kkk', '10F23SWE001_BLUE-QUARTZ_ao-sweater-nam-3-hfyp.jpg', 1);
 
 -- --------------------------------------------------------
 
@@ -2041,17 +2056,18 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `phone`, `address`, `role_id`) VALUES
-(1, 'staff1', '$2y$10$6gX8v7BT9bHuV3Rxg6PXGe6roRNTDxy9FZJXIkMjdxVjiyLHZGPKG', 'staff1@example.com', '0900000001', 'Hà Nội', 4),
-(2, 'staff2', '$2y$10$tVx2T2MvzP0iZrE7nYOLzOVZVXnvBb45uMzI56XwIdWRoLzoMAvZG', 'staff2@example.com', '0900000002', 'TP.HCM', 4),
-(3, 'staff3', '$2y$10$AKcM35.6o7Dk0Jd5ujbQdOyaT9aS2o1X6Fh5TOLZDPjUkB4ScwArW', 'staff3@example.com', '0900000003', 'Đà Nẵng', 4),
-(4, 'staff4', '$2y$10$Ru6hDniEHFZsQT7EVWeRReGRQZcK4UeS81n3qsNYBb6FxmdTXxU6a', 'staff4@example.com', '0900000004', 'Cần Thơ', 4),
-(5, 'staff5', '$2y$10$9z8hF1DJE1E2zJ0k7OZLqOYKUfxksTI7Hg3mN8KyULfxy27RlVOt2', 'staff5@example.com', '0900000005', 'Hải Phòng', 4),
-(6, 'staff6', '$2y$10$SxN81AxBejC/dEgeU5Tfqu0fzqlFEGRkxFgmCkKPvWIv97XYLRi8K', 'staff6@example.com', '0900000006', 'Huế', 4),
+(1, 'staff1', '$2y$10$VLADBEKTpoLK1GhLGlmDNO1LElvM1ZycI4DJUra8eUg7lVBT22Sli', 'staff1@example.com', '0900000001', 'Hà Nội', 4),
+(2, 'staff2', '$2y$10$s84z.ItSf37Bpb.fJLx.uubUEjyRi6yEloRtAjAFd/LckGfGHriH.', 'staff2@example.com', '0900000002', 'TP.HCM', 4),
+(3, 'staff3', '$2y$10$pyDAhMZj9gN7VrKEA9R2OekTdmM5v3Vc5B3bXiANQkyqunhXYbjWe', 'staff3@example.com', '0900000003', 'Đà Nẵng', 4),
+(4, 'staff4', '$2y$10$2/zWLIlYrygsgB9vKVgHpuxfbn8LoW0.m4WNhAVc1Ax9MuQ8gTjgy', 'staff4@example.com', '0900000004', 'Cần Thơ', 4),
+(5, 'staff5', '$2y$10$809pNue9ZWfQxstH85Sjo.rvA9Po36P/HP3SGnoloQ9KLeMKLER72', 'staff5@example.com', '0900000005', 'Hải Phòng', 4),
+(6, 'staff6', '$2y$10$B9LbsiXn9c2AoiX2NCvyx..c52f3ZuLvnXzussKh8G0qH8m1vCXsK', 'staff6@example.com', '0900000006', 'Huế', 4),
 (7, 'user1', '$2y$10$qGUuz0BD.7XtKHXLc03nDOa1tMHPgVDEkU4BiwCTKQ1YZJQHURtJK', 'user1@example.com', '0123456781', 'Address 1', 1),
 (8, 'user2', '$2y$10$D0jTe9e2zEvM7BIrCPvBpeXqkSfx1GhI/1twRaLZ7DfnHqX6SGgZW', 'user2@example.com', '0123456782', 'Address 2', 1),
 (9, 'user3', '$2y$10$TScOEql3UvUfzUEXrclmB.tvD3nVtLBN2aL0TmWQYr1PvVYJJYl5y', 'user3@example.com', '0123456783', 'Address 3', 1),
 (10, 'user4', '$2y$10$P2UE7KiONH3Ggz.9Hn9GP..Crk7SxqJ/kQ27fBkJRMj.PY9fTpmjq', 'user4@example.com', '0123456784', 'Address 4', 1),
-(11, 'user5', '$2y$10$LVY2huOvFZlpeAFESn7R4eA0r2nWHClWnCKrPCgkN99ZB0Bvdyff2', 'user5@example.com', '0123456785', 'Address 5', 1);
+(11, 'user5', '$2y$10$LVY2huOvFZlpeAFESn7R4eA0r2nWHClWnCKrPCgkN99ZB0Bvdyff2', 'user5@example.com', '0123456785', 'Address 5', 1),
+(12, 'vinh', '$2y$10$S28C55QRwVhXfHVFVJcRbehLXSiC3c6YDSB7iCMKgVpqo/YZFaPom', '000@gmail.com', '0123', '0', 1);
 
 --
 -- Indexes for dumped tables
@@ -2187,25 +2203,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `brand`
 --
 ALTER TABLE `brand`
-  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `cart_details`
 --
 ALTER TABLE `cart_details`
-  MODIFY `cart_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `cart_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `import_order`
@@ -2277,13 +2293,13 @@ ALTER TABLE `role_permission_details`
 -- AUTO_INCREMENT for table `supplier`
 --
 ALTER TABLE `supplier`
-  MODIFY `supplier_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `supplier_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables

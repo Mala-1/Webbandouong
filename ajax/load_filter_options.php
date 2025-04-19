@@ -15,7 +15,7 @@ $sql = "SELECT DISTINCT
             b.image AS brand_image
         FROM products p
         JOIN brand b ON p.brand_id = b.brand_id
-        WHERE p.category_id = ?";
+        WHERE p.category_id = ? AND b.is_deleted = 0";
 
 $category_brandImage = $db->select($sql, [$categoryId]);
 

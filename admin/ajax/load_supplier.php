@@ -1,4 +1,9 @@
 <?php
+session_start();
+$permissions = $_SESSION['permissions'] ?? [];
+$canWrite = in_array('write', $permissions['Quản lý đơn nhập'] ?? []);
+$canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
+
 require_once '../../includes/DBConnect.php';
 require_once '../../includes/pagination.php';
 $db = DBConnect::getInstance();
@@ -58,14 +63,24 @@ foreach ($suppliers as $supplier): ?>
         <td><?= $supplier['name'] ?></td>
         <td><?= $supplier['email'] ?></td>
         <td><?= $supplier['address'] ?></td>
-        <td class="action-icons">
-            <i class="fas fa-pen text-primary btn-edit-supplier"
-                data-id="<?= $supplier['supplier_id'] ?>"
-                data-name="<?= htmlspecialchars($supplier['name']) ?>"
-                data-email="<?= htmlspecialchars($supplier['email']) ?>"
-                data-address="<?= htmlspecialchars($supplier['address']) ?>"></i>
-            <i class="fas fa-trash text-danger btn-delete-supplier" data-id="<?= $supplier['supplier_id'] ?>" data-bs-toggle="modal" data-bs-target="#modalXoaNCC"></i>
-        </td>
+        <?php if ($canWrite || $canDelete): ?>
+            <td class="action-icons">
+                <?php if ($canWrite): ?>
+                    <i class="fas fa-pen text-primary btn-edit-supplier"
+                        data-id="<?= $supplier['supplier_id'] ?>"
+                        data-name="<?= htmlspecialchars($supplier['name']) ?>"
+                        data-email="<?= htmlspecialchars($supplier['email']) ?>"
+                        data-address="<?= htmlspecialchars($supplier['address']) ?>"></i>
+                <?php endif; ?>
+
+                <?php if ($canDelete): ?>
+                    <i class="fas fa-trash text-danger btn-delete-supplier"
+                        data-id="<?= $supplier['supplier_id'] ?>"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalXoaNCC"></i>
+                <?php endif; ?>
+            </td>
+        <?php endif; ?>
     </tr>
 <?php endforeach;
 

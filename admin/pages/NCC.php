@@ -1,3 +1,10 @@
+<?php
+$permissions = $_SESSION['permissions'] ?? [];
+$canReadNCC = in_array('read', $permissions['Quản lý đơn nhập'] ?? []);
+$canWriteNCC = in_array('write', $permissions['Quản lý đơn nhập'] ?? []);
+$canDeleteNCC = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
+?>
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -51,9 +58,11 @@
 <body>
   <div class="custom-container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <button class="btn btn-primary btn-add-supplier" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-        <i class="fa fa-plus"></i> THÊM
-      </button>
+      <?php if ($canWriteNCC): ?>
+        <button class="btn btn-primary btn-add-supplier" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+          <i class="fa fa-plus"></i> THÊM
+        </button>
+      <?php endif; ?>
       <input style="margin: auto;" name="name" type="text" class="form-control w-25" placeholder="🔍 Tên nhà cung cấp">
     </div>
   </div>
@@ -71,7 +80,9 @@
             <th>Tên nhà cung cấp</th>
             <th>Email</th>
             <th>Địa chỉ</th>
-            <th>Chức năng</th>
+            <?php if ($canWriteNCC || $canDeleteNCC): ?>
+              <th>Chức năng</th>
+            <?php endif; ?>
           </tr>
         </thead>
         <tbody class="supplier-wrap">
@@ -80,10 +91,12 @@
             <td>Công ty ABC</td>
             <td>abc@abc.com</td>
             <td>Số 10, Đường A, TPHCM</td>
-            <td class="action-icons">
-              <i class="fas fa-pen text-primary"></i>
-              <i class="fas fa-trash text-danger"></i>
-            </td>
+            <?php if ($canWriteNCC || $canDeleteNCC): ?>
+              <td class="action-icons">
+                <i class="fas fa-pen text-primary"></i>
+                <i class="fas fa-trash text-danger"></i>
+              </td>
+            <?php endif; ?>
           </tr>
 
         </tbody>
