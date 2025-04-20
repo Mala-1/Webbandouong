@@ -1,12 +1,9 @@
 <?php
-require_once '../includes/DBConnect.php';
-$sql = "SELECT product_id, name, price FROM product";
-$result = $conn->query($sql);
+require_once '../../includes/DBConnect.php';
+$db = DBConnect::getInstance();
+$sql = "SELECT product_id, name, price FROM products";
 
-$products = [];
-while ($row = $result->fetch_assoc()) {
-    $products[] = $row;
-}
+$products = $db->select($sql, []);
 ?>
 <!DOCTYPE html>
 <html lang="vi">

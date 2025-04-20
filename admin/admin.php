@@ -54,59 +54,64 @@ $menuItems = [
     6 => ['label' => 'Phân quyền', 'icon' => 'fa-shield-alt', 'page' => 'phanquyen'],
     7 => ['label' => 'Thể loại', 'icon' => 'fa-layer-group', 'page' => 'theloai'],
     8 => ['label' => 'Thương hiệu', 'icon' => 'fa-copyright', 'page' => 'thuonghieu'],
+    4 => ['label' => 'Phiếu nhập', 'icon' => 'fa-copyright', 'page' => 'phieunhap'],
 ];
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+
 </head>
+
 <body>
-<div class="py-4 border d-flex" style="min-height: 100vh;">
-    <!-- Sidebar -->
-    <div class="d-flex flex-column ms-4 border-end me-4 border-2" style="width: 250px;">
-        <h3 class="mb-4 ms-3">Admin Panel</h3>
-        <ul class="nav flex-column gap-2">
-            <li class="nav-item fs-5">
-                <a class="nav-link" href="?page=dashboard">
-                    <i class="fas fa-table-columns me-1"></i> Dashboard
-                </a>
-            </li>
+    <div class="py-4 border d-flex" style="min-height: 100vh;">
+        <!-- Sidebar -->
+        <div class="d-flex flex-column ms-4 border-end me-4 border-2" style="width: 250px;">
+            <h3 class="mb-4 ms-3">Admin Panel</h3>
+            <ul class="nav flex-column gap-2">
+                <li class="nav-item fs-5">
+                    <a class="nav-link" href="?page=dashboard">
+                        <i class="fas fa-table-columns me-1"></i> Dashboard
+                    </a>
+                </li>
 
-            <?php foreach ($menuItems as $permId => $item): ?>
-                <?php if (in_array($permId, $availableModules)): ?>
-                    <li class="nav-item fs-5">
-                        <a class="nav-link" href="?page=<?= $item['page'] ?>">
-                            <i class="fas <?= $item['icon'] ?> me-1"></i>
-                            <?= $item['label'] ?>
-                        </a>
-                    </li>
-                <?php endif; ?>
-            <?php endforeach; ?>
+                <?php foreach ($menuItems as $permId => $item): ?>
+                    <?php if (in_array($permId, $availableModules)): ?>
+                        <li class="nav-item fs-5">
+                            <a class="nav-link" href="?page=<?= $item['page'] ?>">
+                                <i class="fas <?= $item['icon'] ?> me-1"></i>
+                                <?= $item['label'] ?>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                <?php endforeach; ?>
 
-        </ul>
+            </ul>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-fill">
+            <?php
+            $page = $_GET['page'] ?? 'dashboard';
+            $allowedPages = ['dashboard', 'sanpham', 'donhang', 'NCC', 'phanquyen', 'thuonghieu', 'theloai'];
+            if (in_array($page, $allowedPages)) {
+                include "pages/{$page}.php";
+            } else {
+                echo "<div class='p-4'>Trang không tồn tại!</div>";
+            }
+            ?>
+        </div>
     </div>
 
-    <!-- Main content -->
-    <div class="flex-fill">
-        <?php
-        $page = $_GET['page'] ?? 'dashboard';
-        $allowedPages = ['dashboard', 'sanpham', 'donhang', 'NCC', 'phanquyen', 'thuonghieu', 'theloai'];
-        if (in_array($page, $allowedPages)) {
-            include "pages/{$page}.php";
-        } else {
-            echo "<div class='p-4'>Trang không tồn tại!</div>";
-        }
-        ?>
-    </div>
-</div>
-
-<script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="/assets/javascript/pagination.js"></script>
+    <script src="/assets/javascript/pagination.js"></script>
 </body>
+
 </html>

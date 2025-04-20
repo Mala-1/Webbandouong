@@ -6,7 +6,7 @@ require_once '../../includes/pagination.php';
 $permissions = $_SESSION['permissions'] ?? [];
 $canWriteOrder = in_array('write', $permissions['Quản lý đơn hàng'] ?? []);
 $canDeleteOrder = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
-$showActionColumn = $canWriteOrder || $canDeleteOrder;
+$canReadOrder = in_array('read', $permissions['Quản lý đơn hàng'] ?? []);
 
 $db = DBConnect::getInstance();
 
@@ -22,33 +22,34 @@ $status = $_GET['status'] ?? '';
 $whereClauses = [];
 $params = [];
 
-// ✅ Luôn kiểm tra đơn hàng chưa bị xoá
-$whereClauses[] = 'status != "cancelled"';
-
 if ($search_id !== '') {
-    $whereClauses[] = 'order_id = ?';
+    $whereClauses[] = 'o.order_id = ?';
     $params[] = $search_id;
 }
 
 if ($price_min !== '') {
-    $whereClauses[] = 'total_price >= ?';
+    $whereClauses[] = 'o.total_price >= ?';
     $params[] = $price_min;
 }
 
 if ($price_max !== '') {
-    $whereClauses[] = 'total_price <= ?';
+    $whereClauses[] = 'o.total_price <= ?';
     $params[] = $price_max;
 }
 
 if ($status !== '') {
-    $whereClauses[] = 'status = ?';
+    $whereClauses[] = 'o.status = ?';
     $params[] = $status;
 }
 
 // Gộp điều kiện WHERE
 $whereSql = count($whereClauses) > 0 ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 
-$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM orders $whereSql LIMIT $limit OFFSET $offset";
+$sql = "SELECT SQL_CALC_FOUND_ROWS o.*, pm.name AS payment_method_name 
+        FROM orders o
+        LEFT JOIN payment_method pm ON o.payment_method_id = pm.payment_method_id
+        $whereSql LIMIT $limit OFFSET $offset";
+
 $orders = $db->select($sql, $params);
 
 $totalQuery = "SELECT FOUND_ROWS()";
@@ -68,15 +69,27 @@ foreach ($orders as $order): ?>
         <td><?= htmlspecialchars($order['user_id']) ?></td>
         <td><?= htmlspecialchars($order['status']) ?></td>
         <td><?= number_format($order['total_price'], 0, ',', '.') ?> VNĐ</td>
+        <td><?= htmlspecialchars($order['payment_method_name'] ?? 'Không xác định') ?></td> <!-- ✅ Thêm phương thức thanh toán -->
         <td><?= htmlspecialchars($order['shipping_address'] ?? 'Không có') ?></td>
         <td><?= htmlspecialchars($order['created_at']) ?></td>
-        <?php if ($showActionColumn): ?>
+        <?php if ($canWriteOrder || $canDeleteOrder || $canReadOrder): ?>
             <td class="action-icons">
+                <?php if ($canReadOrder): ?>
+                    <i class="fas fa-eye text-info btn-view-order me-3 fa-lg" style="cursor: pointer;"
+                        data-id="<?= $order['order_id'] ?>"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalChiTietDonHang"
+                        data-bs-toggle="tooltip"
+                        title="Xem chi tiết đơn hàng"></i>
+                <?php endif; ?>
                 <?php if ($canWriteOrder): ?>
                     <i class="fas fa-pen text-primary btn-edit-order me-3 fa-lg" style="cursor: pointer;"
                         data-id="<?= $order['order_id'] ?>"
+                        data-user="<?= htmlspecialchars($order['user_id']) ?>"
                         data-status="<?= htmlspecialchars($order['status']) ?>"
-                        data-total="<?= $order['total_price'] ?>"></i>
+                        data-address="<?= htmlspecialchars($order['shipping_address']) ?>"
+                        data-payment="<?= htmlspecialchars($order['payment_method_id']) ?>"
+                        data-note="<?= htmlspecialchars($order['note'] ?? '') ?>"></i>
                 <?php endif; ?>
 
                 <?php if ($canDeleteOrder): ?>

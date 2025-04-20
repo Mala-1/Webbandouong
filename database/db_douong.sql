@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 19, 2025 at 12:56 PM
+-- Generation Time: Apr 20, 2025 at 02:40 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -635,6 +635,15 @@ CREATE TABLE `orders` (
   `payment_method_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`order_id`, `user_id`, `status`, `total_price`, `shipping_address`, `note`, `created_at`, `payment_method_id`) VALUES
+(1, 7, 'Chờ xử lý', 175000.00, NULL, NULL, '2025-04-01 10:15:00', NULL),
+(2, 8, 'Đã xác nhận', 89000.00, NULL, NULL, '2025-04-02 15:30:00', NULL),
+(3, 9, 'Đã giao hàng', 125000.00, NULL, NULL, '2025-04-03 09:45:00', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -649,6 +658,16 @@ CREATE TABLE `order_details` (
   `quantity` int(11) NOT NULL,
   `price` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `order_details`
+--
+
+INSERT INTO `order_details` (`order_detail_id`, `order_id`, `product_id`, `packaging_option_id`, `quantity`, `price`) VALUES
+(13, 1, 1, 11, 2, 21000.00),
+(14, 2, 2, 2, 3, 110000.00),
+(15, 3, 1, 11, 2, 21000.00),
+(16, 3, 2, 2, 3, 110000.00);
 
 -- --------------------------------------------------------
 
@@ -1093,7 +1112,10 @@ INSERT INTO `permissions` (`permission_id`, `name`) VALUES
 (3, 'Quản lý người dùng'),
 (4, 'Quản lý đơn nhập'),
 (5, 'Xem báo cáo'),
-(6, 'Quản lý quyền');
+(6, 'Quản lý quyền'),
+(7, 'Quản lý thể loại'),
+(8, 'Quản lý thương hiệu'),
+(9, 'Quản lý nhà cung cấp');
 
 -- --------------------------------------------------------
 
@@ -1993,7 +2015,24 @@ INSERT INTO `role_permission_details` (`role_permission_detail_id`, `role_id`, `
 (28, 4, 1, 'read'),
 (29, 4, 2, 'read'),
 (30, 4, 2, 'write'),
-(31, 4, 4, 'read');
+(31, 4, 4, 'read'),
+(32, 2, 7, 'read'),
+(33, 2, 7, 'write'),
+(34, 2, 7, 'delete'),
+(35, 2, 8, 'read'),
+(36, 2, 8, 'write'),
+(37, 2, 8, 'delete'),
+(38, 3, 7, 'read'),
+(39, 3, 7, 'write'),
+(40, 3, 8, 'read'),
+(41, 3, 8, 'write'),
+(42, 4, 7, 'read'),
+(43, 4, 8, 'read'),
+(44, 2, 9, 'read'),
+(45, 2, 9, 'write'),
+(46, 2, 9, 'delete'),
+(47, 3, 9, 'read'),
+(48, 4, 9, 'read');
 
 -- --------------------------------------------------------
 
@@ -2067,7 +2106,8 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `phone`, `addre
 (9, 'user3', '$2y$10$TScOEql3UvUfzUEXrclmB.tvD3nVtLBN2aL0TmWQYr1PvVYJJYl5y', 'user3@example.com', '0123456783', 'Address 3', 1),
 (10, 'user4', '$2y$10$P2UE7KiONH3Ggz.9Hn9GP..Crk7SxqJ/kQ27fBkJRMj.PY9fTpmjq', 'user4@example.com', '0123456784', 'Address 4', 1),
 (11, 'user5', '$2y$10$LVY2huOvFZlpeAFESn7R4eA0r2nWHClWnCKrPCgkN99ZB0Bvdyff2', 'user5@example.com', '0123456785', 'Address 5', 1),
-(12, 'vinh', '$2y$10$S28C55QRwVhXfHVFVJcRbehLXSiC3c6YDSB7iCMKgVpqo/YZFaPom', '000@gmail.com', '0123', '0', 1);
+(12, 'vinh', '$2y$10$S28C55QRwVhXfHVFVJcRbehLXSiC3c6YDSB7iCMKgVpqo/YZFaPom', '000@gmail.com', '0123', '0', 1),
+(13, 'admin1', '$2y$10$hLHu2sVDSIpB7G3oEWJy4Of1W5OCqips29Far5cs8iT9e4zGkHP8a', 'admin1@example.com', '0123456789', '123 Admin Street', 2);
 
 --
 -- Indexes for dumped tables
@@ -2239,13 +2279,13 @@ ALTER TABLE `import_order_details`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `order_detail_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `packaging_options`
@@ -2263,7 +2303,7 @@ ALTER TABLE `payment_method`
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `permission_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `permission_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -2287,7 +2327,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `role_permission_details`
 --
 ALTER TABLE `role_permission_details`
-  MODIFY `role_permission_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `role_permission_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `supplier`
@@ -2299,7 +2339,7 @@ ALTER TABLE `supplier`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
