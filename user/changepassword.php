@@ -129,12 +129,12 @@ $user = $db->selectOne('SELECT * FROM users WHERE user_id = ?', [$user_id]);
                                         <input type="password" class="form-control" id="confirm_password"
                                             name="confirm_password" required>
                                     </div>
+                                    <div class="text-center">
+                                        <button type="submit" name="change_password" class="btn btn-danger">Cập nhật mật
+                                            khẩu</button>
+                                    </div>
                                 </form>
                             </div>
-                        </div>
-                        <div class="text-center" style="margin-bottom: 20px;">
-                            <button type="submit" name="change_password" class="btn btn-danger">Cập nhật mật
-                                khẩu</button>
                         </div>
                     </div>
                 </div>
