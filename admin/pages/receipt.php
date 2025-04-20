@@ -1,10 +1,6 @@
 <?php
-// Kết nối CSDL
-$conn = new mysqli('localhost', 'root', '', 'banhang');
-$conn->set_charset('utf8');
-
-// Lấy danh sách sản phẩm
-$sql = "SELECT id, ten_san_pham, don_gia FROM sanpham";
+require_once '../includes/DBConnect.php';
+$sql = "SELECT product_id, name, price FROM product";
 $result = $conn->query($sql);
 
 $products = [];
