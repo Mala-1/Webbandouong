@@ -26,7 +26,7 @@ if (!$roleId) {
     exit;
 }
 
-// 🔥 Lấy đầy đủ quyền theo module_name + action
+// Lấy đầy đủ quyền theo module_name + action
 $sqlPermDetail = "SELECT p.name AS module_name, rpd.action
                   FROM role_permission_details rpd
                   JOIN permissions p ON p.permission_id = rpd.permission_id
@@ -48,15 +48,18 @@ $availableModules = array_column($permissionRows, 'permission_id');
 $menuItems = [
     1 => ['label' => 'Sản phẩm', 'icon' => 'fa-cubes', 'page' => 'sanpham'],
     2 => ['label' => 'Đơn hàng', 'icon' => 'fa-file-invoice', 'page' => 'donhang'],
+    10 => ['label' => 'Khách Hàng', 'icon' => 'fa-users', 'page' => 'khachhang'],
+    11 => ['label' => 'Nhân Viên', 'icon' => 'fa-user-tie', 'page' => 'nhanvien'],
     9 => ['label' => 'Nhà cung cấp', 'icon' => 'fa-truck', 'page' => 'NCC'],
     6 => ['label' => 'Phân quyền', 'icon' => 'fa-shield-alt', 'page' => 'phanquyen'],
     7 => ['label' => 'Thể loại', 'icon' => 'fa-layer-group', 'page' => 'theloai'],
     8 => ['label' => 'Thương hiệu', 'icon' => 'fa-copyright', 'page' => 'thuonghieu'],
     4 => ['label' => 'Phiếu nhập', 'icon' => 'fa-inbox', 'page' => 'phieunhap'],
+    5 => ['label' => 'Thống kê', 'icon' => 'fa-inbox', 'page' => 'thongke_doanhthu'],
 ];
 
 $page = $_GET['page'] ?? 'dashboard';
-$allowedPages = ['dashboard', 'sanpham', 'donhang', 'NCC', 'phanquyen', 'thuonghieu', 'theloai', 'phieunhap'];
+$allowedPages = ['dashboard', 'sanpham', 'donhang', 'khachhang', 'nhanvien', 'NCC', 'phanquyen', 'thuonghieu', 'theloai', 'phieunhap'];
 ?>
 
 <!DOCTYPE html>

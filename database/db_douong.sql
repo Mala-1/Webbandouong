@@ -1115,7 +1115,10 @@ INSERT INTO `permissions` (`permission_id`, `name`) VALUES
 (6, 'Quản lý quyền'),
 (7, 'Quản lý thể loại'),
 (8, 'Quản lý thương hiệu'),
-(9, 'Quản lý nhà cung cấp');
+(9, 'Quản lý nhà cung cấp'),
+(10, 'Quản lý khách hàng'),
+(11, 'Quản lý nhân viên');
+
 
 -- --------------------------------------------------------
 
@@ -2032,7 +2035,11 @@ INSERT INTO `role_permission_details` (`role_permission_detail_id`, `role_id`, `
 (45, 2, 9, 'write'),
 (46, 2, 9, 'delete'),
 (47, 3, 9, 'read'),
-(48, 4, 9, 'read');
+(48, 4, 9, 'read'),
+(49, 2, 10, 'view'),
+(50, 2, 10, 'edit'),
+(51, 2, 11, 'view'),
+(52, 2, 11, 'edit');
 
 -- --------------------------------------------------------
 
