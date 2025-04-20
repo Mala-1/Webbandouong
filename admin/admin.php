@@ -26,7 +26,7 @@ if (!$roleId) {
     exit;
 }
 
-// 🔥 Lấy đầy đủ quyền theo module_name + action
+// Lấy đầy đủ quyền theo module_name + action
 $sqlPermDetail = "SELECT p.name AS module_name, rpd.action
                   FROM role_permission_details rpd
                   JOIN permissions p ON p.permission_id = rpd.permission_id
@@ -50,6 +50,8 @@ $availableModules = array_column($permissionRows, 'permission_id');
 $menuItems = [
     1 => ['label' => 'Sản phẩm', 'icon' => 'fa-cubes', 'page' => 'sanpham'],
     2 => ['label' => 'Đơn hàng', 'icon' => 'fa-file-invoice', 'page' => 'donhang'],
+    10 => ['label' => 'Khách Hàng', 'icon' => 'fa-users', 'page' => 'khachhang'],
+    11 => ['label' => 'Nhân Viên', 'icon' => 'fa-user-tie', 'page' => 'nhanvien'],
     9 => ['label' => 'Nhà cung cấp', 'icon' => 'fa-truck', 'page' => 'NCC'],
     6 => ['label' => 'Phân quyền', 'icon' => 'fa-shield-alt', 'page' => 'phanquyen'],
     7 => ['label' => 'Thể loại', 'icon' => 'fa-layer-group', 'page' => 'theloai'],
@@ -68,7 +70,6 @@ $menuItems = [
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
-
 </head>
 
 <body>
@@ -84,16 +85,15 @@ $menuItems = [
                 </li>
 
                 <?php foreach ($menuItems as $permId => $item): ?>
-                    <?php if (in_array($permId, $availableModules)): ?>
-                        <li class="nav-item fs-5">
-                            <a class="nav-link" href="?page=<?= $item['page'] ?>">
-                                <i class="fas <?= $item['icon'] ?> me-1"></i>
-                                <?= $item['label'] ?>
-                            </a>
-                        </li>
-                    <?php endif; ?>
+                <?php if (in_array($permId, $availableModules)): ?>
+                <li class="nav-item fs-5">
+                    <a class="nav-link" href="?page=<?= $item['page'] ?>">
+                        <i class="fas <?= $item['icon'] ?> me-1"></i>
+                        <?= $item['label'] ?>
+                    </a>
+                </li>
+                <?php endif; ?>
                 <?php endforeach; ?>
-
             </ul>
         </div>
 
@@ -101,7 +101,7 @@ $menuItems = [
         <div class="flex-fill">
             <?php
             $page = $_GET['page'] ?? 'dashboard';
-            $allowedPages = ['dashboard', 'sanpham', 'donhang', 'NCC', 'phanquyen', 'thuonghieu', 'theloai'];
+            $allowedPages = ['dashboard', 'sanpham', 'donhang', 'khachhang', 'nhanvien', 'NCC', 'phanquyen', 'thuonghieu', 'theloai', 'phieunhap'];
             if (in_array($page, $allowedPages)) {
                 include "pages/{$page}.php";
             } else {
