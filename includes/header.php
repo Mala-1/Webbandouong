@@ -31,17 +31,19 @@ $categories = $db->select('SELECT * FROM categories', []);
 
             <!-- 🔍 Thanh tìm kiếm -->
             <form class="d-flex me-3 search-form" action="product.php" method="GET" role="search" id="headerSearchForm">
-                <input class="form-control form-control-sm me-2" type="search" name="product_name" placeholder="Tìm đồ uống..."
-                    aria-label="Tìm kiếm" style="border-radius: 20px;">
+                <input class="form-control form-control-sm me-2" type="search" name="product_name"
+                    placeholder="Tìm đồ uống..." aria-label="Tìm kiếm" style="border-radius: 20px;">
 
                 <!-- Icon 🔍 -->
-                <button type="button" class="btn btn-sm p-0 border-0 bg-transparent filterButton" style="color: #ffc107;">
+                <button type="button" class="btn btn-sm p-0 border-0 bg-transparent filterButton"
+                    style="color: #ffc107;">
                     <i class="fas fa-search fa-lg"></i>
                 </button>
 
                 <!-- Icon 🧃 Filter -->
                 <div class="dropdown ms-2">
-                    <a href="#" class="btn btn-sm p-0 border-0 bg-transparent text-warning" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a href="#" class="btn btn-sm p-0 border-0 bg-transparent text-warning" data-bs-toggle="dropdown"
+                        aria-expanded="false">
                         <i class="fas fa-filter fa-lg"></i>
                     </a>
                     <div class="dropdown-menu p-3 shadow"
@@ -53,7 +55,7 @@ $categories = $db->select('SELECT * FROM categories', []);
                             <select name="category" class="form-select form-select-sm">
                                 <option value="">-- Tất cả --</option>
                                 <?php foreach ($categories as $category): ?>
-                                    <option value="<?= $category['category_id'] ?>"><?= $category['name'] ?></option>
+                                <option value="<?= $category['category_id'] ?>"><?= $category['name'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -61,8 +63,10 @@ $categories = $db->select('SELECT * FROM categories', []);
                         <div class="mb-2">
                             <label class="form-label mb-1" style="color: #ffc107;">Giá từ - đến</label>
                             <div class="d-flex gap-2">
-                                <input type="number" name="min" class="form-control form-control-sm" placeholder="Min" min="0">
-                                <input type="number" name="max" class="form-control form-control-sm" placeholder="Max" min="0">
+                                <input type="number" name="min" class="form-control form-control-sm" placeholder="Min"
+                                    min="0">
+                                <input type="number" name="max" class="form-control form-control-sm" placeholder="Max"
+                                    min="0">
                             </div>
                         </div>
 
@@ -75,23 +79,27 @@ $categories = $db->select('SELECT * FROM categories', []);
 
             <!-- 👤 Tài khoản người dùng -->
             <?php if (isset($_SESSION['user_id'])): ?>
-                <div class="dropdown">
-                    <a href="#" class="btn btn-dark dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        👤 <?= htmlspecialchars($_SESSION['username'] ?? 'Người dùng') ?>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="../user/profile.php"><i class="fas fa-user"></i> Hồ sơ</a></li>
-                        <li><a class="dropdown-item" href="changepassword.php"><i class="fas fa-key"></i> Đổi mật khẩu</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="../user/logout.php"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
-                    </ul>
-                </div>
-            <?php else: ?>
-                <a href="../user/login.php" class="btn btn-outline-light btn-sm">
-                    Đăng nhập / Đăng ký
+            <div class="dropdown">
+                <a href="#" class="btn btn-dark dropdown-toggle" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    👤 <?= htmlspecialchars($_SESSION['username'] ?? 'Người dùng') ?>
                 </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="../user/profile.php"><i class="fas fa-user"></i> Hồ sơ</a></li>
+                    <li><a class="dropdown-item" href="../user/changepassword.php" class=" fas fa-key"></i> Đổi mật
+                            khẩu</a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="../user/logout.php"><i class="fas fa-sign-out-alt"></i> Đăng
+                            xuất</a></li>
+                </ul>
+            </div>
+            <?php else: ?>
+            <a href="../user/login.php" class="nav-link text-light d-flex align-items-center gap-2">
+                Đăng nhập / Đăng ký
+            </a>
             <?php endif; ?>
         </div>
     </nav>
