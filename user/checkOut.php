@@ -150,8 +150,8 @@ $grandTotal = $_SESSION['grandTotal'] ?? 0;
       // Hiển thị thông báo thanh toán thành công
       alert('Bạn đã thanh toán thành công!');
 
-      // Chuyển hướng về trang giỏ hàng
-      window.location.href = 'Cart.php';
+      // Chuyển hướng về trang index.php
+      window.location.href = '../index.php';
     });
   </script>
 </body>
