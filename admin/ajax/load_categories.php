@@ -2,6 +2,9 @@
 require_once '../../includes/DBConnect.php';
 require_once '../../includes/pagination.php';
 $db = DBConnect::getInstance();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $permissions = $_SESSION['permissions'] ?? [];
 $canWrite = in_array('write', $permissions['Quản lý thể loại'] ?? []);

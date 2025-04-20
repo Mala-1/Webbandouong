@@ -37,11 +37,9 @@ $permissions = [];
 foreach ($permissionsRaw as $perm) {
     $permissions[$perm['module_name']][] = $perm['action'];
 }
-
-// Gán vào session
 $_SESSION['permissions'] = $permissions;
 
-// Lấy các permission_id (nhóm quyền) mà role này có ít nhất 1 action
+// Lấy các permission_id mà role này có ít nhất 1 action
 $sqlPermissions = "SELECT DISTINCT permission_id FROM role_permission_details WHERE role_id = ?";
 $permissionRows = $db->select($sqlPermissions, [$roleId]);
 $availableModules = array_column($permissionRows, 'permission_id');
@@ -54,12 +52,15 @@ $menuItems = [
     6 => ['label' => 'Phân quyền', 'icon' => 'fa-shield-alt', 'page' => 'phanquyen'],
     7 => ['label' => 'Thể loại', 'icon' => 'fa-layer-group', 'page' => 'theloai'],
     8 => ['label' => 'Thương hiệu', 'icon' => 'fa-copyright', 'page' => 'thuonghieu'],
-    4 => ['label' => 'Phiếu nhập', 'icon' => 'fa-copyright', 'page' => 'phieunhap'],
+    4 => ['label' => 'Phiếu nhập', 'icon' => 'fa-inbox', 'page' => 'phieunhap'],
 ];
+
+$page = $_GET['page'] ?? 'dashboard';
+$allowedPages = ['dashboard', 'sanpham', 'donhang', 'NCC', 'phanquyen', 'thuonghieu', 'theloai', 'phieunhap'];
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
@@ -68,7 +69,31 @@ $menuItems = [
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .nav-link.active {
+            font-weight: bold;
+            border-radius: 0.375rem;
+        }
 
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+
+        .sidebar .nav-link {
+            padding: 10px 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #0d6efd !important;
+            color: white !important;
+            font-weight: bold;
+            border-radius: 0.375rem;
+        }
+    </style>
 </head>
 
 <body>
@@ -78,30 +103,28 @@ $menuItems = [
             <h3 class="mb-4 ms-3">Admin Panel</h3>
             <ul class="nav flex-column gap-2">
                 <li class="nav-item fs-5">
-                    <a class="nav-link" href="?page=dashboard">
+                    <?php $isActive = ($page === 'dashboard') ? 'active bg-primary text-white' : ''; ?>
+                    <a class="nav-link <?= $isActive ?>" href="?page=dashboard">
                         <i class="fas fa-table-columns me-1"></i> Dashboard
                     </a>
                 </li>
 
                 <?php foreach ($menuItems as $permId => $item): ?>
                     <?php if (in_array($permId, $availableModules)): ?>
+                        <?php $isActive = ($page === $item['page']) ? 'active bg-primary text-white' : ''; ?>
                         <li class="nav-item fs-5">
-                            <a class="nav-link" href="?page=<?= $item['page'] ?>">
-                                <i class="fas <?= $item['icon'] ?> me-1"></i>
-                                <?= $item['label'] ?>
+                            <a class="nav-link <?= $isActive ?>" href="?page=<?= $item['page'] ?>">
+                                <i class="fas <?= $item['icon'] ?> me-1"></i> <?= $item['label'] ?>
                             </a>
                         </li>
                     <?php endif; ?>
                 <?php endforeach; ?>
-
             </ul>
         </div>
 
         <!-- Main content -->
         <div class="flex-fill">
             <?php
-            $page = $_GET['page'] ?? 'dashboard';
-            $allowedPages = ['dashboard', 'sanpham', 'donhang', 'NCC', 'phanquyen', 'thuonghieu', 'theloai'];
             if (in_array($page, $allowedPages)) {
                 include "pages/{$page}.php";
             } else {

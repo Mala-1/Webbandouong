@@ -32,7 +32,7 @@ function attachGlobalPaginationEvents() {
       const max = parseInt(e.target.max);
       const validPage = isNaN(page) || page < 1 ? 1 : (page > max ? max : page);
 
-      const container = document.querySelector(".phantrang");
+      const container = e.target.closest(".phantrang"); // 🔥 FIX: lấy đúng pagination tương ứng
       const target = container?.dataset.target || "pageproduct";
 
       document.dispatchEvent(new CustomEvent("pagination:change", {

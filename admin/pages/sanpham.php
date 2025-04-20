@@ -402,6 +402,79 @@ LIMIT 5;
 
 
 
+<!-- Modal xem chi tiết sản phẩm -->
+<div class="modal fade" id="modalXemSanPham" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết sản phẩm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label>Tên sản phẩm</label>
+                        <input type="text" id="xem_name" class="form-control" readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Size</label>
+                        <input type="text" id="xem_size" class="form-control" readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Loại sản phẩm</label>
+                        <select id="xem_category" class="form-select" disabled></select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Thương hiệu</label>
+                        <select id="xem_brand" class="form-select" disabled></select>
+                    </div>
+
+                    <div class="col-12">
+                        <label>Mô tả</label>
+                        <textarea id="xem_description" class="form-control" rows="3" readonly></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <label>Ảnh</label>
+                        <div id="xem_images" class="d-flex gap-2 flex-wrap"></div>
+                    </div>
+
+                    <div class="col-6">
+                        <label>Đơn vị đóng gói</label>
+                        <input type="text" id="xem_unit" class="form-control" readonly>
+                    </div>
+
+                    <div class="col-6">
+                        <label>Nơi sản xuất</label>
+                        <input type="text" id="xem_origin" class="form-control" readonly>
+                    </div>
+
+                    <div class="col-12">
+                        <label>Kiểu đóng gói</label>
+                        <table class="table table-bordered">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th>Tên kiểu</th>
+                                    <th>Số lượng/đơn vị</th>
+                                    <th>Ảnh</th>
+                                </tr>
+                            </thead>
+                            <tbody id="xem_packaging_body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -1027,4 +1100,49 @@ LIMIT 5;
             reader.readAsDataURL(file);
         });
     }
+
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-xem-sanpham');
+        if (!btn) return;
+
+        document.getElementById('xem_name').value = btn.dataset.name;
+        document.getElementById('xem_size').value = btn.dataset.size;
+        document.getElementById('xem_description').value = btn.dataset.description;
+        document.getElementById('xem_unit').value = btn.dataset.unit;
+        document.getElementById('xem_origin').value = btn.dataset.origin;
+
+        // Gán select category/brand
+        const xemCategory = document.getElementById('xem_category');
+        xemCategory.innerHTML = categories.map(c =>
+            `<option value="${c.category_id}" ${c.category_id == btn.dataset.category ? 'selected' : ''}>${c.name}</option>`
+        ).join('');
+
+        const xemBrand = document.getElementById('xem_brand');
+        xemBrand.innerHTML = brands.map(b =>
+            `<option value="${b.brand_id}" ${b.brand_id == btn.dataset.brand ? 'selected' : ''}>${b.name}</option>`
+        ).join('');
+
+        // Gán ảnh sản phẩm
+        const imageWrap = document.getElementById('xem_images');
+        const images = JSON.parse(btn.dataset.images || '[]');
+        imageWrap.innerHTML = images.map(img =>
+            `<img src="/assets/images/SanPham/${img}" class="rounded border" width="80" height="80">`
+        ).join('');
+
+        // Gán bảng đóng gói
+        const packagingBody = document.getElementById('xem_packaging_body');
+        let packaging = [];
+        try {
+            packaging = JSON.parse(btn.dataset.packaging || "[]");
+        } catch (err) {}
+        packagingBody.innerHTML = packaging.map(p =>
+            `<tr>
+      <td>${p.packaging_type}</td>
+      <td>${p.unit_quantity}</td>
+      <td>${p.image ? `<img src="/assets/images/SanPham/${p.image}" width="50">` : ''}</td>
+    </tr>`
+        ).join('');
+
+        new bootstrap.Modal(document.getElementById('modalXemSanPham')).show();
+    });
 </script>

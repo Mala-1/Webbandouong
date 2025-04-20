@@ -11,10 +11,10 @@ $limit = 5;
 $offset = max(($page - 1) * $limit, 1);
 $params = [];
 
-$conditions = ["1"];
+$conditions = ["p.is_deleted = 0"];
 
 if (!empty($search)) {
-    $conditions[] = "p.product_name LIKE ?";
+    $conditions[] = "p.name LIKE ?";
     $params[] = "%" . $search . "%";
 }
 
@@ -75,17 +75,20 @@ function formatProductName($packaging_type, $unit_quantity, $product_name)
 ob_start();
 foreach ($rows as $row): ?>
     <tr>
-        <td><?= formatProductName($row['packaging_type'], $row['unit_quantity'], $row['product_name']) ?></td>
+        <td><?= $row['product_name'] ?></td>
         <td><?= htmlspecialchars($row['packaging_type']) ?></td>
         <td><?= htmlspecialchars($row['unit_quantity']) ?></td>
         <td><?= number_format($row['price']) ?>đ</td>
         <td><img src="../../assets/images/SanPham/<?= $row['image'] ?>" width="50" height="50" style="object-fit:cover;"></td>
         <td>
-            <button class="btn btn-success btn-sm" onclick="selectPackaging(this)"
+            <button
                 data-product-id="<?= $row['product_id'] ?>"
                 data-product="<?= htmlspecialchars($row['product_name']) ?>"
                 data-packaging="<?= htmlspecialchars($row['packaging_type']) ?> - <?= $row['unit_quantity'] ?>"
-                data-price="<?= $row['price'] ?>">
+                data-packaging-id="<?= $row['packaging_option_id'] ?>"
+                data-price="<?= $row['price'] ?>"
+                onclick="selectPackaging(this)"
+                class="btn btn-success btn-sm">
                 Chọn
             </button>
         </td>

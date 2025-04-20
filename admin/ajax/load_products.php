@@ -137,7 +137,20 @@ foreach ($product_images as $img) {
 ob_start();
 foreach ($products as $product):
     $packaging_options = $db->select('SELECT * FROM packaging_options WHERE product_id = ?', [$product['product_id']]);
+
+    // Ảnh mặc định lấy từ product_images (nếu có)
+    $defaultImage = $productImageMap[$product['product_id']][0] ?? null;
+
+    // Gán ảnh fallback nếu thiếu
+    foreach ($packaging_options as &$option) {
+        if (empty($option['image'])) {
+            $option['image'] = $defaultImage;
+        }
+    }
+    unset($option); // phá tham chiếu
+
     $dataPackaging = htmlspecialchars(json_encode($packaging_options), ENT_QUOTES, 'UTF-8');
+
 
     $images = $productImageMap[$product['product_id']] ?? [];
     $dataImages = htmlspecialchars(json_encode($images), ENT_QUOTES, 'UTF-8'); ?>
@@ -156,6 +169,20 @@ foreach ($products as $product):
         <td class="ellipsis" style="max-width: 150px;"><?= $product['description'] ?></td>
         <?php if ($canWrite || $canDelete): ?>
             <td>
+                <a href="#" class="text-info me-2 btn-xem-sanpham text-decoration-none"
+                    data-id="<?= $product['product_id'] ?>"
+                    data-name="<?= htmlspecialchars($product['name']) ?>"
+                    data-size="<?= $product['size'] ?>"
+                    data-price="<?= $product['price'] ?>"
+                    data-category="<?= $product['category_id'] ?>"
+                    data-brand="<?= $product['brand_id'] ?>"
+                    data-origin="<?= $product['origin'] ?>"
+                    data-unit="<?= $product['packaging_type'] ?>"
+                    data-description="<?= htmlspecialchars($product['description']) ?>"
+                    data-images="<?= $dataImages ?>"
+                    data-packaging="<?= $dataPackaging ?>">
+                    <i class="fas fa-eye fa-lg"></i>
+                </a>
                 <?php if (in_array('write', $productPermissions)): ?>
                     <a href="#" class="text-primary me-3 btn-sua-sanpham text-decoration-none"
                         data-id="<?= $product['product_id'] ?>"
