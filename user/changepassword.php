@@ -76,6 +76,27 @@ $user = $db->selectOne('SELECT * FROM users WHERE user_id = ?', [$user_id]);
         max-width: 400px;
         margin: 0 auto;
     }
+
+    .submit-button-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .submit-button-container .btn {
+        width: 200px;
+    }
+
+    @media (max-width: 768px) {
+        .profile-container {
+            flex-direction: column;
+        }
+
+        .profile-info {
+            margin-right: 0;
+            margin-bottom: 20px;
+        }
+    }
     </style>
 </head>
 
@@ -118,7 +139,7 @@ $user = $db->selectOne('SELECT * FROM users WHERE user_id = ?', [$user_id]);
                                     <?= $update_message ?>
                                 </div>
                                 <?php endif; ?>
-                                <form method="POST">
+                                <form method="POST" id="passwordForm">
                                     <div class="mb-3">
                                         <label for="new_password" class="form-label">Mật khẩu mới</label>
                                         <input type="password" class="form-control" id="new_password"
@@ -129,12 +150,12 @@ $user = $db->selectOne('SELECT * FROM users WHERE user_id = ?', [$user_id]);
                                         <input type="password" class="form-control" id="confirm_password"
                                             name="confirm_password" required>
                                     </div>
-                                    <div class="text-center">
-                                        <button type="submit" name="change_password" class="btn btn-danger">Cập nhật mật
-                                            khẩu</button>
-                                    </div>
                                 </form>
                             </div>
+                        </div>
+                        <div class="submit-button-container">
+                            <button type="submit" name="change_password" form="passwordForm" class="btn btn-danger">Cập
+                                nhật mật khẩu</button>
                         </div>
                     </div>
                 </div>
@@ -148,6 +169,7 @@ $user = $db->selectOne('SELECT * FROM users WHERE user_id = ?', [$user_id]);
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('#passwordForm');
         // Tự động tắt alert
         const alertEl = document.getElementById('autoAlert');
         if (alertEl) {
