@@ -72,6 +72,18 @@ if (!empty($cartItems)) {
     $_SESSION['cartItems'] = $cartItems;
     $_SESSION['grandTotal'] = $grandTotal;
 }
+
+// Fetch orders for the user
+$orderSql = 'SELECT 
+    o.order_id,
+    o.status,
+    o.total_price,
+    o.created_at
+FROM orders o
+WHERE o.user_id = ?
+ORDER BY o.created_at DESC;';
+
+$orders = $db->select($orderSql, [$userId]);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -107,7 +119,7 @@ if (!empty($cartItems)) {
                     <tbody>
                         <?php foreach ($cartItems as $item): ?>
                             <tr>
-                                <td><input type="checkbox" name="selected_items[]" value="<?= $item['cart_detail_id'] ?>" checked></td>
+                                <td><input type="checkbox" name="selected_items[]" value="<?= $item['cart_detail_id'] ?>"></td>
                                 <td><img src="../assets/images/SanPham/<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['product_name']) ?>" style="width: 50px; height: auto;"></td>
                                 <td class="text-capitalize"><?= formatProductName($item['packaging_type'], $item['unit_quantity'], $item['product_name']) ?></td>
                                 <td class="productPrice"><?= number_format($item['price']) ?></td>
@@ -138,6 +150,38 @@ if (!empty($cartItems)) {
                     </tfoot>
                 </table>
             </form>
+        <?php endif; ?>
+    </div>
+
+    <div class="container mt-5">
+        <h2>Đơn hàng</h2>
+        <?php if (empty($orders)): ?>
+            <p>Bạn chưa có đơn hàng nào.</p>
+        <?php else: ?>
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>ID Đơn hàng</th>
+                        <th>Tình trạng</th>
+                        <th>Giá (VNĐ)</th>
+                        <th>Ngày tạo</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($orders as $order): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($order['order_id']) ?></td>
+                            <td><?= htmlspecialchars($order['status']) ?></td>
+                            <td><?= number_format($order['total_price']) ?></td>
+                            <td><?= htmlspecialchars($order['created_at']) ?></td>
+                            <td>
+                                <a href="order_detail.php?order_id=<?= $order['order_id'] ?>" class="btn btn-primary">Xem chi tiết</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         <?php endif; ?>
     </div>
 
