@@ -47,6 +47,7 @@ SELECT SQL_CALC_FOUND_ROWS
                         FROM products p
                         LEFT JOIN packaging_options po ON po.product_id = p.product_id
                         WHERE $whereSql
+                        AND po.is_deleted = 0
                         LIMIT $limit OFFSET $offset
 ";
 

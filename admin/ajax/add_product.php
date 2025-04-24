@@ -70,9 +70,7 @@ try {
 
     for ($i = 0; $i < count($packaging_names); $i++) {
         $name = $packaging_names[$i] ?? '';
-        $unitQty = $unit_quantities[$i] ?? '';
-
-        $unitQty .= ' ' . $name;
+        $unitQty = intval($unit_quantities[$i] ?? 1) . ' ' .  $unit; // số lượng lon
 
         $imageName = null;
 

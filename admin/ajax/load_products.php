@@ -95,7 +95,7 @@ LEFT JOIN (
     JOIN (
         SELECT product_id, MIN(packaging_option_id) AS min_id
         FROM packaging_options
-        WHERE CAST(unit_quantity AS UNSIGNED) = 1
+        WHERE CAST(unit_quantity AS UNSIGNED) = 1 AND is_deleted = 0
         GROUP BY product_id
     ) po2 ON po1.packaging_option_id = po2.min_id
 ) po ON p.product_id = po.product_id
@@ -169,7 +169,7 @@ foreach ($products as $product):
         <td class="ellipsis" style="max-width: 150px;"><?= $product['description'] ?></td>
         <?php if ($canWrite || $canDelete): ?>
             <td>
-                <a href="#" class="text-info me-2 btn-xem-sanpham text-decoration-none"
+                <a href="#" class="text-info me-3 btn-xem-sanpham text-decoration-none"
                     data-id="<?= $product['product_id'] ?>"
                     data-name="<?= htmlspecialchars($product['name']) ?>"
                     data-size="<?= $product['size'] ?>"

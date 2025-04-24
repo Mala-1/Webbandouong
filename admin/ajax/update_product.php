@@ -60,12 +60,30 @@ try {
     handleImageUploadUpdate('images_hidden', $product_id, $uploadDir, $db);
     handleImageUploadUpdate('images_outside', $product_id, $uploadDir, $db);
 
-    // ✅ Cập nhật hoặc thêm mới packaging_options
+    // ✅ Xử lý packaging_options
     $packaging_ids = $_POST['packaging_option_id'] ?? [];
     $packaging_names = $_POST['packaging_name'] ?? [];
     $unit_quantities = $_POST['unit_quantity'] ?? [];
     $packaging_images = $_FILES['packaging_image'] ?? [];
 
+    // ✅ Xóa những packaging_option_id cũ không còn
+    $oldPackagingIds = $db->select("SELECT packaging_option_id FROM packaging_options WHERE product_id = ?", [$product_id]);
+    $oldIds = array_column($oldPackagingIds, 'packaging_option_id');
+    $keepIds = array_filter($packaging_ids); // lọc các ID có tồn tại
+
+    $idsToDelete = array_diff($oldIds, $keepIds);
+    foreach ($idsToDelete as $delId) {
+        // Nếu đang được sử dụng thì chỉ đánh dấu xóa
+        $inUse = $db->select("SELECT COUNT(*) AS total FROM import_order_details WHERE packaging_option_id = ?", [$delId]);
+        if ($inUse[0]['total'] > 0) {
+            $db->execute("UPDATE packaging_options SET is_deleted = 1 WHERE packaging_option_id = ? AND product_id = ?", [$delId, $product_id]);
+        } else {
+            $db->execute("DELETE FROM packaging_options WHERE packaging_option_id = ? AND product_id = ?", [$delId, $product_id]);
+        }
+    }
+
+
+    // ✅ Cập nhật hoặc thêm mới
     for ($i = 0; $i < count($packaging_names); $i++) {
         $packaging_id = $packaging_ids[$i] ?? null;
         $packName = trim($packaging_names[$i] ?? '');
@@ -79,13 +97,11 @@ try {
 
         if (!empty($packName) && is_numeric($unitQty)) {
             if ($packaging_id) {
-                // ✅ UPDATE nếu có ID
                 $sql = "UPDATE packaging_options 
                         SET packaging_type = ?, unit_quantity = ?, image = COALESCE(?, image)
                         WHERE packaging_option_id = ? AND product_id = ?";
                 $db->execute($sql, [$packName, $unitQty, $imageName, $packaging_id, $product_id]);
             } else {
-                // ✅ INSERT nếu chưa có
                 $sql = "INSERT INTO packaging_options (product_id, packaging_type, unit_quantity, image)
                         VALUES (?, ?, ?, ?)";
                 $db->execute($sql, [$product_id, $packName, $unitQty, $imageName]);

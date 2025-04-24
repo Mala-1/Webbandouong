@@ -156,7 +156,7 @@ LIMIT 5;
                     <th scope="col">Nơi sản xuất</th>
                     <th scope="col">Mô tả</th>
                     <?php if ($canWrite || $canDelete): ?>
-                        <th scope="col">Chức năng</th>
+                        <th scope="col" style="min-width: 120px;">Chức năng</th>
                     <?php endif; ?>
                 </tr>
             </thead>
@@ -374,12 +374,13 @@ LIMIT 5;
                                     <th scope="col">Tên kiểu đóng gói</th>
                                     <th scope="col">Số lượng trên đơn vị đóng gói</th>
                                     <th scope="col">Ảnh</th>
+                                    <th scope="col">Xóa</th> <!-- ✅ Cột mới -->
                                 </tr>
                             </thead>
                             <tbody id="packagingBodySua">
                                 <!-- sẽ render động các dòng ở đây -->
                                 <tr id="addRowTriggerSua">
-                                    <td colspan="3">
+                                    <td colspan="4" class="text-center">
                                         <button class="btn btn-success" id="btnAddRowSua" type="button">
                                             <i class="fa-solid fa-circle-plus"></i>
                                             Thêm
@@ -958,33 +959,37 @@ LIMIT 5;
 
 
         packaging.forEach(option => {
-            // Tách số và chữ ra
             const raw = option.unit_quantity + '';
-            const number = parseInt(raw); // Lấy phần số
-            const unit = raw.replace(/\d+/g, '').trim(); // Lấy phần chữ (nếu có)
+            const number = parseInt(raw);
+            const unit = raw.replace(/\d+/g, '').trim();
             if (number !== 1) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <input type="hidden" name="packaging_option_id[]" value="${option.packaging_option_id}">
-                    <td><input type="text" name="packaging_name[]" class="form-control" value="${option.packaging_type}"></td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <input type="number" name="unit_quantity[]" class="form-control" value="${number}">
-                        </div>
-                    </td>
-                    <td class="d-flex">
-                        ${option.image ? `<img src="/assets/images/SanPham/${option.image}" style="width: 50px;">` : ''}
-                        <input type="file" name="packaging_image[]" class="form-control mt-2">
-                    </td>
-                `;
+            <input type="hidden" name="packaging_option_id[]" value="${option.packaging_option_id}">
+            <td><input type="text" name="packaging_name[]" class="form-control" value="${option.packaging_type}"></td>
+            <td><input type="number" name="unit_quantity[]" class="form-control" value="${number}"></td>
+            <td class="d-flex align-items-center gap-2">
+                ${option.image ? `<img src="/assets/images/SanPham/${option.image}" style="width: 50px;">` : ''}
+                <input type="file" name="packaging_image[]" class="form-control">
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-danger btn-sm btnRemoveRow">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </td>
+        `;
                 tbody.appendChild(tr);
-
             }
         });
 
         const addRowTrigger = document.createElement('tr');
         addRowTrigger.id = 'addRowTriggerSua';
-        addRowTrigger.innerHTML = `<td colspan="3"><button class="btn btn-success" id="btnAddRowSua" type="button"><i class="fa-solid fa-circle-plus"></i> Thêm</button></td>`;
+        addRowTrigger.innerHTML = `
+    <td colspan="4" class="text-center">
+        <button class="btn btn-success" id="btnAddRowSua" type="button">
+            <i class="fa-solid fa-circle-plus"></i> Thêm
+        </button>
+    </td>`;
         tbody.appendChild(addRowTrigger);
 
 
@@ -1029,13 +1034,28 @@ LIMIT 5;
         if (e.target.closest('#btnAddRowSua')) {
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-      <td><input type="text" name="packaging_name[]" class="form-control"></td>
-      <td><input type="text" name="unit_quantity[]" class="form-control"></td>
-      <td><input type="file" name="packaging_image[]" class="form-control" accept="image/*"></td>
-    `;
+                <td><input type="text" name="packaging_name[]" class="form-control"></td>
+                <td><input type="text" name="unit_quantity[]" class="form-control"></td>
+                <td><input type="file" name="packaging_image[]" class="form-control" accept="image/*"></td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-danger btn-sm btnRemoveRow">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            `;
             this.insertBefore(newRow, document.getElementById('addRowTriggerSua'));
         }
     });
+
+    document.getElementById('packagingBodySua').addEventListener('click', function(e) {
+        if (e.target.closest('.btnRemoveRow')) {
+            const row = e.target.closest('tr');
+            if (row && !row.id.includes("addRowTriggerSua")) {
+                row.remove();
+            }
+        }
+    });
+
 
     // Submit form sửa
     document.getElementById('formSuaSanPham').addEventListener('submit', function(e) {
@@ -1061,7 +1081,8 @@ LIMIT 5;
                     currentFilesSua = [];
                     loadProducts(1); // Cập nhật lại danh sách sản phẩm
                 } else {
-                    alert('Lỗi: ' + data.message);
+                    alert(data.message);
+                    console.log(data.message);
                 }
             })
             .catch(err => {

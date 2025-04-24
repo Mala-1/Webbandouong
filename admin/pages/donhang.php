@@ -235,10 +235,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 <table class="table table-sm table-bordered mb-4">
                     <tbody>
                         <tr>
-                            <th style="width: 15%">Mã đơn hàng</th>
-                            <td id="info_order_id"></td>
                             <th style="width: 15%">Người đặt</th>
-                            <td id="info_user_id"></td>
+                            <td id="info_user_id" colspan="3"></td>
                         </tr>
                         <tr>
                             <th>Trạng thái</th>
@@ -269,6 +267,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                                 <th>Kiểu đóng gói</th>
                                 <th>Số lượng</th>
                                 <th>Giá</th>
+                                <th>Xóa</th>
                             </tr>
                         </thead>
                         <tbody id="orderDetailsTable">
@@ -320,17 +319,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                             </tr>
                         </thead>
                         <tbody id="packagingTable">
-                            <!-- Dữ liệu đóng gói sẽ được load vào đây -->
-                            <!-- Ví dụ:
-              <tr>
-                <td>Sữa tươi</td>
-                <td>Lốc</td>
-                <td>6 chai</td>
-                <td>45.000đ</td>
-                <td><img src="path.jpg" width="50"></td>
-                <td><button class="btn btn-success btn-sm" onclick="selectPackaging(this)">Chọn</button></td>
-              </tr>
-              -->
                         </tbody>
                     </table>
                 </div>
@@ -538,41 +526,46 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             e.preventDefault();
 
             const formData = new FormData(this);
+            const user_id = formData.get('user_id');
+            const status = formData.get('status');
+            const payment_method_id = formData.get('payment_method_id');
+            const payment_method_name = this.querySelector('[name="payment_method_id"] option:checked').textContent;
+            const shipping_address = formData.get('shipping_address');
+            const note = formData.get('note') || '';
 
-            fetch("ajax/add_order.php", {
-                    method: "POST",
-                    body: formData,
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        document.querySelector("#info_order_id").textContent = data.order_id;
-                        document.querySelector("#info_user_id").textContent = data.user_id;
-                        document.querySelector("#info_status").textContent = data.status;
-                        document.querySelector("#info_total_price").textContent = new Intl.NumberFormat('vi-VN').format(data.total_price || 0) + ' VNĐ';
-                        document.querySelector("#info_payment").textContent = data.payment_method_name || "Không xác định";
-                        document.querySelector("#info_address").textContent = data.shipping_address || "Không có";
-                        document.querySelector("#info_date").textContent = data.created_at || "-";
+            // Tạo order_id tạm (để hiển thị), có thể là timestamp hoặc UUID
+            const temp_order_id = "TEMP_" + Date.now();
 
-                        // 1. Đóng modal Thêm đơn hàng
-                        const modalInstance = bootstrap.Modal.getInstance(addOrderModal);
-                        modalInstance.hide();
+            // Gán dữ liệu vào modal chi tiết
+            document.querySelector("#info_user_id").textContent = user_id;
+            document.querySelector("#info_status").textContent = status;
+            document.querySelector("#info_total_price").textContent = "0 VNĐ"; // Tổng giá tạm thời
+            document.querySelector("#info_payment").textContent = payment_method_name;
+            document.querySelector("#info_address").textContent = shipping_address;
+            document.querySelector("#info_date").textContent = new Date().toLocaleString();
 
-                        // 2. Reset form nếu cần
-                        this.reset();
+            // 1. Ẩn modal đơn hàng
+            const modalInstance = bootstrap.Modal.getInstance(addOrderModal);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
 
-                        // loadOrderDetails(data.order_id); // Uncomment nếu có hàm
-                        addOrderDetailsModal.show();
+            // 2. Reset form nếu muốn
+            this.reset();
 
-                        loadOrders(1);
-                    } else {
-                        alert(data.message);
-                    }
-                });
+            // 3. Hiện modal chi tiết đơn hàng
+            addOrderDetailsModal.show();
+
+            // 4. Lưu tạm thông tin order vào biến toàn cục nếu cần gửi sau
+            window.tempOrderData = {
+                user_id,
+                status,
+                payment_method_id,
+                shipping_address,
+                note
+            };
         });
     });
-
-
 
     document.addEventListener("DOMContentLoaded", function() {
         const editModal = document.querySelector("#editOrderModal");
@@ -632,8 +625,13 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 .then(data => {
                     if (data.success) {
                         const modal = bootstrap.Modal.getInstance(editModal);
-                        modal.hide();
-                        loadOrders(1, currentFilterParams);
+                        if (modal) {
+                            modal.hide();
+                        }
+                        // Gọi hàm loadOrders nếu nó được định nghĩa ở đâu đó để cập nhật lại danh sách đơn hàng
+                        if (typeof loadOrders === 'function') {
+                            loadOrders(1, currentFilterParams); // Đảm bảo currentFilterParams được định nghĩa nếu cần
+                        }
                         alert("Cập nhật đơn hàng thành công!");
                     } else {
                         alert(data.message || "Lỗi cập nhật đơn hàng");
@@ -651,7 +649,19 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         const btnAddRow = document.getElementById('btnAddRow');
         const tableBody = document.getElementById('orderDetailsTable');
 
-        // ✅ Event delegation cho nút thêm dòng mới
+        // Hàm kiểm tra xem packaging_option_id đã tồn tại trong bảng chưa
+        function isPackagingOptionExists(packagingOptionId) {
+            const existingRows = tableBody.querySelectorAll('tr:not(#addRowTrigger)');
+            for (const row of existingRows) {
+                const packagingInput = row.querySelector('input[name^="packaging_option_id"]');
+                if (packagingInput && packagingInput.value === packagingOptionId) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // ✅ Event delegation cho nút thêm dòng mới và nút xóa
         tableBody.addEventListener("click", function(e) {
             if (e.target && e.target.id === "btnAddRow") {
                 const newRow = document.createElement("tr");
@@ -661,13 +671,95 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                     <input type="text" class="form-control" name="product_name[]" readonly>
                 </td>
                 <td class="d-flex align-items-center gap-2 justify-content-center">
+                    <input type="hidden" name="packaging_option_id[]" value="">
                     <input type="text" class="form-control" name="packaging_option[]" readonly>
                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="openPackagingSelector(this)">Chọn</button>
                 </td>
                 <td><input type="number" class="form-control" name="quantity[]" placeholder="Số lượng"></td>
                 <td><input type="text" class="form-control" name="price[]" readonly></td>
+                <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa-solid fa-trash-can"></i></button></td>
             `;
                 tableBody.insertBefore(newRow, document.getElementById("addRowTrigger"));
+            } else if (e.target && e.target.classList.contains('remove-row')) {
+                e.target.closest('tr').remove();
+                updateTotalPrice(); // Cập nhật tổng giá khi xóa dòng
+            }
+        });
+
+        // Lắng nghe sự kiện khi một packaging option được chọn từ modal
+        window.selectPackaging = function(btn) {
+            const name = btn.dataset.product;
+            const packaging = btn.dataset.packaging;
+            const price = btn.dataset.price;
+            const productId = btn.dataset.productId;
+            const packagingId = btn.dataset.packagingId;
+
+            if (currentTargetRow) {
+                // Kiểm tra xem packagingOptionId đã tồn tại trong bảng chưa
+                if (isPackagingOptionExists(packagingId)) {
+                    alert(`Kiểu đóng gói "${packaging}" đã tồn tại trong chi tiết đơn hàng.`);
+                    const packagingModal = bootstrap.Modal.getInstance(document.getElementById('selectPackagingModal'));
+                    if (packagingModal) {
+                        packagingModal.hide();
+                    }
+                    const addOrderDetailsModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addOrderDetailsModal'));
+                    setTimeout(() => addOrderDetailsModal.show(), 300);
+                    currentTargetRow = null; // Reset currentTargetRow
+                    return; // Không thêm vào dòng nếu đã tồn tại
+                }
+
+                const productIdInput = currentTargetRow.querySelector('input[name="product_id[]"]');
+                const productNameInput = currentTargetRow.querySelector('input[name="product_name[]"]');
+                const packagingOptionIdInput = currentTargetRow.querySelector('input[name="packaging_option_id[]"]');
+                const packagingNameInput = currentTargetRow.querySelector('input[name="packaging_option[]"]');
+                const priceInput = currentTargetRow.querySelector('input[name="price[]"]');
+                const quantityInput = currentTargetRow.querySelector('input[name="quantity[]"]');
+
+                if (productIdInput) productIdInput.value = productId;
+                if (productNameInput) productNameInput.value = name;
+                if (packagingOptionIdInput) packagingOptionIdInput.value = packagingId;
+                if (packagingNameInput) packagingNameInput.value = packaging;
+                if (priceInput) priceInput.value = parseInt(price).toLocaleString();
+                if (quantityInput) quantityInput.removeAttribute("readonly");
+                quantityInput.value = 1; // Đặt số lượng mặc định là 1
+
+                updateTotalPrice();
+
+                const packagingModal = bootstrap.Modal.getInstance(document.getElementById('selectPackagingModal'));
+                if (packagingModal) {
+                    packagingModal.hide();
+                }
+
+                const addOrderDetailsModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addOrderDetailsModal'));
+                setTimeout(() => addOrderDetailsModal.show(), 300); // Chuyển dòng này ra ngoài if
+
+                // Sau khi chọn thành công, thêm một dòng mới để người dùng tiếp tục chọn
+               
+            }
+        };
+        // Hàm cập nhật tổng giá trong modal chi tiết
+        function updateTotalPrice() {
+            let total = 0;
+            const detailRows = tableBody.querySelectorAll('tr:not(#addRowTrigger)');
+            detailRows.forEach(row => {
+                const quantityInput = row.querySelector('input[name="quantity[]"]');
+                const priceInput = row.querySelector('input[name="price[]"]');
+                if (quantityInput && priceInput) {
+                    const quantity = parseInt(quantityInput.value) || 0;
+                    const price = parseInt(priceInput.value.replace(/[^0-9]/g, '')) || 0;
+                    total += quantity * price;
+                }
+            });
+            document.querySelector("#info_total_price").textContent = total.toLocaleString('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            });
+        }
+
+        // Lắng nghe sự kiện thay đổi số lượng để cập nhật tổng giá
+        tableBody.addEventListener('input', function(e) {
+            if (e.target && e.target.name === 'quantity[]') {
+                updateTotalPrice();
             }
         });
     });
@@ -678,10 +770,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
     const packagingTable = document.querySelector("#packagingTable");
     const paginationWrap = document.querySelector(".pagination-packaging-wrap");
     const searchPackaging = document.querySelector("#searchPackaging");
-    const btnAddRow = document.getElementById("btnAddRow");
-    const tableBody = document.getElementById("orderDetailsTable");
 
-    // 🧠 debounce dùng 1 lần cho toàn trang
     function debounce(func, delay) {
         let timeout;
         return function(...args) {
@@ -690,7 +779,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         };
     }
 
-    // 📦 Load từ DB qua AJAX
     function loadPackagingOptions(page = 1, params = "") {
         fetch(`ajax/load_packaging_options.php?page=${page}${params}`)
             .then(res => res.json())
@@ -700,8 +788,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             });
     }
 
-    // 🔍 Tìm kiếm gần đúng
-    searchPackaging.addEventListener("input", debounce(function() {
+    // 🔍 Tìm kiếm packaging
+    searchPackaging.addEventListener("input", debounce(() => {
         const keyword = searchPackaging.value.trim();
         currentFilterParamsPackaging = keyword ? `&search=${encodeURIComponent(keyword)}` : '';
         loadPackagingOptions(1, currentFilterParamsPackaging);
@@ -712,7 +800,9 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         currentTargetRow = button.closest("tr");
 
         const mainModal = bootstrap.Modal.getInstance(document.getElementById('addOrderDetailsModal'));
-        if (mainModal) mainModal.hide();
+        if (mainModal) {
+            mainModal.hide();
+        }
 
         const packagingModal = new bootstrap.Modal(document.getElementById('selectPackagingModal'));
         packagingModal.show();
@@ -720,109 +810,80 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         loadPackagingOptions(1, currentFilterParamsPackaging);
     };
 
-    // ✅ Gán sản phẩm đã chọn
-    window.selectPackaging = function(btn) {
-        const name = btn.dataset.product;
-        const packaging = btn.dataset.packaging;
-        const price = btn.dataset.price;
-        const id = btn.dataset.productId;
-
-        if (currentTargetRow) {
-            currentTargetRow.querySelector('input[name="product_id[]"]').value = id;
-            currentTargetRow.querySelector('input[name="product_name[]"]').value = name;
-            currentTargetRow.querySelector('input[name="packaging_option[]"]').value = packaging;
-            currentTargetRow.querySelector('input[name="price[]"]').value = parseInt(price).toLocaleString();
-            currentTargetRow.querySelector('input[name="quantity[]"]').removeAttribute("readonly");
-        }
-
-        const packagingModal = bootstrap.Modal.getInstance(document.getElementById('selectPackagingModal'));
-        if (packagingModal) packagingModal.hide();
-
-        const addOrderDetailsModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addOrderDetailsModal'));
-        setTimeout(() => addOrderDetailsModal.show(), 300);
-    };
-
-    // 🚀 Tải mặc định khi mở modal
-    document.querySelector('[data-bs-target="#selectPackagingModal"]')?.addEventListener("click", function() {
+    // 🚀 Khi click vào mở modal đóng gói mặc định (nếu có)
+    document.querySelector('[data-bs-target="#selectPackagingModal"]')?.addEventListener("click", () => {
         loadPackagingOptions(1);
     });
-
-
-    document.addEventListener("DOMContentLoaded", function() {
-        let currentTargetRow = null;
-        let currentFilterParamsPackaging = "";
-
-        const packagingTable = document.querySelector("#packagingTable");
-        const paginationWrap = document.querySelector(".pagination-packaging-wrap");
-        const searchPackaging = document.querySelector("#searchPackaging");
-        const btnAddRow = document.getElementById("btnAddRow");
-        const tableBody = document.getElementById("orderDetailsTable");
-
-        // 🧠 debounce dùng 1 lần cho toàn trang
-        function debounce(func, delay) {
-            let timeout;
-            return function(...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), delay);
-            };
+    document.getElementById("saveOrderDetails").addEventListener("click", function() {
+        // Lấy dữ liệu đơn hàng từ biến tạm
+        const order = window.tempOrderData;
+        if (!order) {
+            alert("Chưa có dữ liệu đơn hàng!");
+            return;
         }
 
-        // 📦 Load từ DB qua AJAX
-        function loadPackagingOptions(page = 1, params = "") {
-            fetch(`ajax/load_packaging_options.php?page=${page}${params}`)
-                .then(res => res.json())
-                .then(data => {
-                    packagingTable.innerHTML = data.packaging_html || '';
-                    paginationWrap.innerHTML = data.pagination || '';
+        // Lấy dữ liệu chi tiết đơn hàng từ bảng
+        const rows = document.querySelectorAll("#orderDetailsTable tr:not(#addRowTrigger)");
+        
+        const details = [];
+
+        rows.forEach(row => {
+            const product_id = row.querySelector('input[name="product_id[]"]')?.value;
+            console.log(product_id)
+            const quantity = row.querySelector('input[name="quantity[]"]')?.value;
+
+            const priceRaw = row.querySelector('input[name="price[]"]')?.value;
+            const packagingName = row.querySelector('input[name="packaging_option[]"]')?.value;
+
+            // Giả sử bạn đã lưu packaging_option_id trong data attribute
+            const packaging_option_id = row.querySelector('input[name="packaging_option_id[]"]')?.value;
+            console.log(packaging_option_id)
+
+            if (product_id && packaging_option_id && quantity && priceRaw) {
+                const price = parseFloat(priceRaw.replace(/[^\d.-]/g, '')); // Loại bỏ định dạng tiền
+                details.push({
+                    product_id: parseInt(product_id),
+                    packaging_option_id: parseInt(packaging_option_id),
+                    quantity: parseInt(quantity),
+                    price
                 });
+            }
+        });
+        // console.log(details)
+
+        if (details.length === 0) {
+            alert("Vui lòng thêm ít nhất một dòng chi tiết sản phẩm.");
+            return;
         }
 
-        // 🔍 Tìm kiếm gần đúng
-        searchPackaging.addEventListener("input", debounce(function() {
-            const keyword = searchPackaging.value.trim();
-            currentFilterParamsPackaging = keyword ? `&search=${encodeURIComponent(keyword)}` : '';
-            loadPackagingOptions(1, currentFilterParamsPackaging);
-        }, 300));
+        const formData = new FormData();
+        formData.append("user_id", order.user_id);
+        formData.append("status", order.status);
+        formData.append("shipping_address", order.shipping_address);
+        formData.append("payment_method_id", order.payment_method_id);
+        formData.append("note", order.note || "");
+        formData.append("details", JSON.stringify(details));
 
+        console.log(formData)
 
-        // 🔍 Mở modal chọn đóng gói
-        window.openPackagingSelector = function(button) {
-            currentTargetRow = button.closest("tr");
-
-            const mainModal = bootstrap.Modal.getInstance(document.getElementById('addOrderDetailsModal'));
-            if (mainModal) mainModal.hide();
-
-            const packagingModal = new bootstrap.Modal(document.getElementById('selectPackagingModal'));
-            packagingModal.show();
-
-            loadPackagingOptions(1, currentFilterParamsPackaging);
-        };
-
-        // ✅ Gán sản phẩm đã chọn
-        window.selectPackaging = function(btn) {
-            const name = btn.dataset.product;
-            const packaging = btn.dataset.packaging;
-            const price = btn.dataset.price;
-            const id = btn.dataset.productId;
-
-            if (currentTargetRow) {
-                currentTargetRow.querySelector('input[name="product_id[]"]').value = id;
-                currentTargetRow.querySelector('input[name="product_name[]"]').value = name;
-                currentTargetRow.querySelector('input[name="packaging_option[]"]').value = packaging;
-                currentTargetRow.querySelector('input[name="price[]"]').value = parseInt(price).toLocaleString();
-                currentTargetRow.querySelector('input[name="quantity[]"]').removeAttribute("readonly");
-            }
-
-            const packagingModal = bootstrap.Modal.getInstance(document.getElementById('selectPackagingModal'));
-            if (packagingModal) packagingModal.hide();
-
-            const addOrderDetailsModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addOrderDetailsModal'));
-            setTimeout(() => addOrderDetailsModal.show(), 300);
-        };
-
-        // 🚀 Tải mặc định khi mở modal
-        document.querySelector('[data-bs-target="#selectPackagingModal"]')?.addEventListener("click", function() {
-            loadPackagingOptions(1);
-        });
+        fetch("ajax/add_order.php", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                if (data.success) {
+                    alert("Thêm đơn hàng thành công!");
+                    bootstrap.Modal.getInstance(document.getElementById("addOrderDetailsModal")).hide();
+                    loadOrders(1);
+                } else {
+                    alert("Lỗi: " + data.message);
+                }
+            })
+            .catch(err => {
+                alert("Có lỗi khi gửi dữ liệu.");
+                console.error(err);
+            });
     });
 </script>
