@@ -144,14 +144,25 @@ $grandTotal = $_SESSION['grandTotal'] ?? 0;
   <!-- Custom JS -->
   <script src="../assets/javascript/checkOut.js"></script>
   <script>
-    document.querySelector('form').addEventListener('submit', function(event) {
-      event.preventDefault(); // Ngăn chặn hành động mặc định của form
+    document.querySelector('#payment-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Ngăn chặn hành động mặc định của form
 
-      // Hiển thị thông báo thanh toán thành công
-      alert('Bạn đã thanh toán thành công!');
+        // Lấy dữ liệu từ form
+        const formData = new FormData(this);
 
-      // Chuyển hướng về trang index.php
-      window.location.href = '../index.php';
+        // Gửi dữ liệu đến placeOrder.php
+        fetch('placeOrder.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            alert('Đặt hàng thành công!'); // Hiển thị thông báo thành công
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+            alert('Đã xảy ra lỗi. Vui lòng thử lại.');
+        });
     });
   </script>
 </body>
