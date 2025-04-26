@@ -25,6 +25,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $query = "INSERT INTO orders (user_id, status, total_price, shipping_address, created_at, payment_method_id) VALUES (?, 'Chờ xử lý', ?, ?, NOW(), ?)";
         $db->execute($query, [$user_id, $grandTotal, $address, $payment_method_id]);
 
+        // Lấy danh sách sản phẩm từ giỏ hàng
+        $cartItems = $_SESSION['cart'] ?? [];
+
+        // Lấy ID của đơn hàng vừa được tạo
+        $orderId = $db->getConnection()->lastInsertId();
+
+        // Thêm chi tiết đơn hàng vào bảng order_details
+        $queryDetails = "INSERT INTO order_details (order_id, product_id, packaging_option_id, quantity, price) VALUES (?, ?, ?, ?, ?)";
+        foreach ($cartItems as $item) {
+            try {
+                $db->execute($queryDetails, [$orderId, $item['product_id'], $item['packaging_option_id'], $item['quantity'], $item['price']]);
+            } catch (PDOException $e) {
+                error_log("Lỗi khi thêm vào order_details: " . $e->getMessage());
+                throw new Exception("Không thể thêm chi tiết đơn hàng. Vui lòng kiểm tra lại dữ liệu.");
+            }
+        }
+
         // Hoàn tất giao dịch
         $db->commit();
 
