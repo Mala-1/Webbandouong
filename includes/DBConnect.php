@@ -55,5 +55,20 @@ class DBConnect {
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute($params);
     }
+
+    // Bắt đầu giao dịch
+    public function beginTransaction() {
+        $this->pdo->beginTransaction();
+    }
+
+    // Hoàn tất giao dịch
+    public function commit() {
+        $this->pdo->commit();
+    }
+
+    // Hủy giao dịch
+    public function rollBack() {
+        $this->pdo->rollBack();
+    }
 }
 ?>

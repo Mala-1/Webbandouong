@@ -3,52 +3,36 @@ session_start();
 include '../includes/DBConnect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = $_SESSION['user_id'];
+    $user_id = $_SESSION['user_id'] ?? null;
     $address = $_POST['address'] ?? '';
     $phone = $_POST['phone'] ?? '';
     $email = $_POST['email'] ?? '';
-    $payment_method_id = $_POST['payment_method_id'] ?? null;
+    $payment_method_id = $_POST['payment_method_id'] ?? null; // Automatically set to NULL if not provided
     $grandTotal = $_SESSION['grandTotal'] ?? 0;
-    $cartItems = $_SESSION['filteredCartItems'] ?? [];
 
-    // Debugging: Print data to the screen before inserting into the database
-    echo '<pre>';
-    echo 'User ID: ' . htmlspecialchars($user_id) . "\n";
-    echo 'Address: ' . htmlspecialchars($address) . "\n";
-    echo 'Phone: ' . htmlspecialchars($phone) . "\n";
-    echo 'Email: ' . htmlspecialchars($email) . "\n";
-    echo 'Payment Method ID: ' . htmlspecialchars($payment_method_id) . "\n";
-    echo 'Grand Total: ' . htmlspecialchars($grandTotal) . "\n";
-    echo "Cart Items:\n";
-    foreach ($cartItems as $item) {
-        echo "- Product ID: " . htmlspecialchars($item['product_id']) . "\n";
-        echo "  Packaging Option ID: " . htmlspecialchars($item['packaging_option_id']) . "\n";
-        echo "  Quantity: " . htmlspecialchars($item['quantity']) . "\n";
-        echo "  Price: " . htmlspecialchars($item['price']) . "\n";
+    if (!$user_id) {
+        echo '<p>Không tìm thấy thông tin người dùng.</p>';
+        exit;
     }
-    echo '</pre>';
-    exit;
 
     $db = DBConnect::getInstance();
 
     try {
-        // Insert new order into the orders table
+        // Bắt đầu giao dịch
+        $db->beginTransaction();
+
+        // Thêm đơn hàng vào bảng orders
         $query = "INSERT INTO orders (user_id, status, total_price, shipping_address, created_at, payment_method_id) VALUES (?, 'Chờ xử lý', ?, ?, NOW(), ?)";
         $db->execute($query, [$user_id, $grandTotal, $address, $payment_method_id]);
 
-        // Insert order details
-        foreach ($cartItems as $item) {
-            $query = "INSERT INTO order_details (order_id, product_id, packaging_option_id, quantity, price) VALUES ((SELECT MAX(order_id) FROM orders), ?, ?, ?, ?)";
-            $db->execute($query, [$item['product_id'], $item['packaging_option_id'], $item['quantity'], $item['price']]);
-        }
+        // Hoàn tất giao dịch
+        $db->commit();
 
-        // Clear cart session data
-        unset($_SESSION['cartItems'], $_SESSION['filteredCartItems'], $_SESSION['grandTotal']);
-
-        exit;
+        echo '<p>Đơn hàng đã được tạo thành công.</p>';
     } catch (Exception $e) {
+        // Hủy giao dịch nếu có lỗi
+        $db->rollBack();
         echo '<p>Lỗi khi tạo đơn hàng: ' . htmlspecialchars($e->getMessage()) . '</p>';
-        exit;
     }
 } else {
     echo '<p>Yêu cầu không hợp lệ.</p>';
