@@ -13,6 +13,7 @@ if (!$orderId) {
 }
 
 try {
+    
     // 1. Lấy thông tin phiếu nhập (gồm mã NCC, tên NCC, người nhập, ngày nhập)
     $receiptInfo = $db->selectOne("
         SELECT io.import_order_id, io.supplier_id, s.name AS supplier_name, io.user_id, io.created_at

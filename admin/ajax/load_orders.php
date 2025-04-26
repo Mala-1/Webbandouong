@@ -45,10 +45,20 @@ if ($status !== '') {
 // Gộp điều kiện WHERE
 $whereSql = count($whereClauses) > 0 ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 
-$sql = "SELECT SQL_CALC_FOUND_ROWS o.*, pm.name AS payment_method_name 
+$sql = "SELECT SQL_CALC_FOUND_ROWS o.*, pm.name AS payment_method_name, 
+        GROUP_CONCAT(
+          CONCAT(
+            p.name, '||', op.quantity, '||', op.price
+          ) SEPARATOR '##'
+        ) AS product_details 
         FROM orders o
         LEFT JOIN payment_method pm ON o.payment_method_id = pm.payment_method_id
-        $whereSql LIMIT $limit OFFSET $offset";
+        LEFT JOIN order_details op ON o.order_id = op.order_id
+        LEFT JOIN products p ON op.product_id = p.product_id
+        $whereSql
+        GROUP BY o.order_id
+        LIMIT $limit OFFSET $offset";
+
 
 $orders = $db->select($sql, $params);
 
@@ -63,7 +73,25 @@ $totalPages = ceil($totalOrders / $limit);
 $pagination = new Pagination($totalOrders, $limit, $page);
 
 ob_start();
-foreach ($orders as $order): ?>
+foreach ($orders as $order):
+    $orderDetails = [
+        'customer_name' => htmlspecialchars($order['user_id']),
+        'status' => htmlspecialchars($order['status']),
+        'payment_method' => htmlspecialchars($order['payment_method_name']),
+        'order_date' => htmlspecialchars($order['created_at']),
+        'total_price' => number_format($order['total_price'], 0, ',', '.'),
+        'delivery_address' => htmlspecialchars($order['shipping_address']),
+        'products' => array_map(function ($productDetail) {
+            $details = explode('||', $productDetail);
+            return [
+                'name' => $details[0],
+                'quantity' => $details[1],
+                'price' => $details[2]
+            ];
+        }, explode('##', $order['product_details'] ?? ''))
+    ];
+?>
+
     <tr>
         <td><?= $order['order_id'] ?></td>
         <td><?= htmlspecialchars($order['user_id']) ?></td>
@@ -75,12 +103,13 @@ foreach ($orders as $order): ?>
         <?php if ($canWriteOrder || $canDeleteOrder || $canReadOrder): ?>
             <td class="action-icons">
                 <?php if ($canReadOrder): ?>
-                    <i class="fas fa-eye text-info btn-view-order me-3 fa-lg" style="cursor: pointer;"
-                        data-id="<?= $order['order_id'] ?>"
+                    <i class="fas fa-eye text-info btn-view-order me-3 fa-lg"
+                        style="cursor: pointer;"
                         data-bs-toggle="modal"
-                        data-bs-target="#modalChiTietDonHang"
+                        data-bs-target="#orderDetailsModal"
                         data-bs-toggle="tooltip"
-                        title="Xem chi tiết đơn hàng"></i>
+                        title="Xem chi tiết đơn hàng"
+                        data-order-details='<?= json_encode($orderDetails) ?>'></i>
                 <?php endif; ?>
                 <?php if ($canWriteOrder): ?>
                     <i class="fas fa-pen text-primary btn-edit-order me-3 fa-lg" style="cursor: pointer;"
@@ -103,4 +132,11 @@ foreach ($orders as $order): ?>
 
 $orderHtml = ob_get_clean();
 
-echo $orderHtml . ($totalPages > 1 ? 'SPLIT' . $pagination->render([], 'orderpage') : '');
+$data = [
+    'orderHtml' => $orderHtml,
+    'pagination' => ($totalPages > 1) ? $pagination->render([], 'orderpage') : null
+];
+
+header('Content-Type: application/json');
+echo json_encode($data);
+

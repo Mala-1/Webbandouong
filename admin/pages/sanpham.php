@@ -565,11 +565,11 @@ LIMIT 5;
             reader.onload = function(e) {
                 const li = document.createElement('li');
                 li.innerHTML = `
-        <a href="#" class="file-link text-primary text-decoration-underline" data-src="${e.target.result}">
-          ${file.name}
-        </a>
-        <button type="button" class="btn btn-close" onclick="removeFile(${currentFiles.length - 1})"></button>
-      `;
+                    <a href="#" class="file-link text-primary text-decoration-underline" data-src="${e.target.result}">
+                    ${file.name}
+                    </a>
+                    <button type="button" class="btn btn-close" onclick="removeFile(${currentFiles.length - 1})"></button>
+                `;
                 fileList.appendChild(li);
             };
 
@@ -591,16 +591,21 @@ LIMIT 5;
     function renderFileList() {
         fileList.innerHTML = '';
         currentFiles.forEach((file, idx) => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-  <a href="#" class="file-link text-primary text-decoration-underline me-1" data-src="${e.target.result}">
-    ${file.name}
-  </a>
-  <button type="button" class="btn btn-close" onclick="removeFile(${currentFiles.length - 1})"></button>
-`;
-            fileList.appendChild(li);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                <a href="#" class="file-link text-primary text-decoration-underline me-1" data-src="${e.target.result}">
+                    ${file.name}
+                </a>
+                <button type="button" class="btn btn-close" onclick="removeFile(${idx})"></button>
+            `;
+                fileList.appendChild(li);
+            };
+            reader.readAsDataURL(file);
         });
     }
+
 
     // Bắt sự kiện khi chọn ảnh bằng input ngoài
     document.getElementById('fileInputOutside').addEventListener('change', function() {

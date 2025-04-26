@@ -57,24 +57,41 @@ $totalPages = ceil($totalReceipts / $limit);
 // Khởi tạo phân trang
 $pagination = new Pagination($totalReceipts, $limit, $page);
 
+
 ob_start();
-foreach ($receipts as $receipt): ?>
+foreach ($receipts as $receipt):
+    $isDone = ($receipt['status'] == 'Đã xác nhận');
+    $classStatus = $isDone ? 'text-success' : 'text-warning border border-warning p-1 rounded'; ?>
     <tr>
         <td><?= htmlspecialchars($receipt['import_order_id']) ?></td>
-        <td><?= htmlspecialchars($receipt['supplier_id']) ?></td>
-        <td><?= htmlspecialchars($receipt['user_id']) ?></td>
+        <td><?= htmlspecialchars($receipt['supplier_name']) ?></td>
+        <td><?= htmlspecialchars($receipt['username']) ?></td>
         <td><?= number_format($receipt['total_price'], 0, ',', '.') ?> VNĐ</td>
         <td><?= htmlspecialchars($receipt['created_at']) ?></td>
+        <td class="fw-bold rounded">
+            <?php if (!$isDone): ?>
+                <div class="<?= $classStatus ?>" onclick="openConfirmModal(<?= $receipt['import_order_id'] ?>)">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                    <span style="cursor: pointer;">
+                        <?= htmlspecialchars($receipt['status']) ?>
+                    </span>
+                </div>
+            <?php else: ?>
+                <span class="<?= $classStatus ?>">
+                    <?= htmlspecialchars($receipt['status']) ?>
+                </span>
+            <?php endif; ?>
+        </td>
         <?php if ($canWriteReceipt || $canDeleteReceipt || $canReadReceipt): ?>
             <td class="action-icons">
                 <?php if ($canReadReceipt): ?>
-                    <i class="fas fa-eye text-info btn-view-receipt me-3 fa-lg" style="cursor: pointer;"
+                    <i class="fas fa-eye text-info btn-view-receipt fa-lg" style="cursor: pointer;"
                         data-id="<?= $receipt['import_order_id'] ?>"
                         title="Xem chi tiết phiếu nhập"
                         data-bs-toggle="modal" data-bs-target="#viewReceiptModal"></i>
                 <?php endif; ?>
-                <?php if ($canWriteReceipt): ?>
-                    <i class="fas fa-pen text-primary btn-edit-receipt me-3 fa-lg" style="cursor: pointer;"
+                <?php if ($canWriteReceipt && !$isDone): ?>
+                    <i class="fas fa-pen text-primary btn-edit-receipt fa-lg ms-3" style="cursor: pointer;"
                         data-bs-toggle="modal"
                         data-bs-target="#editReceiptModal"
                         data-id="<?= $receipt['import_order_id'] ?>"
@@ -84,8 +101,8 @@ foreach ($receipts as $receipt): ?>
                     </i>
                 <?php endif; ?>
 
-                <?php if ($canDeleteReceipt): ?>
-                    <i class="fas fa-trash fa-lg text-danger btn-delete-receipt" style="cursor: pointer;"
+                <?php if ($canDeleteReceipt && $isDone == 0): ?>
+                    <i class="fas fa-trash fa-lg text-danger btn-delete-receipt ms-3" style="cursor: pointer;"
                         data-id="<?= $receipt['import_order_id'] ?>" data-bs-toggle="modal" data-bs-target="#modalXoaPhieuNhap"></i>
                 <?php endif; ?>
             </td>

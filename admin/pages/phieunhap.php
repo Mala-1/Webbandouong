@@ -25,7 +25,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
         <!-- Thanh tìm kiếm -->
         <div class="flex-grow-1">
             <form class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search">
-                <input class="receipt-id form-control me-2" type="search" placeholder="Tìm theo mã phiếu nhập" aria-label="Search" name="receipt_id">
+                <input class="receipt-id form-control me-2" type="search" placeholder="Tìm theo mã phiếu nhập"
+                    aria-label="Search" name="receipt_id">
                 <button type="button" class="btn-search btn btn-sm p-0 border-0 bg-transparent">
                     <i class="fas fa-search fa-lg"></i>
                 </button>
@@ -34,9 +35,12 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     </div>
 
     <!-- Tìm kiếm nâng cao -->
-    <form method="GET" action="" class="form-search d-flex gap-2 align-items-center container mt-3 flex-wrap justify-content-center">
-        <input type="number" class="min-price form-control w-auto" style="width: 120px;" name="price_min" placeholder="Tổng giá từ">
-        <input type="number" class="max-price form-control w-auto" style="width: 120px;" name="price_max" placeholder="Tổng giá đến">
+    <form method="GET" action=""
+        class="form-search d-flex gap-2 align-items-center container mt-3 flex-wrap justify-content-center">
+        <input type="number" class="min-price form-control w-auto" style="width: 120px;" name="price_min"
+            placeholder="Tổng giá từ">
+        <input type="number" class="max-price form-control w-auto" style="width: 120px;" name="price_max"
+            placeholder="Tổng giá đến">
     </form>
 
     <!-- Bảng danh sách phiếu nhập -->
@@ -45,10 +49,11 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
             <thead class="table-light text-center">
                 <tr>
                     <th scope="col">Mã phiếu nhập</th>
-                    <th scope="col">Mã nhà cung cấp</th>
-                    <th scope="col">Mã người nhập</th>
+                    <th scope="col">Nhà cung cấp</th>
+                    <th scope="col">Người nhập</th>
                     <th scope="col">Tổng giá</th>
                     <th scope="col">Ngày nhập</th>
+                    <th scope="col">Tình trạng</th>
                     <?php if ($canWrite || $canDelete): ?>
                         <th scope="col">Chức năng</th>
                     <?php endif; ?>
@@ -84,8 +89,10 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                     <div class="col-md-5">
                         <label class="form-label">Nhà cung cấp:</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="supplier_name" name="supplier_name" placeholder="Chọn nhà cung cấp" readonly>
-                            <button type="button" class="btn btn-outline-primary" onclick="openSupplierModal()">Chọn</button>
+                            <input type="text" class="form-control" id="supplier_name" name="supplier_name"
+                                placeholder="Chọn nhà cung cấp" readonly>
+                            <button type="button" class="btn btn-outline-primary"
+                                onclick="openSupplierModal()">Chọn</button>
                         </div>
                     </div>
 
@@ -100,6 +107,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                     <thead class="table-light">
                         <tr>
                             <th>Tên sản phẩm</th>
+                            <th>Kiểu đóng gói</th>
                             <th>Số lượng</th>
                             <th>Đơn giá</th>
                             <th>Thành tiền</th>
@@ -111,13 +119,20 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                             <td class="d-flex gap-2">
                                 <input type="hidden" name="product_id[]">
                                 <input type="hidden" name="packaging_option[]">
-                                <input type="text" name="product_name[]" class="selected-product-name form-control" readonly placeholder="Sản phẩm" />
-                                <button class="btn btn-success btn-sm btn-select-product" onclick="openPackagingSelector(this)">
-                                    Chọn sản phẩm
+                                <input type="text" name="product_name[]" class="selected-product-name form-control"
+                                    readonly placeholder="Sản phẩm" />
+                                <button class="btn btn-success btn-sm btn-select-product"
+                                    onclick="openPackagingSelector(this)">
+                                    Chọn
                                 </button>
                             </td>
                             <td>
-                                <input type="number" name="quantity[]" class="quantity form-control" value="1" min="1" />
+                                <input type="text" name="packaging[]" class="packaging form-control text-capitalize"
+                                    readonly>
+                            </td>
+                            <td>
+                                <input type="number" name="quantity[]" class="quantity form-control" value="0"
+                                    min="0" />
                             </td>
                             <td>
                                 <input type="number" name="price[]" class="price form-control" value="0" />
@@ -152,7 +167,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Chọn sản phẩm</h5>
+                <h5 class="modal-title">Chọn</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -207,7 +222,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
 
             <div class="modal-body">
                 <!-- 🔍 Thanh tìm kiếm -->
-                <input type="text" id="searchSupplier" class="form-control mb-3" placeholder="Tìm theo tên nhà cung cấp...">
+                <input type="text" id="searchSupplier" class="form-control mb-3"
+                    placeholder="Tìm theo tên nhà cung cấp...">
 
                 <!-- Bảng danh sách nhà cung cấp -->
                 <div class="table-responsive">
@@ -280,8 +296,10 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                     <div class="col-md-5">
                         <label class="form-label">Nhà cung cấp:</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="supplier_name_sua" name="supplier_name" placeholder="Chọn nhà cung cấp" readonly>
-                            <button type="button" class="btn btn-outline-primary" onclick="openSupplierModal('sua')">Chọn</button>
+                            <input type="text" class="form-control" id="supplier_name_sua" name="supplier_name"
+                                placeholder="Chọn nhà cung cấp" readonly>
+                            <button type="button" class="btn btn-outline-primary"
+                                onclick="openSupplierModal('sua')">Chọn</button>
                         </div>
                     </div>
 
@@ -296,6 +314,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                     <thead class="table-light">
                         <tr>
                             <th>Tên sản phẩm</th>
+                            <th>Kiểu đóng gói</th>
                             <th>Số lượng</th>
                             <th>Đơn giá</th>
                             <th>Thành tiền</th>
@@ -347,6 +366,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                     <thead class="table-light">
                         <tr>
                             <th>Tên sản phẩm</th>
+                            <th>Kiểu đóng gói</th>
                             <th>Số lượng</th>
                             <th>Đơn giá</th>
                             <th>Thành tiền</th>
@@ -369,6 +389,23 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     </div>
 </div>
 
+<!-- Modal xác nhận phiếu nhập -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="modal-body text-center">
+                <p class="fw-bold fs-5 text-dark">
+                    Khi chọn xác nhận sẽ không còn xử lý được nữa!<br>
+                    Bạn có chắc chắn không?
+                </p>
+                <div class="mt-4 d-flex justify-content-center gap-3">
+                    <button type="button" class="btn btn-danger" id="btnConfirmAction">Xác nhận</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Hủy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -529,7 +566,10 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                 </button>
             </td>
             <td>
-                <input type="number" name="quantity[]" class="quantity form-control" value="1" min="1" 
+                <input type="text" name="packaging[]" class="packaging form-control text-capitalize" readonly>
+            </td>
+            <td>
+                <input type="number" name="quantity[]" class="quantity form-control" value="0" min="0" 
                     oninput="updateRowTotal(this)">
             </td>
             <td>
@@ -589,7 +629,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
         fetch('ajax/load_packaging_options.php?page=' + page + params)
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 // Gán kết quả HTML trả về vào tbody của bảng đóng gói
                 document.getElementById('productTable').innerHTML = data.packaging_html || '';
                 // Gán phân trang vào vùng đặt phân trang
@@ -609,10 +648,14 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     }
 
     // Hàm mở modal chọn đóng gói, được gọi khi click vào nút mở modal
-    window.openPackagingSelector = function(button) {
+    window.openPackagingSelector = function(button, mode = '') {
         // Lưu dòng hiện tại của modal chính chứa thông tin sản phẩm (là thẻ <tr> chứa nút được click)
         currentTargetRow = button.closest("tr");
 
+        if (mode === 'sua') {
+            const editModal = bootstrap.Modal.getInstance(document.getElementById('editReceiptModal'));
+            if (editModal) editModal.hide();
+        }
 
         // Hiện modal chọn đóng gói
         const packagingModal = new bootstrap.Modal(document.getElementById('productModal'));
@@ -628,9 +671,11 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
         const packagingId = btn.dataset.packagingId;
         const price = btn.dataset.price;
         const id = btn.dataset.productId;
+        const packaging = btn.dataset.packaging;
 
         if (currentTargetRow) {
             currentTargetRow.querySelector('input[name="product_id[]"]').value = id;
+            currentTargetRow.querySelector('input[name="packaging[]"]').value = packaging;
             currentTargetRow.querySelector('input[name="product_name[]"]').value = name;
             currentTargetRow.querySelector('input[name="packaging_option[]"]').value = packagingId;
             currentTargetRow.querySelector('.total').innerText = (price * currentTargetRow.querySelector('input[name="quantity[]"]').value).toLocaleString();
@@ -639,6 +684,11 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
         // Đóng modal chọn sản phẩm
         const packagingModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
         if (packagingModal) packagingModal.hide();
+
+
+        // Nếu đang trong mode sửa thì mở lại editReceiptModal
+        const editModal = new bootstrap.Modal(document.getElementById('editReceiptModal'));
+        editModal.show();
         updateGrandTotal();
     };
 
@@ -709,11 +759,25 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
         const prices = document.querySelectorAll('input[name="price[]"]');
 
         for (let i = 0; i < productIds.length; i++) {
+            const quantity = quantities[i].value.trim();
+            const price = prices[i].value.trim();
+
+            if (!quantity || isNaN(quantity) || Number(quantity) < 0) {
+                alert("Vui lòng nhập số lượng hợp lệ (số > 0) cho sản phẩm dòng " + (i + 1));
+                return; // chặn lưu luôn
+            }
+
+            if (!price || isNaN(price) || Number(price) < 0) {
+                alert("Vui lòng nhập đơn giá hợp lệ (số > 0) cho sản phẩm dòng " + (i + 1));
+                return; // chặn lưu luôn
+            }
+
             formData.append("product_id[]", productIds[i].value);
             formData.append("packaging_option[]", packagingOptions[i].value);
-            formData.append("quantity[]", quantities[i].value);
-            formData.append("price[]", prices[i].value);
+            formData.append("quantity[]", quantity);
+            formData.append("price[]", price);
         }
+
 
         try {
             const res = await fetch("ajax/add_import_order.php", {
@@ -723,15 +787,47 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
 
             const data = await res.json();
             if (data.success) {
-                alert("✅ " + data.message);
+                alert(data.message);
                 bootstrap.Modal.getInstance(document.getElementById("addReceiptModal")).hide();
                 loadReceipts(1); // reload danh sách
+
+                document.getElementById("supplier_id").value = "";
+                document.getElementById("supplier_name").value = "";
+                document.querySelector("input[name='import_date']").value = "";
+
+                const productList = document.getElementById("product-list");
+                productList.innerHTML = `
+                    <tr>
+                        <td class="d-flex gap-2">
+                            <input type="hidden" name="product_id[]">
+                            <input type="hidden" name="packaging_option[]">
+                            <input type="text" name="product_name[]" class="selected-product-name form-control" readonly placeholder="Sản phẩm" />
+                            <button class="btn btn-success btn-sm btn-select-product" onclick="openPackagingSelector(this)">
+                                Chọn
+                            </button>
+                        </td>
+                        <td>
+                            <input type="number" name="quantity[]" class="quantity form-control" value="1" min="0" />
+                        </td>
+                        <td>
+                            <input type="number" name="price[]" class="price form-control" value="0" />
+                        </td>
+                        <td>
+                            <span class="total">0</span>
+                        </td>
+                        <td>
+                            <button onclick="removeRow(this)" class="btn btn-danger btn-sm">Xóa</button>
+                        </td>
+                    </tr>
+                `;
+
+                document.getElementById("grand-total").textContent = "0";
             } else {
-                alert("❌ Lỗi: " + data.message);
+                alert("Lỗi: " + data.message);
             }
         } catch (err) {
             console.log(err.message);
-            alert("❌ Lỗi hệ thống: " + err.message);
+            alert("Lỗi hệ thống: " + err.message);
         }
     });
 
@@ -794,7 +890,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                     alert("❌ Lỗi: " + data.message);
                     return;
                 }
-                console.log(data)
+
 
                 // Gán thông tin chung phiếu nhập
                 document.getElementById("import_date_sua").value = data.receipt.created_at.substring(0, 10);
@@ -817,6 +913,9 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                         <button type="button" class="btn btn-success btn-sm btn-select-product" onclick="openPackagingSelector(this, 'sua')">Chọn</button>
                     </td>
                     <td>
+                        <input type="text" name="packaging[]" class="packaging form-control text-capitalize" value="${item.packaging_type + ' - ' + item.unit_quantity}" readonly>
+                    </td>
+                    <td>
                         <input type="number" name="quantity[]" class="quantity form-control" value="${item.quantity}" oninput="updateRowTotal(this, 'sua')" />
                     </td>
                     <td>
@@ -837,25 +936,28 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
 
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
-        <td class="d-flex gap-2">
-            <input type="hidden" name="product_id[]" />
-            <input type="hidden" name="packaging_option[]" />
-            <input type="text" name="product_name[]" class="selected-product-name form-control" readonly placeholder="Sản phẩm" />
-            <button type="button" class="btn btn-success btn-sm btn-select-product" onclick="openPackagingSelector(this, '${mode}')">Chọn</button>
-        </td>
-        <td>
-            <input type="number" name="quantity[]" class="quantity form-control" value="1" min="1" oninput="updateRowTotal(this, '${mode}')" />
-        </td>
-        <td>
-            <input type="number" name="price[]" class="price form-control" value="0" oninput="updateRowTotal(this, '${mode}')" />
-        </td>
-        <td>
-            <span class="total">0</span>
-        </td>
-        <td>
-            <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this, '${mode}')">Xoá</button>
-        </td>
-    `;
+            <td class="d-flex gap-2">
+                <input type="hidden" name="product_id[]" />
+                <input type="hidden" name="packaging_option[]" />
+                <input type="text" name="product_name[]" class="selected-product-name form-control" readonly placeholder="Sản phẩm" />
+                <button type="button" class="btn btn-success btn-sm btn-select-product" onclick="openPackagingSelector(this, '${mode}')">Chọn</button>
+            </td>
+            <td>
+                <input type="text" name="packaging[]" class="packaging form-control text-capitalize" readonly>
+            </td>
+            <td>
+                <input type="number" name="quantity[]" class="quantity form-control" value="0" min="0" oninput="updateRowTotal(this, '${mode}')" />
+            </td>
+            <td>
+                <input type="number" name="price[]" class="price form-control" value="0" oninput="updateRowTotal(this, '${mode}')" />
+            </td>
+            <td>
+                <span class="total">0</span>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this, '${mode}')">Xoá</button>
+            </td>
+        `;
 
         tableBody.appendChild(newRow);
     }
@@ -941,6 +1043,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
 
                     row.innerHTML = `
                     <td><input type="text" class="form-control" value="${item.product_name}" readonly></td>
+                    <td><input type = "text" class="form-control" value="${item.packaging_type + ' - ' + item.unit_quantity}" readonly></td>
                     <td><input type="number" class="form-control text-center" value="${item.quantity}" readonly></td>
                     <td><input type="text" class="form-control text-end" value="${item.price.toLocaleString()}" readonly></td>
                     <td><input type="text" class="form-control text-end" value="${subtotal.toLocaleString()}" readonly></td>
@@ -954,5 +1057,38 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                 console.error("Lỗi khi lấy chi tiết phiếu nhập:", err);
                 alert("❌ Lỗi hệ thống khi xem chi tiết!");
             });
+    });
+
+    let selectedImportOrderId = null; // Lưu id phiếu nhập cần xác nhận
+
+    function openConfirmModal(importOrderId) {
+        selectedImportOrderId = importOrderId;
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        confirmModal.show();
+    }
+
+    document.getElementById('btnConfirmAction').addEventListener('click', function() {
+        if (selectedImportOrderId) {
+            fetch('ajax/confirm_receipt.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: 'import_order_id=' + selectedImportOrderId
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Xác nhận phiếu nhập thành công!');
+                        location.reload();
+                    } else {
+                        alert('Xác nhận thất bại: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã có lỗi xảy ra.');
+                });
+        }
     });
 </script>

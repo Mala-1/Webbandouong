@@ -66,11 +66,7 @@ foreach ($suppliers as $supplier): ?>
         <td><?= $supplier['address'] ?></td>
         <?php if ($canWrite || $canDelete): ?>
             <td class="action-icons">
-                <i class="fas fa-eye text-info btn-view-supplier"
-                    data-id="<?= $supplier['supplier_id'] ?>"
-                    data-name="<?= htmlspecialchars($supplier['name']) ?>"
-                    data-email="<?= htmlspecialchars($supplier['email']) ?>"
-                    data-address="<?= htmlspecialchars($supplier['address']) ?>"></i>
+                
                 <?php if ($canWrite): ?>
                     <i class="fas fa-pen text-primary btn-edit-supplier"
                         data-id="<?= $supplier['supplier_id'] ?>"

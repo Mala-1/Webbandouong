@@ -15,7 +15,7 @@ $packaging_options = $_POST['packaging_option'] ?? [];
 $quantities = $_POST['quantity'] ?? [];
 $prices = $_POST['price'] ?? [];
 
-if (!$import_order_id || !$supplier_id || !$user_id || !$import_date || empty($product_ids)) {
+if (!$import_order_id || !$supplier_id || !$user_id || !$import_date) {
     echo json_encode(['success' => false, 'message' => 'Thiếu thông tin cần thiết']);
     exit;
 }
@@ -24,42 +24,31 @@ try {
     $pdo->beginTransaction();
 
     // Cập nhật thông tin phiếu nhập
-    $stmt = $pdo->prepare("UPDATE import_order SET supplier_id = ?, user_id = ?, created_at = ? WHERE import_order_id = ?");
-    $stmt->execute([$supplier_id, $user_id, $import_date, $import_order_id]);
+    $db->execute("UPDATE import_order SET supplier_id = ?, user_id = ?, created_at = ? WHERE import_order_id = ?", [
+        $supplier_id, $user_id, $import_date, $import_order_id
+    ]);
 
-    // Xóa chi tiết cũ
-    $stmt = $pdo->prepare("DELETE FROM import_order_details WHERE import_order_id = ?");
-    $stmt->execute([$import_order_id]);
-
-    // Lấy margin_percent
-    $margin = $db->selectOne("SELECT margin_percent FROM profitmargin LIMIT 1")['margin_percent'] ?? 10;
-    $margin_factor = (100 - $margin) / 100;
+    // Xóa toàn bộ chi tiết cũ
+    $db->execute("DELETE FROM import_order_details WHERE import_order_id = ?", [$import_order_id]);
 
     $total_price = 0;
 
-    // Thêm lại các dòng chi tiết
-    for ($i = 0; $i < count($product_ids); $i++) {
-        $product_id = $product_ids[$i];
+    // Thêm lại chi tiết mới
+    foreach ($product_ids as $i => $product_id) {
         $packaging_id = $packaging_options[$i];
         $quantity = (int)$quantities[$i];
-        $raw_price = (float)$prices[$i];
-        $final_price = round($raw_price * $margin_factor);
-        $line_total = $final_price * $quantity;
+        $raw_price = (float)str_replace(',', '', $prices[$i]);
+        $line_total = $quantity * $raw_price;
 
-        $stmt = $pdo->prepare("INSERT INTO import_order_details (import_order_id, product_id, quantity, price, total_price, packaging_option_id)
-            VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$import_order_id, $product_id, $quantity, $final_price, $line_total, $packaging_id]);
+        $db->execute("INSERT INTO import_order_details (import_order_id, product_id, quantity, price, total_price, packaging_option_id) VALUES (?, ?, ?, ?, ?, ?)", [
+            $import_order_id, $product_id, $quantity, $raw_price, $line_total, $packaging_id
+        ]);
 
         $total_price += $line_total;
-
-        // Cập nhật lại giá trong packaging_options
-        $stmtUpdate = $pdo->prepare("UPDATE packaging_options SET price = ? WHERE packaging_option_id = ?");
-        $stmtUpdate->execute([$final_price, $packaging_id]);
     }
 
-    // Cập nhật tổng giá cho phiếu nhập
-    $stmt = $pdo->prepare("UPDATE import_order SET total_price = ? WHERE import_order_id = ?");
-    $stmt->execute([$total_price, $import_order_id]);
+    // Cập nhật tổng tiền vào phiếu nhập
+    $db->execute("UPDATE import_order SET total_price = ? WHERE import_order_id = ?", [$total_price, $import_order_id]);
 
     $pdo->commit();
     echo json_encode(['success' => true, 'message' => 'Cập nhật phiếu nhập thành công']);

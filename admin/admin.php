@@ -74,26 +74,19 @@ $allowedPages = ['dashboard', 'sanpham', 'donhang', 'khachhang', 'nhanvien', 'NC
     <script src="/assets/bootstrap/js/bootstrap.bundle.min.js"></script>
     <style>
         .nav-link.active {
-            font-weight: bold;
             border-radius: 0.375rem;
         }
 
-        .sidebar {
-            width: 250px;
-            flex-shrink: 0;
-        }
-
-        .sidebar .nav-link {
-            padding: 10px 16px;
+        .nav-link {
+            /* padding: 10px 16px; */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .sidebar .nav-link.active {
-            background-color: #0d6efd !important;
+        .nav-link.active {
+            background-color:rgb(49, 128, 247) !important;
             color: white !important;
-            font-weight: bold;
             border-radius: 0.375rem;
         }
     </style>
@@ -102,7 +95,7 @@ $allowedPages = ['dashboard', 'sanpham', 'donhang', 'khachhang', 'nhanvien', 'NC
 <body>
     <div class="py-4 border d-flex" style="min-height: 100vh;">
         <!-- Sidebar -->
-        <div class="d-flex flex-column ms-4 border-end me-4 border-2" style="width: 250px;">
+        <div class="d-flex flex-column ms-2 border-end me-4 border-2" style="width: 225px;">
             <h3 class="mb-4 ms-3">Admin Panel</h3>
             <ul class="nav flex-column gap-2">
                 <li class="nav-item fs-5">

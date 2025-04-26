@@ -26,7 +26,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         <!-- Thanh tìm kiếm -->
         <div class="flex-grow-1">
             <form class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search">
-                <input class="order-id form-control me-2" type="search" placeholder="Tìm theo mã đơn hàng" aria-label="Search" name="order_id">
+                <input class="order-id form-control me-2" type="search" placeholder="Tìm theo mã đơn hàng"
+                    aria-label="Search" name="order_id">
                 <button type="button" class="btn-search btn btn-sm p-0 border-0 bg-transparent">
                     <i class="fas fa-search fa-lg"></i>
                 </button>
@@ -35,9 +36,12 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
     </div>
 
     <!-- Tìm kiếm nâng cao -->
-    <form method="GET" action="" class="form-search d-flex gap-2 align-items-center container mt-3 flex-wrap justify-content-center">
-        <input type="number" class="min-price form-control w-auto" style="width: 120px;" name="price_min" placeholder="Tổng giá từ">
-        <input type="number" class="max-price form-control w-auto" style="width: 120px;" name="price_max" placeholder="Tổng giá đến">
+    <form method="GET" action=""
+        class="form-search d-flex gap-2 align-items-center container mt-3 flex-wrap justify-content-center">
+        <input type="number" class="min-price form-control w-auto" style="width: 120px;" name="price_min"
+            placeholder="Tổng giá từ">
+        <input type="number" class="max-price form-control w-auto" style="width: 120px;" name="price_max"
+            placeholder="Tổng giá đến">
 
         <select class="statusSearch form-select w-auto" style="width: 180px;" name="status">
             <option value="">Tất cả trạng thái</option>
@@ -89,13 +93,16 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                     <div class="col-md-6">
                         <label class="form-label">Người đặt hàng</label>
                         <div class="input-group">
-                            <input type="number" id="user_id" name="user_id" class="form-control" placeholder="Nhập ID người đặt" required>
-                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#selectUserModal">Chọn khách hàng</button>
+                            <input type="number" id="user_id" name="user_id" class="form-control"
+                                placeholder="Nhập ID người đặt" required>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal"
+                                data-bs-target="#selectUserModal">Chọn khách hàng</button>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Địa chỉ giao hàng</label>
-                        <input type="text" name="shipping_address" class="form-control" placeholder="Nhập địa chỉ" required>
+                        <input type="text" name="shipping_address" class="form-control" placeholder="Nhập địa chỉ"
+                            required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Trạng thái đơn hàng</label>
@@ -113,13 +120,16 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                             $payment_method = $db->select('SELECT * FROM payment_method', []);
                             ?>
                             <?php foreach ($payment_method as $p): ?>
-                                <option value="<?= $p['payment_method_id'] ?>"><?= $p['name'] ?></option>
+                                <option value="<?= $p['payment_method_id'] ?>">
+                                    <?= $p['name'] ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="col-md-12">
                         <label class="form-label">Ghi chú đơn hàng</label>
-                        <textarea name="note" class="form-control" rows="3" placeholder="Nhập ghi chú (nếu có)"></textarea>
+                        <textarea name="note" class="form-control" rows="3"
+                            placeholder="Nhập ghi chú (nếu có)"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer mt-3">
@@ -203,7 +213,9 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                             $payment_method = $db->select('SELECT * FROM payment_method', []);
                             ?>
                             <?php foreach ($payment_method as $p): ?>
-                                <option value="<?= $p['payment_method_id'] ?>"><?= $p['name'] ?></option>
+                                <option value="<?= $p['payment_method_id'] ?>">
+                                    <?= $p['name'] ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -223,7 +235,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
 
 
 <!-- Modal thêm chi tiết đơn hàng -->
-<div class="modal fade" id="addOrderDetailsModal" tabindex="-1" aria-labelledby="addOrderDetailsModalLabel" aria-hidden="true">
+<div class="modal fade" id="addOrderDetailsModal" tabindex="-1" aria-labelledby="addOrderDetailsModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -294,7 +307,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
 
 
 <!-- Modal chọn kiểu đóng gói -->
-<div class="modal fade" id="selectPackagingModal" tabindex="-1" aria-labelledby="selectPackagingModalLabel" aria-hidden="true">
+<div class="modal fade" id="selectPackagingModal" tabindex="-1" aria-labelledby="selectPackagingModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -332,6 +346,42 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
     </div>
 </div>
 
+<!-- Modal chi tiết đơn -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderDetailsModalLabel">Chi Tiết Đơn Hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- <p><strong>Người đặt:</strong> Nguyễn Văn A</p>
+                <p><strong>Trạng thái:</strong> Chờ xử lý</p>
+                <p><strong>PT thanh toán:</strong> Thanh toán khi nhận hàng (COD)</p>
+                <p><strong>Ngày đặt:</strong> 24/04/2025, 22:54</p>
+                <p><strong>Tổng giá:</strong> 0 VNĐ</p>
+                <p><strong>Địa chỉ giao hàng:</strong> 123 Đường ABC</p>
+                <h5>Chi tiết sản phẩm đặt hàng</h5>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th>Kiểu đóng gói</th>
+                            <th>Số lượng</th>
+                            <th>Giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody> -->
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -347,12 +397,17 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         const paginationWrap = document.querySelector('.pagination-wrap');
 
         fetch('ajax/load_orders.php?page=' + page + params)
-            .then(res => res.text())
+            .then(res => res.json())
             .then(data => {
-                const parts = data.split('SPLIT');
-                orderWrap.innerHTML = parts[0] || '';
-                paginationWrap.innerHTML = parts[1] || '';
+                // Gán dữ liệu từ JSON vào các phần tử HTML
+                orderWrap.innerHTML = data.orderHtml || ''; // Nội dung đơn hàng
+                console.log(data.pagination)
+                paginationWrap.innerHTML = data.pagination || ''; // Phân trang
+            })
+            .catch(error => {
+                console.error('Có lỗi xảy ra:', error);
             });
+
     }
 
     // Tải danh sách đơn hàng khi trang được load
@@ -672,7 +727,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 </td>
                 <td class="d-flex align-items-center gap-2 justify-content-center">
                     <input type="hidden" name="packaging_option_id[]" value="">
-                    <input type="text" class="form-control" name="packaging_option[]" readonly>
+                    <input type="text" class="form-control text-capitalize" name="packaging_option[]" readonly>
                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="openPackagingSelector(this)">Chọn</button>
                 </td>
                 <td><input type="number" class="form-control" name="quantity[]" placeholder="Số lượng"></td>
@@ -734,7 +789,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 setTimeout(() => addOrderDetailsModal.show(), 300); // Chuyển dòng này ra ngoài if
 
                 // Sau khi chọn thành công, thêm một dòng mới để người dùng tiếp tục chọn
-               
+
             }
         };
         // Hàm cập nhật tổng giá trong modal chi tiết
@@ -824,7 +879,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
 
         // Lấy dữ liệu chi tiết đơn hàng từ bảng
         const rows = document.querySelectorAll("#orderDetailsTable tr:not(#addRowTrigger)");
-        
+
         const details = [];
 
         rows.forEach(row => {
@@ -875,8 +930,19 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 console.log(data)
                 if (data.success) {
                     alert("Thêm đơn hàng thành công!");
-                    bootstrap.Modal.getInstance(document.getElementById("addOrderDetailsModal")).hide();
+                    const modalElement = document.getElementById("addOrderDetailsModal");
+
+                    // Đóng modal
+                    bootstrap.Modal.getInstance(modalElement).hide();
+
+                    // Reset các trường thông tin trong modal
+                    modalElement.querySelectorAll("input, textarea").forEach(input => input.value = "");
+                    modalElement.querySelectorAll("#orderDetailsTable tr:not(#addRowTrigger)").forEach(row => row.remove());
+
+
                     loadOrders(1);
+
+
                 } else {
                     alert("Lỗi: " + data.message);
                 }
@@ -886,4 +952,51 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 console.error(err);
             });
     });
+
+    // Lấy phần tử cha chứa các nút
+    const orderContainer = document.querySelector(".order-wrap");
+
+    // Sử dụng event delegation
+    orderContainer.addEventListener("click", (event) => {
+        // Kiểm tra xem phần tử được click có phải là nút "btn-view-order"
+        if (event.target.classList.contains("btn-view-order")) {
+            // Lấy dữ liệu chi tiết đơn hàng từ data-order-details
+            const orderDetails = JSON.parse(event.target.getAttribute("data-order-details"));
+
+            // Render dữ liệu vào modal
+            renderOrderDetails(orderDetails);
+        }
+    });
+
+
+    function renderOrderDetails(order) {
+        const modalBody = document.querySelector("#orderDetailsModal .modal-body");
+        modalBody.innerHTML = `
+                <p><strong>Người đặt:</strong> ${order.customer_name}</p>
+                <p><strong>Trạng thái:</strong> ${order.status}</p>
+                <p><strong>PT thanh toán:</strong> ${order.payment_method}</p>
+                <p><strong>Ngày đặt:</strong> ${order.order_date}</p>
+                <p><strong>Tổng giá:</strong> ${order.total_price} VNĐ</p>
+                <p><strong>Địa chỉ giao hàng:</strong> ${order.delivery_address}</p>
+                <h5>Chi tiết sản phẩm đặt hàng</h5>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Giá</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    ${order.products.map(product => `
+                        <tr>
+                        <td>${product.name}</td>
+                        <td>${product.quantity}</td>
+                        <td>${product.price} VNĐ</td>
+                        </tr>
+                    `).join('')}
+                    </tbody>
+                </table>
+                `;
+    }
 </script>
