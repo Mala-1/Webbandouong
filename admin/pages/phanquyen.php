@@ -235,7 +235,7 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    alert('✅ Xóa nhóm thành công!');
+                    alert('Xóa nhóm thành công!');
                     location.href = '?page=phanquyen'; // Quay về trang chọn nhóm
                 } else {
                     alert('❌ Xóa thất bại: ' + (data.message || 'Không rõ nguyên nhân'));

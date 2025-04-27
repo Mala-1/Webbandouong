@@ -1,382 +1,339 @@
-<!DOCTYPE html>
-<html lang="vi">
+<?php
+require_once '../includes/DBConnect.php';
+$db = DBConnect::getInstance();
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Khách Hàng</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-    .search-container {
-        display: flex;
-        align-items: center;
-        margin-right: 400px;
-    }
+// Phân quyền (nếu có)
+$permissions = $_SESSION['permissions'] ?? [];
+$canReadCustomer = in_array('read', $permissions['Quản lý khách hàng'] ?? []);
+$canWriteCustomer = in_array('write', $permissions['Quản lý khách hàng'] ?? []);
+$canDeleteCustomer = in_array('delete', $permissions['Quản lý khách hàng'] ?? []);
+?>
 
-    .search-container input {
-        max-width: 250px;
-    }
+<div class="p-3 d-flex align-items-center rounded" style="background-color: #f0f0f0; height: 80px;">
+    <?php if ($canWriteCustomer): ?>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+            <i class="fa-solid fa-plus me-1"></i> THÊM
+        </button>
+    <?php endif; ?>
 
-    .search-container i {
-        color: #555;
-        font-size: 18px;
-        cursor: pointer;
-    }
-
-    .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        /* Đảm bảo căn giữa theo chiều dọc */
-        width: 100%;
-        /* Đảm bảo pagination chiếm toàn bộ chiều rộng container */
-        margin: 20px 0;
-        /* Khoảng cách trên/dưới */
-        padding: 0;
-        /* Xóa padding mặc định */
-        list-style: none;
-        /* Xóa kiểu danh sách mặc định */
-    }
-
-    .pagination .page-item {
-        margin: 0 5px;
-        /* Khoảng cách giữa các nút */
-    }
-
-    .pagination .page-link {
-        padding: 8px 12px;
-        /* Kích thước nút hợp lý */
-        border-radius: 5px;
-        /* Bo góc nhẹ */
-    }
-
-    /* Đảm bảo container cha không làm lệch */
-    nav {
-        text-align: center;
-        /* Fallback cho các trình duyệt cũ */
-        width: 100%;
-    }
-
-    /* Container chính */
-    .container-fluid {
-        padding: 0;
-        height: 100vh;
-    }
-
-    /* Thanh Sidebar */
-    .sidebar {
-        width: 250px;
-        /* Chiều rộng sidebar */
-        min-width: 200px;
-        transition: width 0.3s;
-    }
-
-    /* Nội dung chính */
-    .main-content {
-        padding: 20px;
-        flex-grow: 1;
-        /* Chiếm toàn bộ không gian còn lại */
-        overflow-x: auto;
-    }
-
-    /* Thu hẹp các cột trong bảng */
-    .table th.col-id,
-    .table td.col-id {
-        min-width: 50px;
-        /* Giảm từ 60px */
-    }
-
-    .table th.col-name,
-    .table td.col-name {
-        min-width: 120px;
-        /* Giảm từ 150px */
-    }
-
-    .table th.col-email,
-    .table td.col-email {
-        min-width: 150px;
-        /* Giảm từ 200px */
-    }
-
-    .table th.col-phone,
-    .table td.col-phone {
-        min-width: 120px;
-        /* Giảm từ 150px */
-    }
-
-    .table th.col-address,
-    .table td.col-address {
-        min-width: 150px;
-        /* Giảm từ 200px */
-    }
-
-    .table th.col-status,
-    .table td.col-status {
-        min-width: 100px;
-        /* Giảm từ 120px */
-    }
-
-    .table th.col-actions,
-    .table td.col-actions {
-        min-width: 120px;
-        /* Giảm từ 150px */
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .sidebar {
-            width: 200px;
-            /* Thu hẹp sidebar trên màn hình nhỏ */
-        }
-
-        .main-content {
-            padding: 10px;
-        }
-
-        .table th,
-        .table td {
-            font-size: 12px;
-            /* Giảm kích thước chữ */
-            padding: 8px;
-            /* Giảm padding */
-        }
-
-        /* Ẩn sidebar nếu cần trên màn hình rất nhỏ */
-        @media (max-width: 576px) {
-            .sidebar {
-                display: none;
-                /* Ẩn sidebar */
-            }
-
-            .main-content {
-                width: 100%;
-            }
-        }
-    }
-    </style>
-</head>
-
-<body>
-    <div class="main-content">
-        <h1>Quản Lý Khách Hàng</h1>
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#customerModal"
-                onclick="openAddModal()">+ Thêm Khách Hàng</button>
-            <div class="d-flex align-items-center search-container">
-                <input type="text" class="form-control me-2" id="searchInput" placeholder="Tìm kiếm tên khách hàng"
-                    onkeyup="searchCustomers()">
-                <i class="fas fa-search"></i>
-            </div>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-striped" id="customerTable">
-                <thead>
-                    <tr>
-                        <th class="col-id">ID</th>
-                        <th class="col-name">Username</th>
-                        <th class="col-email">Mật khẩu</th>
-                        <th class="col-email">Email</th>
-                        <th class="col-phone">Điện Thoại</th>
-                        <th class="col-address">Địa Chỉ</th>
-                        <th class="col-status">Trạng thái</th>
-                        <th class="col-actions">Chức Năng</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dữ liệu khách hàng sẽ được chèn tại đây -->
-                </tbody>
-            </table>
-        </div>
-        <nav>
-            <ul class="pagination" id="pagination">
-                <!-- Liên kết phân trang sẽ được chèn tại đây -->
-            </ul>
-        </nav>
+    <div class="flex-grow-1">
+        <form class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search">
+            <input class="customer-search form-control me-2" type="search" placeholder="Tìm kiếm tên khách hàng" aria-label="Search" name="search-username">
+            <button type="button" class="btn-search btn btn-sm p-0 border-0 bg-transparent">
+                <i class="fas fa-search fa-lg"></i>
+            </button>
+        </form>
     </div>
+</div>
 
-    <!-- Modal Khách Hàng -->
-    <div class="modal fade" id="customerModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
+<!-- Bảng danh sách khách hàng -->
+<div class="table-responsive mt-4 pe-3">
+    <table class="table align-middle table-bordered">
+        <thead class="table-light text-center">
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>SĐT</th>
+                <th>Địa chỉ</th>
+                <?php if ($canWriteCustomer || $canDeleteCustomer): ?>
+                    <th>Chức năng</th>
+                <?php endif; ?>
+            </tr>
+        </thead>
+        <tbody class="customer-wrap text-center align-middle">
+            <!-- Dữ liệu khách hàng sẽ được load từ Ajax -->
+        </tbody>
+    </table>
+</div>
+<div class="pagination-wrap"></div>
+
+<!-- Modal thêm khách hàng -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form id="customerForm">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Thêm Khách Hàng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="addCustomerModalLabel">Thêm Khách Hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="customerForm">
-                        <input type="hidden" id="customerId">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Mật khẩu</label>
-                            <input type="password" class="form-control" id="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Điện Thoại</label>
-                            <input type="text" class="form-control" id="phone">
-                        </div>
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Địa Chỉ</label>
-                            <input type="text" class="form-control" id="address">
-                        </div>
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Trạng Thái</label>
-                            <select class="form-control" id="status">
-                                <option value="active">Hoạt Động</option>
-                                <option value="inactive">Không Hoạt Động</option>
-                            </select>
-                        </div>
-                    </form>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" placeholder="Tên đăng nhập" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Mật khẩu</label>
+                        <input type="password" name="password" class="form-control" placeholder="Mật khẩu" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="text" name="phone" class="form-control" placeholder="Số điện thoại">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Địa chỉ</label>
+                        <input type="text" name="address" class="form-control" placeholder="Địa chỉ">
+                    </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer mt-3">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary" onclick="saveCustomer()">Lưu</button>
+                    <button type="submit" class="btn btn-primary">Thêm</button>
                 </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal sửa khách hàng -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form id="editCustomerForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCustomerModalLabel">Sửa Khách Hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <input type="hidden" name="user_id" id="editCustomerId">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" id="editUsername" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" id="editEmail" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="text" name="phone" id="editPhone" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Địa chỉ</label>
+                        <input type="text" name="address" id="editAddress" class="form-control">
+                    </div>
+
+                    <div class="col-md-8">
+                        <label class="form-label">Mật khẩu mới</label>
+                        <div class="input-group">
+                            <input type="password" name="new_password" id="editNewPassword" class="form-control" placeholder="Nhập mật khẩu mới (nếu đổi)" style="display: none;">
+                            <button type="button" id="generatePasswordBtn" class="btn btn-outline-primary">Cấp mật khẩu mới</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer mt-3">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa khách hàng -->
+<div class="modal fade" id="modalXoaCustomer" tabindex="-1" aria-labelledby="deleteCustomerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xoá khách hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xoá khách hàng có mã <strong id="customer-id-display"></strong> không?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                <button type="button" class="btn btn-danger" id="btnXacNhanXoaCustomer">Xoá</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    let currentPage = 1;
-    const perPage = 10;
-    const totalPages = 32;
+<script>
+    let currentFilterParams = '';
 
-    function fetchCustomers(page = 1, search = '') {
-        const customers = [{
-                id: 1,
-                username: 'Nguyễn Văn A',
-                password: '123456',
-                email: 'a@example.com',
-                phone: '0123456789',
-                address: '123 Đường ABC',
-                status: 'active'
-            },
-            {
-                id: 2,
-                username: 'Trần Thị B',
-                password: '987654',
-                email: 'b@example.com',
-                phone: '0987654321',
-                address: '456 Đường XYZ',
-                status: 'inactive'
-            }
-        ];
-        renderCustomers(customers);
-        renderPagination();
+    // Hàm load danh sách khách hàng
+    function loadCustomers(page = 1, params = "") {
+        const customerWrap = document.querySelector('.customer-wrap');
+        const paginationWrap = document.querySelector('.pagination-wrap');
+
+        fetch('ajax/load_khachhang.php?page=' + page + params)
+            .then(res => res.text())
+            .then(data => {
+                const parts = data.split('SPLIT');
+                customerWrap.innerHTML = parts[0] || '';
+                paginationWrap.innerHTML = parts[1] || '';
+            });
     }
 
-    function renderCustomers(customers) {
-        const tbody = document.querySelector('#customerTable tbody');
-        tbody.innerHTML = '';
-        customers.forEach(customer => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                     <td class="col-id">${customer.id}</td>
-                     <td class="col-name">${customer.username}</td>
-                     <td class="col-email">${customer.password}</td>
-                     <td class="col-email">${customer.email}</td>
-                     <td class="col-phone">${customer.phone}</td>
-                     <td class="col-address">${customer.address}</td>
-                     <td class="col-status"><span class="status-badge status-${customer.status}">${customer.status === 'active' ? 'Hoạt Động' : 'Không Hoạt Động'}</span></td>
-                     <td class="col-actions action-buttons">
-                         <button class="btn btn-sm btn-warning" onclick="openEditModal(${customer.id})"><i class="fas fa-edit"></i></button>
-                         <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${customer.id})"><i class="fas fa-trash"></i></button>
-                     </td>
-                 `;
-            tbody.appendChild(row);
+    // Gọi lần đầu khi trang load
+    loadCustomers(1);
+
+    // Bắt sự kiện phân trang
+    document.addEventListener("pagination:change", function(e) {
+        const {
+            page,
+            target
+        } = e.detail;
+
+        if (target === "khachhangpage") {
+            loadCustomers(page, currentFilterParams);
+        }
+    });
+
+    // Bắt sự kiện tìm kiếm username
+    document.querySelector('input[name="search-username"]').addEventListener('input', function() {
+        const searchValue = this.value.trim();
+        currentFilterParams = searchValue ? '&search_name=' + encodeURIComponent(searchValue) : '';
+        loadCustomers(1, currentFilterParams);
+    });
+
+    // ✅ Thêm khách hàng - kiểm tra đầy đủ thông tin trước khi gửi
+    const addCustomerForm = document.getElementById("customerForm");
+
+    if (addCustomerForm) {
+        addCustomerForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            // Lấy dữ liệu từ form
+            const username = this.querySelector('input[name="username"]').value.trim();
+            const password = this.querySelector('input[name="password"]').value.trim();
+            const email = this.querySelector('input[name="email"]').value.trim();
+
+            // Kiểm tra các trường bắt buộc
+            if (!username || !password || !email) {
+                alert('Vui lòng điền đầy đủ thông tin bắt buộc (Tên đăng nhập, Mật khẩu, Email, Trạng thái)');
+                return;
+            }
+
+            const formData = new FormData(this);
+
+            fetch('ajax/add_khachhang.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addCustomerModal'));
+                        modal.hide();
+                        loadCustomers(1); // reload danh sách
+                        this.reset();
+                        alert('Thêm khách hàng thành công!');
+                    } else {
+                        alert(data.message || 'Thêm khách hàng thất bại');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Đã xảy ra lỗi khi thêm khách hàng');
+                });
         });
     }
 
-    function renderPagination() {
-        const pagination = document.querySelector('#pagination');
-        pagination.innerHTML = '';
-        const prevLi = document.createElement('li');
-        prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-        prevLi.innerHTML =
-            `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></a>`;
-        pagination.appendChild(prevLi);
-        const pageInfo = document.createElement('li');
-        pageInfo.className = 'page-item disabled';
-        pageInfo.innerHTML = `<a class="page-link">Trang ${currentPage} / ${totalPages}</a>`;
-        pagination.appendChild(pageInfo);
-        const nextLi = document.createElement('li');
-        nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-        nextLi.innerHTML =
-            `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></a>`;
-        pagination.appendChild(nextLi);
-    }
-
-    function changePage(page) {
-        if (page < 1 || page > totalPages) return;
-        currentPage = page;
-        fetchCustomers(page, document.querySelector('#searchInput').value);
-    }
-
-    function searchCustomers() {
-        const searchTerm = document.querySelector('#searchInput').value;
-        fetchCustomers(1, searchTerm);
-    }
-
-    function openAddModal() {
-        document.querySelector('#modalTitle').textContent = 'Thêm Khách Hàng';
-        document.querySelector('#customerForm').reset();
-        document.querySelector('#customerId').value = '';
-    }
-
-    function openEditModal(id) {
-        const customer = {
-            id: id,
-            username: 'Nguyễn Văn A',
-            password: '********',
-            email: 'a@example.com',
-            phone: '0123456789',
-            address: '123 Đường ABC',
-            status: 'active'
-        };
-        document.querySelector('#modalTitle').textContent = 'Chỉnh Sửa Khách Hàng';
-        document.querySelector('#customerId').value = customer.id;
-        document.querySelector('#username').value = customer.username;
-        document.querySelector('#password').value = customer.password;
-        document.querySelector('#email').value = customer.email;
-        document.querySelector('#phone').value = customer.phone;
-        document.querySelector('#address').value = customer.address;
-        document.querySelector('#status').value = customer.status;
-        new bootstrap.Modal(document.querySelector('#customerModal')).show();
-    }
-
-    function saveCustomer() {
-        const id = document.querySelector('#customerId').value;
-        const username = document.querySelector('#username').value;
-        const password = document.querySelector('#password').value;
-        const email = document.querySelector('#email').value;
-        const phone = document.querySelector('#phone').value;
-        const address = document.querySelector('#address').value;
-        const status = document.querySelector('#status').value;
-
-        if (username && password && email) {
-            bootstrap.Modal.getInstance(document.querySelector('#customerModal')).hide();
-            fetchCustomers(currentPage);
-        } else {
-            alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+    // ✅ Xoá khách hàng
+    let idDangXoa = null;
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-delete-customer');
+        if (btn) {
+            e.preventDefault();
+            idDangXoa = btn.getAttribute('data-id');
+            document.getElementById('customer-id-display').textContent = idDangXoa;
         }
-    }
+    });
 
-    function deleteCustomer(id) {
-        if (confirm('Bạn có chắc chắn muốn xóa khách hàng này không?')) {
-            fetchCustomers(currentPage);
+    document.getElementById('btnXacNhanXoaCustomer').addEventListener('click', function() {
+        if (!idDangXoa) return;
+
+        fetch('ajax/delete_user.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: idDangXoa
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadCustomers(1, currentFilterParams);
+                    alert('Xóa khách hàng thành công!');
+                } else {
+                    alert('Xóa thất bại: ' + data.message);
+                }
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalXoaCustomer'));
+                modal.hide();
+            });
+    });
+
+    // ✅ Sửa khách hàng
+    document.addEventListener('click', function(e) {
+        const editBtn = e.target.closest('.btn-edit-customer');
+        if (editBtn) {
+            document.getElementById('editCustomerId').value = editBtn.dataset.id || '';
+            document.getElementById('editUsername').value = editBtn.dataset.username || '';
+            document.getElementById('editEmail').value = editBtn.dataset.email || '';
+            document.getElementById('editPhone').value = editBtn.dataset.phone || '';
+            document.getElementById('editAddress').value = editBtn.dataset.address || '';
+
+            // Reset mật khẩu mới (ẩn ô nhập mật khẩu nếu có)
+            const editNewPasswordInput = document.getElementById('editNewPassword');
+            const generatePasswordBtn = document.getElementById('generatePasswordBtn');
+            if (editNewPasswordInput && generatePasswordBtn) {
+                editNewPasswordInput.style.display = 'none';
+                editNewPasswordInput.value = '';
+                generatePasswordBtn.textContent = 'Cấp mật khẩu mới';
+            }
         }
+    });
+
+    // ✅ Khi bấm "Cấp mật khẩu mới" thì show ô nhập
+    const generatePasswordBtn = document.getElementById('generatePasswordBtn');
+    const editNewPasswordInput = document.getElementById('editNewPassword');
+
+    if (generatePasswordBtn && editNewPasswordInput) {
+        generatePasswordBtn.addEventListener('click', function() {
+            if (editNewPasswordInput.style.display === 'none') {
+                editNewPasswordInput.style.display = 'block';
+                editNewPasswordInput.focus();
+                generatePasswordBtn.textContent = 'Hủy cấp mật khẩu';
+            } else {
+                editNewPasswordInput.style.display = 'none';
+                editNewPasswordInput.value = '';
+                generatePasswordBtn.textContent = 'Cấp mật khẩu mới';
+            }
+        });
     }
 
-    fetchCustomers();
-    </script>
-</body>
+    // ✅ Xử lý submit form sửa khách hàng
+    document.getElementById("editCustomerForm").addEventListener("submit", function(e) {
+        e.preventDefault();
 
-</html>
+        const formData = new FormData(this);
+
+        fetch('ajax/update_khachhang.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editCustomerModal'));
+                    modal.hide();
+                    loadCustomers(1, currentFilterParams);
+                    alert('Cập nhật khách hàng thành công!');
+                } else {
+                    alert(data.message || 'Cập nhật khách hàng thất bại!');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                alert('Có lỗi khi cập nhật khách hàng!');
+            });
+    });
+</script>

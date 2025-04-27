@@ -129,15 +129,17 @@ $classDoanhThu = ($doanhThuThangNay['total_revenue'] - $doanhThuThangTruoc['tota
             ]
         ];
         ?>
-        <div class="row">
-            <div class="col-4 p-2">
-                <div class="bg-white rounded p-2">
-                    <h5>Biểu đồ Doanh thu</h5>
-                    <canvas id="doanhThuChart" width="400" height="200"></canvas>
-                </div>
+        <?php if ($canRead): ?>
+            <div class="row">
+                <div class="col-4 p-2">
+                    <div class="bg-white rounded p-2">
+                        <h5>Biểu đồ Doanh thu</h5>
+                        <canvas id="doanhThuChart" width="400" height="200"></canvas>
+                    </div>
 
+                </div>
             </div>
-        </div>
+        <?php endif; ?>
 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>

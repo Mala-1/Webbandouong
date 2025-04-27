@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     WHERE u.username = ? 
       AND u.role_id != 1 
       AND r.is_deleted = 0
+      AND u.is_deleted = 0
 ", [$username]);
 
     if ($user && password_verify($password, $user['password'])) {

@@ -19,7 +19,7 @@ $search_name = $_GET['search_name'] ?? '';
 $whereClauses = [];
 $params = [];
 
-$whereClauses[] = 'role_id NOT IN (1, 2)';
+$whereClauses[] = 'role_id != 1 AND is_deleted = 0';
 
 if ($search_name !== '') {
     $whereClauses[] = 'username LIKE ?';
@@ -39,30 +39,34 @@ $totalPages = ceil($totalUsers / $limit);
 $pagination = new Pagination($totalUsers, $limit, $page);
 
 ob_start();
-foreach ($users as $user): ?>
+foreach ($users as $user):
+    $role = $db->selectOne('SELECT * FROM roles WHERE role_id = ?', [$user['role_id']]);
+?>
     <tr>
         <td><?= $user['user_id'] ?></td>
         <td><?= htmlspecialchars($user['username']) ?></td>
         <td><?= htmlspecialchars($user['email']) ?></td>
         <td><?= htmlspecialchars($user['phone']) ?></td>
         <td><?= htmlspecialchars($user['address']) ?></td>
-        <td><?= htmlspecialchars($user['role_id']) ?></td>
+        <td><?= htmlspecialchars($role['name']) ?></td>
         <?php if ($canWrite || $canDelete): ?>
             <td class="action-icons">
-                <?php if ($canWrite): ?>
-                    <i class="fas fa-pen text-primary btn-edit-user me-2 fa-lg" style="cursor: pointer;"
-                        data-id="<?= $user['user_id'] ?>"
-                        data-username="<?= htmlspecialchars($user['username']) ?>"
-                        data-email="<?= htmlspecialchars($user['email']) ?>"
-                        data-phone="<?= htmlspecialchars($user['phone']) ?>"
-                        data-address="<?= htmlspecialchars($user['address']) ?>"
-                        data-role="<?= htmlspecialchars($user['role_id']) ?>"
-                        data-bs-toggle="modal" data-bs-target="#editUserModal"></i>
-                <?php endif; ?>
-                <?php if ($canDelete): ?>
-                    <i class="fas fa-trash text-danger btn-delete-user fa-lg" style="cursor: pointer;"
-                        data-id="<?= $user['user_id'] ?>"
-                        data-bs-toggle="modal" data-bs-target="#modalXoaNhanVien"></i>
+                <?php if ($user['role_id'] != 2): ?>
+                    <?php if ($canWrite): ?>
+                        <i class="fas fa-pen text-primary btn-edit-user me-2 fa-lg" style="cursor: pointer;"
+                            data-id="<?= $user['user_id'] ?>"
+                            data-username="<?= htmlspecialchars($user['username']) ?>"
+                            data-email="<?= htmlspecialchars($user['email']) ?>"
+                            data-phone="<?= htmlspecialchars($user['phone']) ?>"
+                            data-address="<?= htmlspecialchars($user['address']) ?>"
+                            data-role_id="<?= htmlspecialchars($user['role_id']) ?>"
+                            data-bs-toggle="modal" data-bs-target="#editUserModal"></i>
+                    <?php endif; ?>
+                    <?php if ($canDelete): ?>
+                        <i class="fas fa-trash text-danger btn-delete-user fa-lg" style="cursor: pointer;"
+                            data-id="<?= $user['user_id'] ?>"
+                            data-bs-toggle="modal" data-bs-target="#modalXoaNhanVien"></i>
+                    <?php endif; ?>
                 <?php endif; ?>
             </td>
         <?php endif; ?>
