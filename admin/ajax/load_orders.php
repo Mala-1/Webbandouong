@@ -48,16 +48,19 @@ $whereSql = count($whereClauses) > 0 ? 'WHERE ' . implode(' AND ', $whereClauses
 $sql = "SELECT SQL_CALC_FOUND_ROWS o.*, pm.name AS payment_method_name, 
         GROUP_CONCAT(
           CONCAT(
-            p.name, '||', op.quantity, '||', op.price
+            p.product_id, '||', po.packaging_option_id, '||', p.name, '||', op.quantity, '||', op.price, '||', po.packaging_type, '||', po.unit_quantity
           ) SEPARATOR '##'
         ) AS product_details 
         FROM orders o
         LEFT JOIN payment_method pm ON o.payment_method_id = pm.payment_method_id
         LEFT JOIN order_details op ON o.order_id = op.order_id
         LEFT JOIN products p ON op.product_id = p.product_id
+        LEFT JOIN packaging_options po ON op.packaging_option_id = po.packaging_option_id
         $whereSql
-        GROUP BY o.order_id
+        GROUP BY o.order_id DESC
         LIMIT $limit OFFSET $offset";
+
+
 
 
 $orders = $db->select($sql, $params);
@@ -84,9 +87,13 @@ foreach ($orders as $order):
         'products' => array_map(function ($productDetail) {
             $details = explode('||', $productDetail);
             return [
-                'name' => $details[0],
-                'quantity' => $details[1],
-                'price' => $details[2]
+                'product_id' => $details[0] ?? null,
+                'packaging_option_id' => $details[1] ?? null,
+                'name' => $details[2] ?? '',
+                'quantity' => $details[3] ?? 0,
+                'price' => $details[4] ?? 0,
+                'packaging_type' => $details[5] ?? '',
+                'unit_quantity' => $details[6] ?? ''
             ];
         }, explode('##', $order['product_details'] ?? ''))
     ];
@@ -103,7 +110,7 @@ foreach ($orders as $order):
         <?php if ($canWriteOrder || $canDeleteOrder || $canReadOrder): ?>
             <td class="action-icons">
                 <?php if ($canReadOrder): ?>
-                    <i class="fas fa-eye text-info btn-view-order me-3 fa-lg"
+                    <i class="fas fa-eye text-info btn-view-order fa-lg"
                         style="cursor: pointer;"
                         data-bs-toggle="modal"
                         data-bs-target="#orderDetailsModal"
@@ -111,18 +118,20 @@ foreach ($orders as $order):
                         title="Xem chi tiết đơn hàng"
                         data-order-details='<?= json_encode($orderDetails) ?>'></i>
                 <?php endif; ?>
-                <?php if ($canWriteOrder): ?>
-                    <i class="fas fa-pen text-primary btn-edit-order me-3 fa-lg" style="cursor: pointer;"
+                <?php if ($canWriteOrder && $orderDetails['status'] == 'Chờ xử lý'): ?>
+                    <i class="fas fa-pen text-primary btn-edit-order ms-3 fa-lg" style="cursor: pointer;"
                         data-id="<?= $order['order_id'] ?>"
                         data-user="<?= htmlspecialchars($order['user_id']) ?>"
                         data-status="<?= htmlspecialchars($order['status']) ?>"
                         data-address="<?= htmlspecialchars($order['shipping_address']) ?>"
                         data-payment="<?= htmlspecialchars($order['payment_method_id']) ?>"
-                        data-note="<?= htmlspecialchars($order['note'] ?? '') ?>"></i>
+                        data-note="<?= htmlspecialchars($order['note'] ?? '') ?>"
+                        data-total-price="<?= $order['total_price'] ?>"
+                        data-order-details='<?= json_encode($orderDetails) ?>'></i>
                 <?php endif; ?>
 
-                <?php if ($canDeleteOrder): ?>
-                    <i class="fas fa-trash fa-lg text-danger btn-delete-order" style="cursor: pointer;"
+                <?php if ($canDeleteOrder && $orderDetails['status'] != 'Đã giao hàng' && $orderDetails['status'] != 'Đã xác nhận'): ?>
+                    <i class="fas fa-trash fa-lg text-danger btn-delete-order ms-3" style="cursor: pointer;"
                         data-id="<?= $order['order_id'] ?>" data-bs-toggle="modal" data-bs-target="#modalXoaDonHang"></i>
                 <?php endif; ?>
             </td>
@@ -139,4 +148,3 @@ $data = [
 
 header('Content-Type: application/json');
 echo json_encode($data);
-

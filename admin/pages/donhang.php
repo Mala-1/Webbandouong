@@ -176,18 +176,18 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
     </div>
 </div>
 
-
 <!-- Modal sửa đơn hàng -->
 <div class="modal fade" id="editOrderModal" tabindex="-1" aria-labelledby="editOrderModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-xl"> <!-- ✅ modal-xl cho rộng ra -->
         <div class="modal-content">
             <form id="editOrderForm">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editOrderModalLabel">Sửa Đơn Hàng</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
+
                 <div class="modal-body row g-3">
-                    <input type="hidden" id="order_id" name="order_id"> <!-- Để lưu mã đơn hàng -->
+                    <input type="hidden" id="order_id" name="order_id">
 
                     <div class="col-md-6">
                         <label class="form-label">Người đặt hàng</label>
@@ -197,6 +197,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                         <label class="form-label">Địa chỉ giao hàng</label>
                         <input type="text" id="shipping_address" name="shipping_address" class="form-control" required>
                     </div>
+
                     <div class="col-md-6">
                         <label class="form-label">Trạng thái đơn hàng</label>
                         <select id="status" name="status" class="form-select" required>
@@ -206,24 +207,63 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                             <option value="Đã hủy">Đã hủy</option>
                         </select>
                     </div>
+
                     <div class="col-md-6">
                         <label class="form-label">Phương thức thanh toán</label>
                         <select id="payment_method_id" name="payment_method_id" class="form-select">
                             <?php
                             $payment_method = $db->select('SELECT * FROM payment_method', []);
+                            foreach ($payment_method as $p):
                             ?>
-                            <?php foreach ($payment_method as $p): ?>
                                 <option value="<?= $p['payment_method_id'] ?>">
-                                    <?= $p['name'] ?>
+                                    <?= htmlspecialchars($p['name']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
+
                     <div class="col-md-12">
                         <label class="form-label">Ghi chú đơn hàng</label>
                         <textarea id="note" name="note" class="form-control" rows="3"></textarea>
                     </div>
+
+                    <!-- ✅ Thêm phần Chi tiết sản phẩm đặt hàng -->
+                    <div class="col-12">
+                        <label class="form-label fw-bold mt-4">Chi tiết sản phẩm đặt hàng</label>
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-center align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th>Kiểu đóng gói</th>
+                                        <th>Số lượng</th>
+                                        <th>Giá</th>
+                                        <th>Xoá</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="editOrderDetailsTable">
+                                    <!-- Các dòng sản phẩm sẽ được load dynamic tại đây -->
+                                    <tr id="editAddRowTrigger">
+                                        <td colspan="5">
+                                            <button class="btn btn-success" id="editBtnAddRow" type="button">
+                                                <i class="fa-solid fa-circle-plus"></i> Thêm
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- ✅ Chỗ này thêm tổng tiền -->
+                        <div class="d-flex justify-content-end align-items-center gap-2 mt-3">
+                            <strong class="me-2">Tổng tiền:</strong>
+                            <span id="editTotalPrice" class="fw-bold text-primary fs-5">0 VNĐ</span>
+                        </div>
+                    </div>
+
+
                 </div>
+
                 <div class="modal-footer mt-3">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                     <button type="submit" class="btn btn-primary">Cập nhật</button>
@@ -232,6 +272,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         </div>
     </div>
 </div>
+
 
 
 <!-- Modal thêm chi tiết đơn hàng -->
@@ -349,7 +390,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
 <!-- Modal chi tiết đơn -->
 <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="orderDetailsModalLabel">Chi Tiết Đơn Hàng</h5>
@@ -383,6 +424,24 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
     </div>
 </div>
 
+<!-- Modal xác nhận xoá đơn hàng -->
+<div class="modal fade" id="modalXoaDonHang" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xoá đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn xoá đơn hàng có mã <strong id="order-id-display"></strong> không?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
+                <button type="button" class="btn btn-danger" id="btnXacNhanXoaDonHang">Xoá</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -401,7 +460,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             .then(data => {
                 // Gán dữ liệu từ JSON vào các phần tử HTML
                 orderWrap.innerHTML = data.orderHtml || ''; // Nội dung đơn hàng
-                console.log(data.pagination)
                 paginationWrap.innerHTML = data.pagination || ''; // Phân trang
             })
             .catch(error => {
@@ -423,7 +481,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             loadOrders(page, currentFilterParams);
         }
         if (target === "userpage") {
-            console.log('debug');
             loadUsers(page, currentFilterParams);
         }
         if (target === "packagingpage") {
@@ -437,7 +494,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         const targetLink = e.target.closest("[data-page][data-target]");
         if (targetLink) {
             e.preventDefault();
-            console.log('DEBUG CLICK PAGINATION:', targetLink.dataset.page, targetLink.dataset.target);
             const page = parseInt(targetLink.getAttribute("data-page"));
             const targetName = targetLink.getAttribute("data-target");
 
@@ -531,14 +587,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         loadUsers(1, currentFilterParams);
     }, 300));
 
-    function debounce(func, delay) {
-        let timeout;
-        return function(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
-
     // 🎯 Xử lý chọn khách hàng (chỉ chọn 1 người)
     userTable.addEventListener("click", function(e) {
         if (e.target.classList.contains("select-user")) {
@@ -570,7 +618,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         selectUserModal.hide();
         setTimeout(() => addOrderModal.show(), 500);
     });
-
 
     document.addEventListener("DOMContentLoaded", function() {
         const orderForm = document.querySelector("#orderForm");
@@ -622,6 +669,90 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         });
     });
 
+    document.addEventListener("click", function(event) {
+        const editBtn = event.target.closest(".btn-edit-order");
+        if (editBtn) {
+            const orderDetails = JSON.parse(editBtn.getAttribute('data-order-details'));
+
+            // 🚀 Lấy dữ liệu
+            document.getElementById('order_id').value = editBtn.dataset.id;
+            document.getElementById('user_id').value = editBtn.dataset.user;
+            document.getElementById('shipping_address').value = editBtn.dataset.address;
+            document.getElementById('status').value = editBtn.dataset.status;
+            document.getElementById('payment_method_id').value = editBtn.dataset.payment;
+            document.getElementById('note').value = editBtn.dataset.note || '';
+
+            // ➡️ Thêm dòng này để hiện tổng tiền
+            const totalPrice = editBtn.dataset.totalPrice || 0;
+            document.getElementById('editTotalPrice').textContent = parseInt(totalPrice).toLocaleString('vi-VN') + " VNĐ";
+
+            // 🚀 Load chi tiết sản phẩm vào bảng
+            const tableBody = document.getElementById("editOrderDetailsTable");
+            tableBody.querySelectorAll("tr:not(#editAddRowTrigger)").forEach(tr => tr.remove());
+            orderDetails.products.forEach(product => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>
+                        <input type="hidden" class="product-id" value="${product.product_id}">
+                        ${product.name}
+                    </td>
+                    <td>
+                        <input type="hidden" class="packaging-option-id" value="${product.packaging_option_id}">
+                        ${product.packaging_type || ''} - ${product.unit_quantity || ''}
+                    </td>
+                    <td>
+                        <input type="number" class="form-control quantity-input" value="${product.quantity}" min="1">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control price-input" value="${parseInt(product.price).toLocaleString('vi-VN')}" readonly>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm btn-remove-product">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.insertBefore(row, document.getElementById("editAddRowTrigger"));
+            });
+
+
+
+        }
+    });
+
+    function updateEditTotalPrice() {
+        let total = 0;
+        const rows = document.querySelectorAll('#editOrderDetailsTable tr:not(#editAddRowTrigger)');
+        rows.forEach(row => {
+            const quantityInput = row.querySelector('input.quantity-input');
+            const priceCell = row.querySelector('td:nth-child(4)');
+            if (quantityInput && priceCell) {
+                const quantity = parseInt(quantityInput.value) || 0;
+                const price = parseInt(priceCell.textContent.replace(/\D/g, '')) || 0;
+                total += quantity * price;
+            }
+        });
+        document.getElementById('editTotalPrice').textContent = total.toLocaleString('vi-VN') + ' VNĐ';
+    }
+
+
+
+
+    // 🎯 Xử lý nút Xoá dòng trong bảng chi tiết
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.btn-remove-product')) {
+            e.target.closest('tr').remove();
+            updateEditTotalPrice();
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-row-edit')) {
+            e.target.closest('tr').remove();
+            updateEditTotalPrice();
+        }
+    });
+
     document.addEventListener("DOMContentLoaded", function() {
         const editModal = document.querySelector("#editOrderModal");
         const orderIdInput = editModal.querySelector("#order_id");
@@ -663,6 +794,32 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             const payment_method_id = this.payment_method_id.value;
             const note = this.note.value.trim();
 
+            const detailRows = document.querySelectorAll("#editOrderDetailsTable tr:not(#editAddRowTrigger)");
+            const details = [];
+
+            detailRows.forEach(row => {
+                const product_id = row.querySelector('.product-id')?.value;
+                const packaging_option_id = row.querySelector('.packaging-option-id')?.value;
+                const quantity = row.querySelector('.quantity-input')?.value;
+                const priceRaw = row.querySelector('.price-input')?.value;
+
+                if (product_id && packaging_option_id && quantity && priceRaw) {
+                    const price = parseFloat(priceRaw.replace(/[^\d.-]/g, ''));
+                    details.push({
+                        product_id: parseInt(product_id),
+                        packaging_option_id: parseInt(packaging_option_id),
+                        quantity: parseInt(quantity),
+                        price
+                    });
+                }
+            });
+
+
+            if (details.length === 0) {
+                alert("Vui lòng thêm ít nhất một sản phẩm vào đơn hàng!");
+                return;
+            }
+
             fetch("ajax/update_order.php", {
                     method: "POST",
                     headers: {
@@ -673,7 +830,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                         status,
                         shipping_address,
                         payment_method_id,
-                        note
+                        note,
+                        details
                     })
                 })
                 .then(res => res.json())
@@ -700,27 +858,26 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         tooltipTriggerList.forEach(tooltipEl => new bootstrap.Tooltip(tooltipEl));
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const btnAddRow = document.getElementById('btnAddRow');
-        const tableBody = document.getElementById('orderDetailsTable');
+    const btnAddRow = document.getElementById('btnAddRow');
+    const tableBody = document.getElementById('orderDetailsTable');
 
-        // Hàm kiểm tra xem packaging_option_id đã tồn tại trong bảng chưa
-        function isPackagingOptionExists(packagingOptionId) {
-            const existingRows = tableBody.querySelectorAll('tr:not(#addRowTrigger)');
-            for (const row of existingRows) {
-                const packagingInput = row.querySelector('input[name^="packaging_option_id"]');
-                if (packagingInput && packagingInput.value === packagingOptionId) {
-                    return true;
-                }
+    // Hàm kiểm tra xem packaging_option_id đã tồn tại trong bảng chưa
+    function isPackagingOptionExists(packagingOptionId) {
+        const existingRows = tableBody.querySelectorAll('tr:not(#addRowTrigger)');
+        for (const row of existingRows) {
+            const packagingInput = row.querySelector('input[name^="packaging_option_id"]');
+            if (packagingInput && packagingInput.value === packagingOptionId) {
+                return true;
             }
-            return false;
         }
+        return false;
+    }
 
-        // ✅ Event delegation cho nút thêm dòng mới và nút xóa
-        tableBody.addEventListener("click", function(e) {
-            if (e.target && e.target.id === "btnAddRow") {
-                const newRow = document.createElement("tr");
-                newRow.innerHTML = `
+    // ✅ Event delegation cho nút thêm dòng mới và nút xóa
+    tableBody.addEventListener("click", function(e) {
+        if (e.target && e.target.id === "btnAddRow") {
+            const newRow = document.createElement("tr");
+            newRow.innerHTML = `
                 <td>
                     <input type="hidden" name="product_id[]" value="">
                     <input type="text" class="form-control" name="product_name[]" readonly>
@@ -734,105 +891,115 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 <td><input type="text" class="form-control" name="price[]" readonly></td>
                 <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa-solid fa-trash-can"></i></button></td>
             `;
-                tableBody.insertBefore(newRow, document.getElementById("addRowTrigger"));
-            } else if (e.target && e.target.classList.contains('remove-row')) {
-                e.target.closest('tr').remove();
-                updateTotalPrice(); // Cập nhật tổng giá khi xóa dòng
-            }
-        });
+            tableBody.insertBefore(newRow, document.getElementById("addRowTrigger"));
+        } else if (e.target && e.target.classList.contains('remove-row')) {
+            e.target.closest('tr').remove();
+            updateTotalPrice(); // Cập nhật tổng giá khi xóa dòng
+        }
+    });
 
-        // Lắng nghe sự kiện khi một packaging option được chọn từ modal
-        window.selectPackaging = function(btn) {
-            const name = btn.dataset.product;
-            const packaging = btn.dataset.packaging;
-            const price = btn.dataset.price;
-            const productId = btn.dataset.productId;
-            const packagingId = btn.dataset.packagingId;
+    // Lắng nghe sự kiện khi một packaging option được chọn từ modal
+    window.selectPackaging = function(btn) {
+        const name = btn.dataset.product;
+        const packaging = btn.dataset.packaging;
+        const price = btn.dataset.price;
+        const productId = btn.dataset.productId;
+        const packagingId = btn.dataset.packagingId;
 
-            if (currentTargetRow) {
-                // Kiểm tra xem packagingOptionId đã tồn tại trong bảng chưa
-                if (isPackagingOptionExists(packagingId)) {
-                    alert(`Kiểu đóng gói "${packaging}" đã tồn tại trong chi tiết đơn hàng.`);
-                    const packagingModal = bootstrap.Modal.getInstance(document.getElementById('selectPackagingModal'));
-                    if (packagingModal) {
-                        packagingModal.hide();
-                    }
-                    const addOrderDetailsModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addOrderDetailsModal'));
-                    setTimeout(() => addOrderDetailsModal.show(), 300);
-                    currentTargetRow = null; // Reset currentTargetRow
-                    return; // Không thêm vào dòng nếu đã tồn tại
-                }
+        if (!currentTargetRow) return;
 
-                const productIdInput = currentTargetRow.querySelector('input[name="product_id[]"]');
-                const productNameInput = currentTargetRow.querySelector('input[name="product_name[]"]');
-                const packagingOptionIdInput = currentTargetRow.querySelector('input[name="packaging_option_id[]"]');
-                const packagingNameInput = currentTargetRow.querySelector('input[name="packaging_option[]"]');
-                const priceInput = currentTargetRow.querySelector('input[name="price[]"]');
-                const quantityInput = currentTargetRow.querySelector('input[name="quantity[]"]');
+        // Check trùng packaging option trong bảng
+        const checkExists = [...document.querySelectorAll(`#${currentSelectMode === 'add' ? 'orderDetailsTable' : 'editOrderDetailsTable'} input[name*="packaging_option_id"]`)]
+            .some(input => input.value == packagingId);
 
-                if (productIdInput) productIdInput.value = productId;
-                if (productNameInput) productNameInput.value = name;
-                if (packagingOptionIdInput) packagingOptionIdInput.value = packagingId;
-                if (packagingNameInput) packagingNameInput.value = packaging;
-                if (priceInput) priceInput.value = parseInt(price).toLocaleString();
-                if (quantityInput) quantityInput.removeAttribute("readonly");
-                quantityInput.value = 1; // Đặt số lượng mặc định là 1
-
-                updateTotalPrice();
-
-                const packagingModal = bootstrap.Modal.getInstance(document.getElementById('selectPackagingModal'));
-                if (packagingModal) {
-                    packagingModal.hide();
-                }
-
-                const addOrderDetailsModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('addOrderDetailsModal'));
-                setTimeout(() => addOrderDetailsModal.show(), 300); // Chuyển dòng này ra ngoài if
-
-                // Sau khi chọn thành công, thêm một dòng mới để người dùng tiếp tục chọn
-
-            }
-        };
-        // Hàm cập nhật tổng giá trong modal chi tiết
-        function updateTotalPrice() {
-            let total = 0;
-            const detailRows = tableBody.querySelectorAll('tr:not(#addRowTrigger)');
-            detailRows.forEach(row => {
-                const quantityInput = row.querySelector('input[name="quantity[]"]');
-                const priceInput = row.querySelector('input[name="price[]"]');
-                if (quantityInput && priceInput) {
-                    const quantity = parseInt(quantityInput.value) || 0;
-                    const price = parseInt(priceInput.value.replace(/[^0-9]/g, '')) || 0;
-                    total += quantity * price;
-                }
-            });
-            document.querySelector("#info_total_price").textContent = total.toLocaleString('vi-VN', {
-                style: 'currency',
-                currency: 'VND'
-            });
+        if (checkExists) {
+            alert("Kiểu đóng gói này đã tồn tại trong bảng.");
+            bootstrap.Modal.getInstance(document.getElementById('selectPackagingModal')).hide();
+            setTimeout(() => {
+                bootstrap.Modal.getOrCreateInstance(
+                    document.getElementById(currentSelectMode === 'add' ? 'addOrderDetailsModal' : 'editOrderModal')
+                ).show();
+            }, 300);
+            currentTargetRow = null;
+            return;
         }
 
-        // Lắng nghe sự kiện thay đổi số lượng để cập nhật tổng giá
-        tableBody.addEventListener('input', function(e) {
-            if (e.target && e.target.name === 'quantity[]') {
-                updateTotalPrice();
+        // Gán dữ liệu vào dòng
+        if (currentSelectMode === 'add') {
+            currentTargetRow.querySelector('input[name="product_id[]"]').value = productId;
+            currentTargetRow.querySelector('input[name="product_name[]"]').value = name;
+            currentTargetRow.querySelector('input[name="packaging_option_id[]"]').value = packagingId;
+            currentTargetRow.querySelector('input[name="packaging_option[]"]').value = packaging;
+            currentTargetRow.querySelector('input[name="price[]"]').value = parseInt(price).toLocaleString('vi-VN');
+            const quantityInput = currentTargetRow.querySelector('input[name="quantity[]"]');
+            if (quantityInput) {
+                quantityInput.removeAttribute('readonly');
+                quantityInput.value = 1;
+            }
+        } else if (currentSelectMode === 'edit') {
+            currentTargetRow.querySelector('input[name="product_id_edit[]"]').value = productId;
+            currentTargetRow.querySelector('input[name="product_name_edit[]"]').value = name;
+            currentTargetRow.querySelector('input[name="packaging_option_id_edit[]"]').value = packagingId;
+            currentTargetRow.querySelector('input[name="packaging_option_edit[]"]').value = packaging;
+            currentTargetRow.querySelector('input[name="price_edit[]"]').value = parseInt(price).toLocaleString('vi-VN');
+            const quantityInput = currentTargetRow.querySelector('input[name="quantity_edit[]"]');
+            if (quantityInput) {
+                quantityInput.removeAttribute('readonly');
+                quantityInput.value = 1;
+            }
+        }
+
+        // Đóng modal packaging và mở lại modal đúng
+        bootstrap.Modal.getInstance(document.getElementById('selectPackagingModal')).hide();
+        setTimeout(() => {
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById(currentSelectMode === 'add' ? 'addOrderDetailsModal' : 'editOrderModal')
+            ).show();
+        }, 300);
+
+        // Cập nhật tổng giá
+        if (currentSelectMode === 'add') {
+            updateTotalPrice();
+        } else {
+            updateEditTotalPrice();
+        }
+
+        currentTargetRow = null;
+    };
+    // Hàm cập nhật tổng giá trong modal chi tiết
+    function updateTotalPrice() {
+        let total = 0;
+        const detailRows = tableBody.querySelectorAll('tr:not(#addRowTrigger)');
+        detailRows.forEach(row => {
+            const quantityInput = row.querySelector('input[name="quantity[]"]');
+            const priceInput = row.querySelector('input[name="price[]"]');
+            if (quantityInput && priceInput) {
+                const quantity = parseInt(quantityInput.value) || 0;
+                const price = parseInt(priceInput.value.replace(/[^0-9]/g, '')) || 0;
+                total += quantity * price;
             }
         });
+        document.querySelector("#info_total_price").textContent = total.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        });
+    }
+
+    // Lắng nghe sự kiện thay đổi số lượng để cập nhật tổng giá
+    tableBody.addEventListener('input', function(e) {
+        if (e.target && e.target.name === 'quantity[]') {
+            updateTotalPrice();
+        }
     });
 
     let currentTargetRow = null;
+    let currentSelectMode = 'add';
     let currentFilterParamsPackaging = "";
 
     const packagingTable = document.querySelector("#packagingTable");
     const paginationWrap = document.querySelector(".pagination-packaging-wrap");
     const searchPackaging = document.querySelector("#searchPackaging");
 
-    function debounce(func, delay) {
-        let timeout;
-        return function(...args) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
 
     function loadPackagingOptions(page = 1, params = "") {
         fetch(`ajax/load_packaging_options.php?page=${page}${params}`)
@@ -851,10 +1018,19 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
     }, 300));
 
     // 🔍 Mở modal chọn đóng gói
-    window.openPackagingSelector = function(button) {
+    function openPackagingSelector(button) {
         currentTargetRow = button.closest("tr");
 
-        const mainModal = bootstrap.Modal.getInstance(document.getElementById('addOrderDetailsModal'));
+        // Phân biệt mode
+        if (currentTargetRow.closest('#orderDetailsTable')) {
+            currentSelectMode = 'add'; // Nếu dòng nằm trong bảng thêm
+        } else if (currentTargetRow.closest('#editOrderDetailsTable')) {
+            currentSelectMode = 'edit'; // Nếu dòng nằm trong bảng sửa
+        }
+
+        const mainModal = bootstrap.Modal.getInstance(
+            document.getElementById(currentSelectMode === 'add' ? 'addOrderDetailsModal' : 'editOrderModal')
+        );
         if (mainModal) {
             mainModal.hide();
         }
@@ -863,7 +1039,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         packagingModal.show();
 
         loadPackagingOptions(1, currentFilterParamsPackaging);
-    };
+    }
+
 
     // 🚀 Khi click vào mở modal đóng gói mặc định (nếu có)
     document.querySelector('[data-bs-target="#selectPackagingModal"]')?.addEventListener("click", () => {
@@ -884,7 +1061,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
 
         rows.forEach(row => {
             const product_id = row.querySelector('input[name="product_id[]"]')?.value;
-            console.log(product_id)
             const quantity = row.querySelector('input[name="quantity[]"]')?.value;
 
             const priceRaw = row.querySelector('input[name="price[]"]')?.value;
@@ -892,7 +1068,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
 
             // Giả sử bạn đã lưu packaging_option_id trong data attribute
             const packaging_option_id = row.querySelector('input[name="packaging_option_id[]"]')?.value;
-            console.log(packaging_option_id)
 
             if (product_id && packaging_option_id && quantity && priceRaw) {
                 const price = parseFloat(priceRaw.replace(/[^\d.-]/g, '')); // Loại bỏ định dạng tiền
@@ -904,7 +1079,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 });
             }
         });
-        // console.log(details)
 
         if (details.length === 0) {
             alert("Vui lòng thêm ít nhất một dòng chi tiết sản phẩm.");
@@ -919,7 +1093,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         formData.append("note", order.note || "");
         formData.append("details", JSON.stringify(details));
 
-        console.log(formData)
 
         fetch("ajax/add_order.php", {
                 method: "POST",
@@ -927,7 +1100,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             })
             .then(res => res.json())
             .then(data => {
-                console.log(data)
                 if (data.success) {
                     alert("Thêm đơn hàng thành công!");
                     const modalElement = document.getElementById("addOrderDetailsModal");
@@ -942,7 +1114,12 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
 
                     loadOrders(1);
 
-
+                    setTimeout(() => {
+                        const btnViewOrder = document.querySelector(".btn-view-order");
+                        if (btnViewOrder) {
+                            btnViewOrder.click();
+                        }
+                    }, 500);
                 } else {
                     alert("Lỗi: " + data.message);
                 }
@@ -983,6 +1160,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                     <thead>
                     <tr>
                         <th>Sản phẩm</th>
+                        <th>Loại đóng gói</th>
                         <th>Số lượng</th>
                         <th>Giá</th>
                     </tr>
@@ -991,6 +1169,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                     ${order.products.map(product => `
                         <tr>
                         <td>${product.name}</td>
+                        <td class="text-capitalize">${product.packaging_type + ' - ' + product.unit_quantity}</td>
                         <td>${product.quantity}</td>
                         <td>${product.price} VNĐ</td>
                         </tr>
@@ -999,4 +1178,84 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 </table>
                 `;
     }
+
+    let orderIdToDelete = null; // Lưu tạm order_id cần xoá
+
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-delete-order');
+        if (!btn) return;
+
+        const orderId = btn.dataset.id; // Lấy order_id từ data-attribute
+
+        if (!orderId) {
+            alert("Không tìm thấy ID đơn hàng.");
+            return;
+        }
+
+        // ⚡ Thay confirm bằng modal xác nhận
+        orderIdToDelete = orderId;
+        document.getElementById('order-id-display').textContent = orderId; // Cập nhật mã đơn trong modal
+    });
+
+    // Khi người dùng bấm nút "Xác nhận Xoá" trong modal
+    document.getElementById('btnXacNhanXoaDonHang').addEventListener('click', function() {
+        if (!orderIdToDelete) return;
+
+        fetch('ajax/delete_order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    order_id: orderIdToDelete
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message || "Xoá đơn hàng thành công!");
+                    loadOrders(1); // 🚀 Reload danh sách đơn hàng
+                } else {
+                    alert(data.message || "Xoá đơn hàng thất bại!");
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                alert("Đã có lỗi xảy ra khi gửi yêu cầu xoá.");
+            });
+
+        // Đóng modal sau khi bấm xác nhận xoá
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalXoaDonHang'));
+        if (modal) {
+            modal.hide();
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'editBtnAddRow') {
+            const tableBody = document.getElementById('editOrderDetailsTable');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>
+                    <input type="hidden" name="product_id_edit[]" value="">
+                    <input type="text" class="form-control" name="product_name_edit[]" readonly>
+                </td>
+                <td class="d-flex align-items-center gap-2 justify-content-center">
+                    <input type="hidden" name="packaging_option_id_edit[]" value="">
+                    <input type="text" class="form-control text-capitalize" name="packaging_option_edit[]" readonly>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="openPackagingSelector(this)">Chọn</button>
+                </td>
+                <td>
+                    <input type="number" class="form-control quantity-input" name="quantity_edit[]" placeholder="Số lượng" min="1">
+                </td>
+                <td>
+                    <input type="text" class="form-control" name="price_edit[]" readonly>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm remove-row-edit"><i class="fa-solid fa-trash-can"></i></button>
+                </td>
+            `;
+            tableBody.insertBefore(newRow, document.getElementById('editAddRowTrigger'));
+        }
+    });
 </script>

@@ -412,6 +412,9 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
 
 
 <script>
+    let currentTargetRow = null;
+    let currentMode = 'add'; // mặc định là thêm
+
     let currentFilterParams = "";
 
     function loadReceipts(page = 1, params = "") {
@@ -621,8 +624,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     // modal chọn sp
     // Global variable dùng để lưu bộ lọc cho đóng gói
     let currentFilterParamsPackaging = "";
-    // Global variable dùng để lưu dòng hiện tại được chọn từ modal chính
-    let currentTargetRow = null;
 
     // Hàm tải danh sách sản phẩm kiểu đóng gói từ file PHP dựa trên tham số tìm kiếm và phân trang
     function loadPackagingOptions(page = 1, params = "") {
@@ -648,20 +649,21 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     }
 
     // Hàm mở modal chọn đóng gói, được gọi khi click vào nút mở modal
-    window.openPackagingSelector = function(button, mode = '') {
-        // Lưu dòng hiện tại của modal chính chứa thông tin sản phẩm (là thẻ <tr> chứa nút được click)
+    window.openPackagingSelector = function(button, mode = 'add') {
         currentTargetRow = button.closest("tr");
+        currentMode = mode; // 'add' hoặc 'edit'
 
-        if (mode === 'sua') {
+        if (mode === 'edit') {
             const editModal = bootstrap.Modal.getInstance(document.getElementById('editReceiptModal'));
             if (editModal) editModal.hide();
+        } else {
+            const addModal = bootstrap.Modal.getInstance(document.getElementById('addReceiptModal'));
+            if (addModal) addModal.hide();
         }
 
-        // Hiện modal chọn đóng gói
         const packagingModal = new bootstrap.Modal(document.getElementById('productModal'));
         packagingModal.show();
 
-        // Tải danh sách đóng gói theo tham số hiện tại
         loadPackagingOptions(1, currentFilterParamsPackaging);
     };
 
@@ -678,36 +680,47 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
             currentTargetRow.querySelector('input[name="packaging[]"]').value = packaging;
             currentTargetRow.querySelector('input[name="product_name[]"]').value = name;
             currentTargetRow.querySelector('input[name="packaging_option[]"]').value = packagingId;
-            currentTargetRow.querySelector('.total').innerText = (price * currentTargetRow.querySelector('input[name="quantity[]"]').value).toLocaleString();
+            currentTargetRow.querySelector('.total').innerText = (price * (currentTargetRow.querySelector('input[name="quantity[]"]').value || 0)).toLocaleString();
         }
 
         // Đóng modal chọn sản phẩm
         const packagingModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
         if (packagingModal) packagingModal.hide();
 
-
-        // Nếu đang trong mode sửa thì mở lại editReceiptModal
-        const editModal = new bootstrap.Modal(document.getElementById('editReceiptModal'));
-        editModal.show();
-        updateGrandTotal();
+        // Mở lại đúng modal thêm/sửa
+        if (currentMode === 'edit') {
+            const editModal = new bootstrap.Modal(document.getElementById('editReceiptModal'));
+            editModal.show();
+            updateGrandTotal('edit');
+        } else {
+            const addModal = new bootstrap.Modal(document.getElementById('addReceiptModal'));
+            addModal.show();
+            updateGrandTotal('add');
+        }
     };
+
 
     // Tải mặc định danh sách nếu mở modal đóng gói thông qua nút có data-bs-target="#selectPackagingModal"
     document.querySelector('[data-bs-target="#selectPackagingModal"]')?.addEventListener("click", function() {
         loadPackagingOptions(1);
     });
 
-    function updateGrandTotal() {
+    function updateGrandTotal(mode = 'add') {
         let total = 0;
-        document.querySelectorAll('#product-list tr').forEach(row => {
+        const tableSelector = mode === 'edit' ? '#product-list-sua tr' : '#product-list tr';
+        const totalSelector = mode === 'edit' ? 'grand-total-sua' : 'grand-total';
+
+        document.querySelectorAll(tableSelector).forEach(row => {
             const qty = parseInt(row.querySelector('input[name="quantity[]"]').value) || 0;
             const price = parseInt(row.querySelector('input[name="price[]"]').value.replace(/,/g, '')) || 0;
             const subtotal = qty * price;
             row.querySelector('.total').innerText = subtotal.toLocaleString();
             total += subtotal;
         });
-        document.getElementById('grand-total').innerText = total.toLocaleString();
+
+        document.getElementById(totalSelector).innerText = total.toLocaleString();
     }
+
 
     // Gọi modal
     function openSupplierModal() {
@@ -906,24 +919,24 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                     const total = item.quantity * item.price;
 
                     row.innerHTML = `
-                    <td class="d-flex gap-2">
-                        <input type="hidden" name="product_id[]" value="${item.product_id}">
-                        <input type="hidden" name="packaging_option[]" value="${item.packaging_option_id}">
-                        <input type="text" name="product_name[]" class="selected-product-name form-control" readonly value="${item.product_name}" />
-                        <button type="button" class="btn btn-success btn-sm btn-select-product" onclick="openPackagingSelector(this, 'sua')">Chọn</button>
-                    </td>
-                    <td>
-                        <input type="text" name="packaging[]" class="packaging form-control text-capitalize" value="${item.packaging_type + ' - ' + item.unit_quantity}" readonly>
-                    </td>
-                    <td>
-                        <input type="number" name="quantity[]" class="quantity form-control" value="${item.quantity}" oninput="updateRowTotal(this, 'sua')" />
-                    </td>
-                    <td>
-                        <input type="number" name="price[]" class="price form-control" value="${item.price}" oninput="updateRowTotal(this, 'sua')" />
-                    </td>
-                    <td><span class="total">${total.toLocaleString()}</span></td>
-                    <td><button type="button" onclick="removeRow(this, 'sua')" class="btn btn-danger btn-sm">Xoá</button></td>
-                `;
+                        <td class="d-flex gap-2">
+                            <input type="hidden" name="product_id[]" value="${item.product_id}">
+                            <input type="hidden" name="packaging_option[]" value="${item.packaging_option_id}">
+                            <input type="text" name="product_name[]" class="selected-product-name form-control" readonly value="${item.product_name}" />
+                            <button type="button" class="btn btn-success btn-sm btn-select-product" onclick="openPackagingSelector(this, 'edit')">Chọn</button>
+                        </td>
+                        <td>
+                            <input type="text" name="packaging[]" class="packaging form-control text-capitalize" value="${item.packaging_type + ' - ' + item.unit_quantity}" readonly>
+                        </td>
+                        <td>
+                            <input type="number" name="quantity[]" class="quantity form-control" value="${item.quantity}" oninput="updateRowTotal(this, 'sua')" />
+                        </td>
+                        <td>
+                            <input type="number" name="price[]" class="price form-control" value="${item.price}" oninput="updateRowTotal(this, 'sua')" />
+                        </td>
+                        <td><span class="total">${total.toLocaleString()}</span></td>
+                        <td><button type="button" onclick="removeRow(this, 'sua')" class="btn btn-danger btn-sm">Xoá</button></td>
+                    `;
                     tbody.appendChild(row);
                 });
 
