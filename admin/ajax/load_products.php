@@ -16,7 +16,7 @@ $offset = ($page - 1) * $limit;
 $whereClauses = [];
 $params = [];
 
-// Luôn lọc sản phẩm chưa bị xoá mềm
+// Luôn lọc sản phẩm chưa bị xoá
 $whereClauses[] = 'p.is_deleted = 0';
 
 // Lọc theo category

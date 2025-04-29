@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/DBConnect.php';
 $db = DBConnect::getInstance();
-$categories = $db->select('SELECT * FROM categories', []);
+$categories = $db->select('SELECT * FROM categories WHERE is_deleted = 0', []);
 ?>
 <link href="../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />

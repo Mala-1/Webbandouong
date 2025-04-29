@@ -21,6 +21,21 @@ $maxPrice = $_GET['max_price'] ?? '';
 $whereClauses = [];
 $params = [];
 
+$whereClauses[] = 'p.is_deleted = 0';
+$whereClauses[] = 'po.is_deleted = 0';
+
+$whereClauses[] = "(
+    po.stock > 0 
+    OR EXISTS (
+        SELECT 1
+        FROM packaging_options po2
+        WHERE po2.product_id = po.product_id
+          AND CAST(SUBSTRING_INDEX(po2.unit_quantity, ' ', 1) AS UNSIGNED) > CAST(SUBSTRING_INDEX(po.unit_quantity, ' ', 1) AS UNSIGNED)
+          AND po2.stock > 0
+          AND (po2.is_deleted = 0 OR po2.is_deleted IS NULL)
+    )
+)";
+
 $effectiveCategory = !empty($categoryFilter) ? $categoryFilter : $categoryId;
 if (!empty($effectiveCategory)) {
     $whereClauses[] = 'p.category_id = ?';

@@ -25,7 +25,7 @@ $packagingTypes = $db->select(
     "SELECT DISTINCT po.packaging_type
      FROM packaging_options po
      JOIN products p ON po.product_id = p.product_id
-     WHERE p.category_id = ?", 
+     WHERE p.category_id = ? AND po.is_deleted = 0 AND p.is_deleted = 0", 
     [$categoryId]
 );
 

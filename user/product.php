@@ -133,21 +133,7 @@
 
             <div id="productScrollWrapper" class="border bg-white">
                 <div class="product-wrap row row-cols-2 row-cols-md-4 row-cols-xl-5 p-3 g-0">
-                <?php foreach ($products as $product): ?>
-    <div class="p-1 ps-md-3">
-        <div class="product-item border">
-            <a href="product_detail.php?packaging_option_id=<?= $product['packaging_option_id'] ?>">
-                <img alt="<?= $product['name'] ?>" class="img-fluid object-fit-contain mx-auto"
-                     src="../assets/images/SanPham/<?= $product['image'] ?>" />
-                <div class="mt-2">
-                    <p class="ellipsis-2-lines text-secondary mb-2 ms-2"><?= $product['name'] ?></p>
-                    <p class="fw-medium fs-5 ms-2"><?= number_format($product['price'], 0, ',', '.') ?>đ</p>
-                    <span class="btn-buy text-decoration-none text-black d-block w-100 text-center py-2">MUA</span>
-                </div>
-            </a>
-        </div>
-    </div>
-<?php endforeach; ?>
+                    
                 </div>
                 <!-- Phân trnag -->
                 <div class="pagination-wrap"></div>
@@ -159,7 +145,7 @@
         const searchKeyword = <?= json_encode($_GET['product_name'] ?? '') ?>;
         const searchCategory = <?= json_encode($_GET['category'] ?? '') ?>;
         const searchMinPrice = <?= json_encode($_GET['min'] ?? '') ?>;
-        const searchMaxPrice = <?= json_encode($_GET['max'] ?? '') ?>;  
+        const searchMaxPrice = <?= json_encode($_GET['max'] ?? '') ?>;
         const initialCategoryId = <?= json_encode($_GET['category'] ?? '') ?>;
     </script>
     <script src="../assets/javascript/product.js"></script>

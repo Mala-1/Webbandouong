@@ -12,7 +12,7 @@ $offset = ($page - 1) * $limit;
 $params = [];
 
 // 🔥 Luôn lọc người dùng có `role_id = 1`
-$whereSql = "WHERE role_id = 1";
+$whereSql = "WHERE role_id = 1 AND is_deleted = 0";
 
 if (!empty($search)) {
     $whereSql .= " AND username LIKE ?";

@@ -70,35 +70,6 @@ $categories = $db->select('SELECT * FROM categories WHERE is_deleted = 0');
 
 $brands = $db->select('SELECT * FROM brand WHERE is_deleted = 0');
 
-$products = $db->select('
-SELECT 
-    p.product_id,
-    pi.image,
-    p.name,
-    COALESCE(po.price, p.price) AS price,
-    c.name AS category_name,
-    b.name AS brand_name,
-    po.stock AS stock,
-    po.packaging_type,
-    p.origin,
-    p.description
-FROM products p
-LEFT JOIN categories c ON p.category_id = c.category_id
-LEFT JOIN brand b ON p.brand_id = b.brand_id
-LEFT JOIN (
-    SELECT *
-    FROM packaging_options
-    WHERE unit_quantity = 1
-    GROUP BY product_id
-) po ON p.product_id = po.product_id
-LEFT JOIN (
-    SELECT product_id, MIN(image) AS image
-    FROM product_images
-    GROUP BY product_id
-) pi ON p.product_id = pi.product_id
-LIMIT 5;
-', []);
-
 ?>
 <div>
     <div class="p-3 d-flex align-items-center rounded" style="background-color: #f0f0f0; height: 80px;">

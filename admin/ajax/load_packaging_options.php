@@ -19,7 +19,7 @@ if (!empty($search)) {
 }
 
 // Gộp điều kiện thành chuỗi WHERE
-$whereSql = implode(" AND ", $conditions); // KHÔNG thêm "WHERE" ở đây
+$whereSql = implode(" AND ", $conditions);
 
 // ✅ Truy vấn lấy sản phẩm + packaging_option có unit_quantity = 1
 $sql = "

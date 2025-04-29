@@ -7,6 +7,8 @@
     <title>Document</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css">
+    <link rel="icon" type="image/png" href="/assets/images/strarbucks.jpg">
+
     <style>
         .btn-scroll {
             position: absolute;
@@ -136,7 +138,7 @@
                             END AS price
                         FROM products p
                         LEFT JOIN packaging_options po ON po.product_id = p.product_id
-                        WHERE p.product_id = ?", [$product_id]);
+                        WHERE p.product_id = ? AND po.is_deleted = 0", [$product_id]);
 
 
     function formatProductName($packaging_type, $unit_quantity, $product_name)
@@ -302,6 +304,7 @@
     <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
         const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
+        
         const packagingStocks = {
             <?php foreach ($products as $product): ?>
                 <?= $product['packaging_option_id'] ?>: <?= $product['stock'] ?? 0 ?>,
@@ -541,12 +544,10 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        window.location.href = "../user/cart.php";  
-                    }    
+                        window.location.href = "../user/cart.php";
+                    }
                 });
         });
-
-       
     </script>
 </body>
 

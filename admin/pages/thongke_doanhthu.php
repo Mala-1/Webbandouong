@@ -1,9 +1,7 @@
 <?php require_once '../includes/DBConnect.php'; ?>
 
-<title>Thống kê doanh thu</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <div class="px-2">
     <h2 class="mb-4">Thống kê Doanh Thu</h2>
