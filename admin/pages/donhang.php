@@ -919,7 +919,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         tooltipTriggerList.forEach(tooltipEl => new bootstrap.Tooltip(tooltipEl));
     });
 
-    const btnAddRow = document.getElementById('btnAddRow');
     const tableBody = document.getElementById('orderDetailsTable');
 
     // Hàm kiểm tra xem packaging_option_id đã tồn tại trong bảng chưa
@@ -937,6 +936,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
     // ✅ Event delegation cho nút thêm dòng mới và nút xóa
     tableBody.addEventListener("click", function(e) {
         if (e.target && e.target.id === "btnAddRow") {
+            console.log('debug')
             const newRow = document.createElement("tr");
             newRow.innerHTML = `
                 <td>
@@ -1301,6 +1301,33 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
     });
 
 
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.id === 'editBtnAddRow') {
+            const tableBody = document.getElementById('editOrderDetailsTable');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>
+                    <input type="hidden" name="product_id_edit[]" value="">
+                    <input type="text" class="form-control" name="product_name_edit[]" readonly>
+                </td>
+                <td class="d-flex align-items-center gap-2 justify-content-center">
+                    <input type="hidden" name="packaging_option_id_edit[]" value="">
+                    <input type="text" class="form-control text-capitalize" name="packaging_option_edit[]" readonly>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="openPackagingSelector(this)">Chọn</button>
+                </td>
+                <td>
+                    <input type="number" class="form-control quantity-input" name="quantity_edit[]" placeholder="Số lượng" min="1">
+                </td>
+                <td>
+                    <input type="text" class="form-control" name="price_edit[]" readonly>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm remove-row-edit"><i class="fa-solid fa-trash-can"></i></button>
+                </td>
+            `;
+            tableBody.insertBefore(newRow, document.getElementById('editAddRowTrigger'));
+        }
+    });
 
     // xuất pdf
     document.getElementById("btnExportOrderPdf").addEventListener("click", function() {
