@@ -13,14 +13,15 @@ if (!$orderId) {
 }
 
 try {
-    
+
     // 1. Lấy thông tin phiếu nhập (gồm mã NCC, tên NCC, người nhập, ngày nhập)
     $receiptInfo = $db->selectOne("
-        SELECT io.import_order_id, io.supplier_id, s.name AS supplier_name, io.user_id, io.created_at
+        SELECT io.import_order_id, io.supplier_id, s.name AS supplier_name, io.user_id, u.username, io.created_at, io.status
         FROM import_order io
         LEFT JOIN supplier s ON io.supplier_id = s.supplier_id
+        LEFT JOIN users u ON io.user_id = u.user_id
         WHERE io.import_order_id = ?
-    ", [$orderId]);
+", [$orderId]);
 
     if (!$receiptInfo) {
         echo json_encode(['success' => false, 'message' => 'Không tìm thấy phiếu nhập']);

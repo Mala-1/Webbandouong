@@ -17,7 +17,7 @@ if (!$userId) {
 }
 
 // Lấy role_id của user
-$sqlRole = "SELECT role_id FROM users WHERE user_id = ?";
+$sqlRole = "SELECT role_id FROM users WHERE user_id = ? AND user_id != 1";
 $userData = $db->select($sqlRole, [$userId]);
 $roleId = $userData[0]['role_id'] ?? null;
 
@@ -55,11 +55,11 @@ $menuItems = [
     8 => ['label' => 'Thương hiệu', 'icon' => 'fa-copyright', 'page' => 'thuonghieu'],
     4 => ['label' => 'Phiếu nhập', 'icon' => 'fa-inbox', 'page' => 'phieunhap'],
     5 => ['label' => 'Thống kê', 'icon' => 'fa-chart-bar', 'page' => 'thongke_doanhthu'],
-    10 => ['label' => 'Quản lý nhân viên', 'icon' => 'fa-user-tie', 'page' => 'nhanvien'],
+    10 => ['label' => 'Nhân viên', 'icon' => 'fa-user-tie', 'page' => 'nhanvien'],
 ];
 
 $page = $_GET['page'] ?? 'dashboard';
-$allowedPages = ['dashboard', 'sanpham', 'donhang', 'khachhang', 'nhanvien', 'NCC', 'phanquyen', 'thuonghieu', 'theloai', 'phieunhap', 'thongke_doanhthu'];
+$allowedPages = ['dashboard', 'sanpham', 'donhang', 'khachhang', 'nhanvien', 'NCC', 'phanquyen', 'thuonghieu', 'theloai', 'phieunhap', 'thongke_doanhthu', 'taikhoan'];
 ?>
 
 <!DOCTYPE html>
@@ -85,7 +85,7 @@ $allowedPages = ['dashboard', 'sanpham', 'donhang', 'khachhang', 'nhanvien', 'NC
         }
 
         .nav-link.active {
-            background-color:rgb(49, 128, 247) !important;
+            background-color: rgb(49, 128, 247) !important;
             color: white !important;
             border-radius: 0.375rem;
         }
@@ -115,6 +115,13 @@ $allowedPages = ['dashboard', 'sanpham', 'donhang', 'khachhang', 'nhanvien', 'NC
                         </li>
                     <?php endif; ?>
                 <?php endforeach; ?>
+
+                <li class="nav-item fs-5">
+                    <?php $isActive = ($page === 'taikhoan') ? 'active bg-primary text-white' : ''; ?>
+                    <a class="nav-link <?= $isActive ?>" href="?page=taikhoan">
+                        <i class="fa-solid fa-circle-user me-1"></i> Tài khoản
+                    </a>
+                </li>
             </ul>
         </div>
 

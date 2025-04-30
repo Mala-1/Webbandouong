@@ -43,7 +43,9 @@ $sql = "SELECT SQL_CALC_FOUND_ROWS io.*, s.name AS supplier_name, u.username
         FROM import_order io
         LEFT JOIN supplier s ON io.supplier_id = s.supplier_id
         LEFT JOIN users u ON io.user_id = u.user_id
-        $whereSql LIMIT $limit OFFSET $offset";
+        $whereSql 
+        ORDER BY io.created_at DESC
+        LIMIT $limit OFFSET $offset";
 
 $receipts = $db->select($sql, $params);
 

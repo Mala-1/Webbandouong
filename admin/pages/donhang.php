@@ -33,6 +33,12 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 </button>
             </form>
         </div>
+
+        <select id="exportExcelOption" class="form-select w-auto">
+            <option value="all">Xuất tất cả đơn hàng</option>
+            <option value="filtered">Xuất theo bộ lọc</option>
+        </select>
+        <button id="btnExportExcel" class="btn btn-success ms-2">Xuất Excel</button>
     </div>
 
     <!-- Tìm kiếm nâng cao -->
@@ -50,6 +56,22 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             <option value="Đã giao hàng">Đã giao hàng</option>
             <option value="Đã hủy">Đã hủy</option>
         </select>
+
+        <!-- Từ ngày -->
+        <div class="form-group d-flex align-items-center ms-2">
+            <label for="from_date" class="form-label mb-1 me-2">Từ ngày</label>
+            <input type="date" class="form-control w-auto" style="width: 180px;" name="from_date" id="from_date"
+                value="<?= $_GET['from_date'] ?? '' ?>">
+        </div>
+
+        <!-- Đến ngày -->
+        <div class="form-group d-flex align-items-center">
+            <label for="to_date" class="form-label mb-1 me-2">Đến ngày</label>
+            <input type="date" class="form-control w-auto" style="width: 180px;" name="to_date" id="to_date"
+                value="<?= $_GET['to_date'] ?? '' ?>">
+        </div>
+
+
     </form>
 
     <!-- Bảng danh sách đơn hàng -->
@@ -418,6 +440,10 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 </table>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-danger d-flex justify-content-end align-items-center"
+                    id="btnExportOrderPdf">
+                    <i class="fa-solid fa-file-pdf me-1"></i> Xuất PDF
+                </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
@@ -542,6 +568,9 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         const priceMin = document.querySelector('.min-price').value.trim();
         const priceMax = document.querySelector('.max-price').value.trim();
         const status = document.querySelector('.statusSearch').value.trim();
+        const fromDate = document.querySelector('[name="from_date"]').value.trim();
+        const toDate = document.querySelector('[name="to_date"]').value.trim();
+
 
         currentFilterParams = "";
 
@@ -549,6 +578,9 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         if (priceMin) currentFilterParams += `&price_min=${encodeURIComponent(priceMin)}`;
         if (priceMax) currentFilterParams += `&price_max=${encodeURIComponent(priceMax)}`;
         if (status) currentFilterParams += `&status=${encodeURIComponent(status)}`;
+        if (fromDate) currentFilterParams += `&from_date=${encodeURIComponent(fromDate)}`;
+        if (toDate) currentFilterParams += `&to_date=${encodeURIComponent(toDate)}`;
+
 
         loadOrders(1, currentFilterParams);
     }
@@ -1177,6 +1209,14 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                     </tbody>
                 </table>
                 `;
+
+        // Hiển thị/ẩn nút "Xuất PDF" theo trạng thái đơn hàng
+        const exportBtn = document.getElementById('btnExportOrderPdf');
+        if (order.status === 'Đã xác nhận' || order.status === 'Đã giao hàng') {
+            exportBtn.style.setProperty('display', 'inline-flex', 'important');
+        } else {
+            exportBtn.style.setProperty('display', 'none', 'important');
+        }
     }
 
     let orderIdToDelete = null; // Lưu tạm order_id cần xoá
@@ -1257,5 +1297,43 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             `;
             tableBody.insertBefore(newRow, document.getElementById('editAddRowTrigger'));
         }
+    });
+
+    // xuất pdf
+    document.getElementById("btnExportOrderPdf").addEventListener("click", function() {
+        const btn = document.querySelector(".btn-view-order");
+        if (!btn) return;
+
+        const orderDetails = JSON.parse(btn.getAttribute("data-order-details"));
+
+        fetch("ajax/export_order_pdf.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(orderDetails)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Không thể xuất PDF");
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                window.open(url, "_blank");
+            })
+            .catch(err => alert("Lỗi khi xuất PDF: " + err.message));
+    });
+
+    // xuất excel
+    document.getElementById('btnExportExcel').addEventListener('click', function() {
+        const option = document.getElementById('exportExcelOption').value;
+
+        let exportUrl = 'ajax/export_orders_excel.php';
+
+        if (option === 'filtered' && currentFilterParams) {
+            exportUrl += '?' + currentFilterParams.replace(/^&/, ''); // Xoá dấu & đầu nếu có
+        }
+
+        window.location.href = exportUrl;
     });
 </script>

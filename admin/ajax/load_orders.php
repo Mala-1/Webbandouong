@@ -18,6 +18,8 @@ $search_id = $_GET['search_id'] ?? '';
 $price_min = $_GET['price_min'] ?? '';
 $price_max = $_GET['price_max'] ?? '';
 $status = $_GET['status'] ?? '';
+$from_date = $_GET['from_date'] ?? '';
+$to_date = $_GET['to_date'] ?? '';
 
 $whereClauses = [];
 $params = [];
@@ -42,10 +44,21 @@ if ($status !== '') {
     $params[] = $status;
 }
 
+
+if ($from_date !== '') {
+    $whereClauses[] = 'DATE(o.created_at) >= ?';
+    $params[] = $from_date;
+}
+
+if ($to_date !== '') {
+    $whereClauses[] = 'DATE(o.created_at) <= ?';
+    $params[] = $to_date;
+}
+
 // Gộp điều kiện WHERE
 $whereSql = count($whereClauses) > 0 ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 
-$sql = "SELECT SQL_CALC_FOUND_ROWS o.*, pm.name AS payment_method_name, 
+$sql = "SELECT SQL_CALC_FOUND_ROWS o.*, pm.name AS payment_method_name, u.username AS username,
         GROUP_CONCAT(
           CONCAT(
             p.product_id, '||', po.packaging_option_id, '||', p.name, '||', op.quantity, '||', op.price, '||', po.packaging_type, '||', po.unit_quantity
@@ -56,6 +69,7 @@ $sql = "SELECT SQL_CALC_FOUND_ROWS o.*, pm.name AS payment_method_name,
         LEFT JOIN order_details op ON o.order_id = op.order_id
         LEFT JOIN products p ON op.product_id = p.product_id
         LEFT JOIN packaging_options po ON op.packaging_option_id = po.packaging_option_id
+        LEFT JOIN users u ON o.user_id = u.user_id
         $whereSql
         GROUP BY o.order_id DESC
         LIMIT $limit OFFSET $offset";
@@ -78,7 +92,7 @@ $pagination = new Pagination($totalOrders, $limit, $page);
 ob_start();
 foreach ($orders as $order):
     $orderDetails = [
-        'customer_name' => htmlspecialchars($order['user_id']),
+        'customer_name' => htmlspecialchars($order['username']),
         'status' => htmlspecialchars($order['status']),
         'payment_method' => htmlspecialchars($order['payment_method_name']),
         'order_date' => htmlspecialchars($order['created_at']),

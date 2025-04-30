@@ -32,6 +32,12 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                 </button>
             </form>
         </div>
+
+        <select id="exportExcelOption" class="form-select w-auto">
+            <option value="all">Xuất tất cả phiếu nhập</option>
+            <option value="filtered">Xuất theo bộ lọc</option>
+        </select>
+        <button id="btnExportExcel" class="btn btn-success ms-2">Xuất Excel</button>
     </div>
 
     <!-- Tìm kiếm nâng cao -->
@@ -341,6 +347,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     </div>
 </div>
 
+<!-- modal chi tiết -->
 <div class="modal fade" id="viewReceiptModal" tabindex="-1" aria-labelledby="modalViewTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -383,6 +390,10 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                 </div>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-danger d-flex justify-content-end align-items-center"
+                    id="btnExportReceiptPdf">
+                    <i class="fa-solid fa-file-pdf me-1"></i> Xuất PDF
+                </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
@@ -1032,6 +1043,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
 
         const receiptId = btn.dataset.id;
 
+
+
         fetch(`ajax/get_import_order_details.php?id=${receiptId}`)
             .then(res => res.json())
             .then(data => {
@@ -1040,6 +1053,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                     return;
                 }
 
+                window.currentReceiptForPdf = data;
                 // Gán dữ liệu vào modal
                 document.getElementById("supplier_name_view").value = data.receipt.supplier_name;
                 document.getElementById("import_date_view").value = data.receipt.created_at.substring(0, 10);
@@ -1065,6 +1079,14 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                 });
 
                 document.getElementById("grand-total-view").innerText = total.toLocaleString();
+
+                // Kiểm tra trạng thái
+                const exportBtn = document.getElementById("btnExportReceiptPdf");
+                if (data.receipt.status === "Đã xác nhận") {
+                    exportBtn.style.setProperty('display', 'inline-flex', 'important');
+                } else {
+                    exportBtn.style.setProperty('display', 'none', 'important');
+                }
             })
             .catch(err => {
                 console.error("Lỗi khi lấy chi tiết phiếu nhập:", err);
@@ -1103,5 +1125,52 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
                     alert('Đã có lỗi xảy ra.');
                 });
         }
+    });
+
+    // xuất pdf
+    document.getElementById("btnExportReceiptPdf").addEventListener("click", function() {
+        if (!window.currentReceiptForPdf) {
+            alert("Không tìm thấy dữ liệu phiếu nhập để xuất PDF.");
+            return;
+        }
+
+        fetch('ajax/export_receipt_pdf.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(window.currentReceiptForPdf)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Không thể xuất PDF");
+
+                return response.blob();
+            })
+            .then(blob => {
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = 'phieu_nhap.pdf'; // Hoặc không set thì tự động mở tab
+                a.click();
+                URL.revokeObjectURL(blobUrl);
+            })
+            .catch(error => {
+                console.error("Lỗi xuất PDF:", error);
+                alert("❌ Lỗi khi xuất PDF");
+            });
+    });
+
+
+    // xuất excel
+    document.getElementById('btnExportExcel').addEventListener('click', function() {
+        const option = document.getElementById('exportExcelOption').value;
+
+        let exportUrl = 'ajax/export_receipts_excel.php';
+
+        if (option === 'filtered' && currentFilterParams) {
+            exportUrl += '?' + currentFilterParams.replace(/^&/, ''); // Xoá dấu & đầu nếu có
+        }
+
+        window.location.href = exportUrl;
     });
 </script>
