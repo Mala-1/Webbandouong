@@ -136,7 +136,16 @@ foreach ($product_images as $img) {
 
 ob_start();
 foreach ($products as $product):
-    $packaging_options = $db->select('SELECT * FROM packaging_options WHERE product_id = ?', [$product['product_id']]);
+    $packaging_options = $db->select('SELECT 
+                po.*, 
+                CASE 
+                    WHEN po.price > 0 THEN po.price 
+                    ELSE p.price 
+                END AS price
+            FROM packaging_options po
+            JOIN products p ON po.product_id = p.product_id
+            WHERE po.product_id = ?
+', [$product['product_id']]);
 
     // Ảnh mặc định lấy từ product_images (nếu có)
     $defaultImage = $productImageMap[$product['product_id']][0] ?? null;

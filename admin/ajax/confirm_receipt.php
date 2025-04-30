@@ -16,9 +16,15 @@ if (!$import_order_id) {
     exit;
 }
 
-function extractUnitQuantity($unitStr) {
+function extractUnitQuantity($unitStr)
+{
     preg_match('/\d+/', $unitStr, $matches);
     return isset($matches[0]) ? (int)$matches[0] : 1; // Mặc định 1 nếu không tách được
+}
+
+function ceilToNearestHundred($number)
+{
+    return ceil($number / 100) * 100;
 }
 
 $db = DBConnect::getInstance();
@@ -73,14 +79,13 @@ try {
         // Nếu có loại lớn nhất, cập nhật giá các loại khác
         if ($base) {
             // Tính giá bán cho loại lớn nhất
-            $baseSellingPrice = $base['price'] * (1 + $margin / 100);
-            $db->execute("UPDATE packaging_options SET price = ? WHERE packaging_option_id = ?", [round($baseSellingPrice), $base['id']]);
+            $baseSellingPrice = ceilToNearestHundred($base['price'] * (1 + $margin / 100));
+            $db->execute("UPDATE packaging_options SET price = ? WHERE packaging_option_id = ?", [$baseSellingPrice, $base['id']]);
 
             foreach ($packagings as $pkg) {
                 if ($pkg['packaging_option_id'] == $base['id']) continue;
 
-                // Giá mới = (giá/lon) * số lon của loại hiện tại * 1.05
-                $adjusted = round(($baseSellingPrice / $base['unit']) * $pkg['unit'] * 1.05);
+                $adjusted = ceilToNearestHundred(($baseSellingPrice / $base['unit']) * $pkg['unit'] * 1.05);
                 $db->execute("UPDATE packaging_options SET price = ? WHERE packaging_option_id = ?", [$adjusted, $pkg['packaging_option_id']]);
             }
         }
@@ -88,7 +93,6 @@ try {
 
     $pdo->commit();
     echo json_encode(['success' => true]);
-
 } catch (Exception $e) {
     $pdo->rollBack();
     echo json_encode(['success' => false, 'message' => 'Lỗi: ' . $e->getMessage()]);

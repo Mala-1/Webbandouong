@@ -432,6 +432,8 @@ $brands = $db->select('SELECT * FROM brand WHERE is_deleted = 0');
                                 <tr>
                                     <th>Tên kiểu</th>
                                     <th>Số lượng/đơn vị</th>
+                                    <th>Giá bán</th>
+                                    <th>Số lượng tồn kho</th>
                                     <th>Ảnh</th>
                                 </tr>
                             </thead>
@@ -1153,10 +1155,12 @@ $brands = $db->select('SELECT * FROM brand WHERE is_deleted = 0');
         } catch (err) {}
         packagingBody.innerHTML = packaging.map(p =>
             `<tr>
-      <td>${p.packaging_type}</td>
-      <td>${p.unit_quantity}</td>
-      <td>${p.image ? `<img src="/assets/images/SanPham/${p.image}" width="50">` : ''}</td>
-    </tr>`
+                <td>${p.packaging_type}</td>
+                <td>${p.unit_quantity}</td>
+                <td>${p.price.toLocaleString('vi-VN')}</td>
+                <td>${p.stock}</td>
+                <td>${p.image ? `<img src="/assets/images/SanPham/${p.image}" width="50">` : ''}</td>
+            </tr>`
         ).join('');
 
         new bootstrap.Modal(document.getElementById('modalXemSanPham')).show();

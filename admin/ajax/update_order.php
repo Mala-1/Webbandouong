@@ -54,17 +54,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $product_id = (int)$newDetail['product_id'];
             $quantity = (int)$newDetail['quantity'];
             $price = (float)$newDetail['price'];
-            
-            
+
             $total_price += $quantity * $price;
-            
+
             if (isset($oldMap[$packaging_option_id])) {
                 // Nếu đã tồn tại → cần trả stock cũ trước
                 restoreStock($db, $product_id, $packaging_option_id, $oldMap[$packaging_option_id]['quantity']);
-                
+
                 // Sau đó mới trừ stock lại với số lượng mới
                 consumeStock($db, $product_id, $packaging_option_id, $quantity);
-                
+
                 // Cập nhật lại order_detail
                 $db->execute('UPDATE order_details SET quantity = ?, price = ? WHERE order_detail_id = ?', [
                     $quantity,
