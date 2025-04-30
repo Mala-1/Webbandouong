@@ -8,14 +8,29 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 $db = DBConnect::getInstance();
 $pdo = $db->getConnection();
 
-// Nếu cần lọc theo status, from_date, to_date...
-$status = $_GET['status'] ?? '';
-$from_date = $_GET['from_date'] ?? '';
-$to_date = $_GET['to_date'] ?? '';
+// Đọc tham số lọc
+$order_id   = $_GET['order_id'] ?? '';
+$price_min  = $_GET['price_min'] ?? '';
+$price_max  = $_GET['price_max'] ?? '';
+$status     = $_GET['status'] ?? '';
+$from_date  = $_GET['from_date'] ?? '';
+$to_date    = $_GET['to_date'] ?? '';
 
 $whereClauses = [];
 $params = [];
 
+if ($order_id !== '') {
+    $whereClauses[] = 'o.order_id = ?';
+    $params[] = $order_id;
+}
+if ($price_min !== '') {
+    $whereClauses[] = 'o.total_price >= ?';
+    $params[] = $price_min;
+}
+if ($price_max !== '') {
+    $whereClauses[] = 'o.total_price <= ?';
+    $params[] = $price_max;
+}
 if ($status !== '') {
     $whereClauses[] = 'o.status = ?';
     $params[] = $status;
@@ -31,6 +46,7 @@ if ($to_date !== '') {
 
 $whereSql = count($whereClauses) > 0 ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
 
+// Lấy dữ liệu đơn hàng
 $sql = "SELECT o.order_id, u.username, o.total_price, o.status, o.shipping_address, o.created_at, pm.name AS payment_method
         FROM orders o
         LEFT JOIN users u ON o.user_id = u.user_id
@@ -40,7 +56,7 @@ $sql = "SELECT o.order_id, u.username, o.total_price, o.status, o.shipping_addre
 
 $orders = $db->select($sql, $params);
 
-// Khởi tạo Excel
+// Tạo Excel
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle('Danh sách đơn hàng');

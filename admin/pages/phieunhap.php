@@ -24,7 +24,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
 
         <!-- Thanh tìm kiếm -->
         <div class="flex-grow-1">
-            <form class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search">
+            <form class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search" id="form-search-id">
                 <input class="receipt-id form-control me-2" type="search" placeholder="Tìm theo mã phiếu nhập"
                     aria-label="Search" name="receipt_id">
                 <button type="button" class="btn-search btn btn-sm p-0 border-0 bg-transparent">
@@ -552,15 +552,45 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
         };
     }
 
+    // Lấy phần tử form, input, button
+    const receiptSearchForm = document.getElementById('form-search-id');
+    const receiptSearchInput = receiptSearchForm.querySelector('.receipt-id');
+    const receiptSearchButton = receiptSearchForm.querySelector('.btn-search');
+
+    // Sự kiện click nút tìm kiếm
+    receiptSearchButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleFilterChange();
+    });
+
+    // Sự kiện nhấn Enter trong ô tìm kiếm
+    receiptSearchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleFilterChange();
+        }
+    });
+
     function handleFilterChange() {
-        const form = document.querySelector('.form-search');
-        const formData = new FormData(form);
+        const form1 = document.querySelector('.form-search'); // form lọc nâng cao
+        const form2 = document.getElementById('form-search-id'); // form tìm theo mã
 
-        currentFilterParams = new URLSearchParams(formData).toString();
+        const data = new URLSearchParams();
 
+        // Lấy dữ liệu từ form lọc nâng cao
+        for (let [key, value] of new FormData(form1).entries()) {
+            if (value) data.append(key, value);
+        }
+
+        // Lấy thêm dữ liệu từ form tìm kiếm mã
+        for (let [key, value] of new FormData(form2).entries()) {
+            if (value) data.append('search_id', value); // ⚠ đổi 'order_id' → 'search_id' nếu cần
+        }
+
+        currentFilterParams = data.toString();
         loadReceipts(1, currentFilterParams);
-
     }
+
 
     // 🎯 Lắng nghe sự kiện tìm kiếm tự động và theo phím bấm
     document.querySelectorAll('.form-search input, .form-search select').forEach(element => {
@@ -1182,11 +1212,24 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     // xuất excel
     document.getElementById('btnExportExcel').addEventListener('click', function() {
         const option = document.getElementById('exportExcelOption').value;
-
         let exportUrl = 'ajax/export_receipts_excel.php';
 
-        if (option === 'filtered' && currentFilterParams) {
-            exportUrl += '?' + currentFilterParams.replace(/^&/, ''); // Xoá dấu & đầu nếu có
+        if (option === 'filtered') {
+            const form1 = document.querySelector('.form-search');
+            const form2 = document.getElementById('form-search-id');
+
+            const data = new URLSearchParams();
+
+            for (let [key, value] of new FormData(form1).entries()) {
+                if (value) data.append(key, value);
+            }
+
+            for (let [key, value] of new FormData(form2).entries()) {
+                if (value) data.append('search_id', value); // Đảm bảo đúng tên biến server đang nhận
+            }
+
+            const queryString = data.toString();
+            if (queryString) exportUrl += '?' + queryString;
         }
 
         window.location.href = exportUrl;

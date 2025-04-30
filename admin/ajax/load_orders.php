@@ -14,7 +14,7 @@ $limit = 5;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-$search_id = $_GET['search_id'] ?? '';
+$search_id = $_GET['order_id'] ?? '';
 $price_min = $_GET['price_min'] ?? '';
 $price_max = $_GET['price_max'] ?? '';
 $status = $_GET['status'] ?? '';

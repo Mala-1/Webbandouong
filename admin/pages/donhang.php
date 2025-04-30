@@ -25,7 +25,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
 
         <!-- Thanh tìm kiếm -->
         <div class="flex-grow-1">
-            <form class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search">
+            <form class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search" id="form-search-id">
                 <input class="order-id form-control me-2" type="search" placeholder="Tìm theo mã đơn hàng"
                     aria-label="Search" name="order_id">
                 <button type="button" class="btn-search btn btn-sm p-0 border-0 bg-transparent">
@@ -563,6 +563,25 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         };
     }
 
+    const searchForm = document.getElementById('form-search-id');
+    const searchInput = searchForm.querySelector('.order-id');
+    const searchButton = searchForm.querySelector('.btn-search');
+
+    // Nhấn nút tìm kiếm
+    searchButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleFilterChange();
+        console.log('debug')
+    });
+
+    // Nhấn Enter trong ô input
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleFilterChange();
+        }
+    });
+
     function handleFilterChange() {
         const orderId = document.querySelector('.order-id').value.trim();
         const priceMin = document.querySelector('.min-price').value.trim();
@@ -571,16 +590,14 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         const fromDate = document.querySelector('[name="from_date"]').value.trim();
         const toDate = document.querySelector('[name="to_date"]').value.trim();
 
-
         currentFilterParams = "";
 
-        if (orderId) currentFilterParams += `&search_id=${encodeURIComponent(orderId)}`;
+        if (orderId) currentFilterParams += `&order_id=${encodeURIComponent(orderId)}`;
         if (priceMin) currentFilterParams += `&price_min=${encodeURIComponent(priceMin)}`;
         if (priceMax) currentFilterParams += `&price_max=${encodeURIComponent(priceMax)}`;
         if (status) currentFilterParams += `&status=${encodeURIComponent(status)}`;
         if (fromDate) currentFilterParams += `&from_date=${encodeURIComponent(fromDate)}`;
         if (toDate) currentFilterParams += `&to_date=${encodeURIComponent(toDate)}`;
-
 
         loadOrders(1, currentFilterParams);
     }
