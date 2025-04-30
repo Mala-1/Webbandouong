@@ -1131,7 +1131,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             const packaging_option_id = row.querySelector('input[name="packaging_option_id[]"]')?.value;
 
             if (product_id && packaging_option_id && quantity && priceRaw) {
-                const price = parseFloat(priceRaw.replace(/[^\d.-]/g, '')); // Loại bỏ định dạng tiền
+                const price = parseFloat(priceRaw.replace(/\./g, '')); // bỏ tất cả dấu chấm
                 details.push({
                     product_id: parseInt(product_id),
                     packaging_option_id: parseInt(packaging_option_id),
@@ -1139,6 +1139,9 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                     price
                 });
             }
+            
+            console.log(details);
+            return;
         });
 
         if (details.length === 0) {
@@ -1232,7 +1235,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                         <td>${product.name}</td>
                         <td class="text-capitalize">${product.packaging_type + ' - ' + product.unit_quantity}</td>
                         <td>${product.quantity}</td>
-                        <td>${product.price} VNĐ</td>
+                        <td>${product.price.toLocaleString('vi-VN')} VNĐ</td>
                         </tr>
                     `).join('')}
                     </tbody>

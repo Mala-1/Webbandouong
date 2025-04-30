@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $status = $_POST['status'] ?? 'Chờ xử lý';
     $details = json_decode($_POST['details'] ?? '[]', true);
 
-    
+
 
     // Kiểm tra tính hợp lệ của thông tin
     if (!$user_id || !$shipping_address || !$payment_method_id || empty($details)) {
@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 
-    
+
     $total_price = 0;
 
     // Mảng lưu chi tiết đơn hàng
@@ -72,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 'is_change' => 0, // Đánh dấu mặc định là không thay đổi
             ];
         }
-        
+
 
         // Sắp xếp packaging_stock theo unit_quantity giảm dần
         usort($packaging_stock, function ($a, $b) {
@@ -86,16 +86,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         // 3. Duyệt qua các packaging_option và trừ stock
         // Duyệt qua các packaging_option và trừ stock
+
         foreach ($packaging_stock as &$option) {
+
             $unit_quantity = $option['unit_quantity'];
             $stock = null;
             if ($option['stock'] == 0) continue;
-            if ($unit_quantity <= $remaining_quantity) {
 
+            if ($unit_quantity <= $remaining_quantity && $unit_quantity >= getUnitValue($packaging_option['unit_quantity'])) {
                 $stock_used = intdiv($remaining_quantity, $unit_quantity);
                 if ($stock_used > $option['stock']) {
                     $stock_used = $option['stock'];
                 }
+
                 $option['stock'] -= $stock_used;
                 $remaining_quantity -= $stock_used * $unit_quantity;
                 $option['is_change'] = 1;
@@ -106,6 +109,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 }
             }
         }
+
+
 
 
         if ($remaining_quantity > 0) {
@@ -120,11 +125,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $i = 0;
                 foreach ($packaging_stock as &$option) {
                     $unit_quantity = $option['unit_quantity'];
-                    $stock = null;
                     if ($option['stock'] == 0) {
                         $i++;
                         continue;
                     }
+
 
                     if ($unit_quantity > getUnitValue($packaging_option['unit_quantity'])) {
                         $pre_unit_quantity = $option['unit_quantity'];
@@ -132,12 +137,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $option['is_change'] = 1;
                         for ($j = $i - 1; $j >= 0; $j--) {
                             $packaging_stock[$j]['stock'] += floor($pre_unit_quantity / $packaging_stock[$j]['unit_quantity']);
+                            $pre_unit_quantity = $packaging_stock[$j]['unit_quantity'];
                             $packaging_stock[$j]['is_change'] = 1;
-                            if ($packaging_stock[$j]['packaging_option_id'] == $packaging_option['packaging_option_id'] && $remaining_quantity <= $packaging_stock[$j]['stock']) {
-                                $packaging_stock[$j]['stock'] -= $remaining_quantity;
-                                $packaging_stock[$j]['is_change'] = 1;
+                            if ($packaging_stock[$j]['packaging_option_id'] == $packaging_option['packaging_option_id'] && $remaining_quantity <= $packaging_stock[$j]['stock'] * $packaging_stock[$j]['unit_quantity']) {
+                                $packaging_stock[$j]['stock'] -= $remaining_quantity / getUnitValue($packaging_option['unit_quantity']);
                                 $is_empty = false;
                                 break;
+                            } else {
+                                $packaging_stock[$j]['stock']--;
                             }
                         }
                         break;
@@ -145,8 +152,39 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                     $i++;
                 }
+
+
+                // nếu ko còn loại đóng gói để tách thì lấy lon lẻ
+                if ($remaining_quantity > 0) {
+
+                    usort($packaging_stock, function ($a, $b) {
+                        return $b['unit_quantity'] - $a['unit_quantity'];
+                    });
+                    foreach ($packaging_stock as &$option) {
+                        $unit_quantity = $option['unit_quantity'];
+                        if ($option['stock'] == 0) {
+                            $i++;
+                            continue;
+                        }
+                        if ($unit_quantity < getUnitValue($packaging_option['unit_quantity'])) {
+                            $stock_used = intdiv($remaining_quantity, $unit_quantity);
+                            if ($stock_used > $option['stock']) {
+                                $stock_used = $option['stock'];
+                            }
+                            $option['stock'] -= $stock_used;
+                            $remaining_quantity -= $stock_used * $unit_quantity;
+                            $option['is_change'] = 1;
+
+                            if($remaining_quantity == 0) {
+                                $is_empty = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 if ($is_empty == true) {
-                    echo json_encode(["success" => false, "message" => "Không đủ số lượng sản phẩm {$packaging_option['name']} + {$debug}"]);
+                    echo json_encode(["success" => false, "message" => "Không đủ số lượng sản phẩm {$packaging_option['name']}"]);
                     exit;
                 }
             }
@@ -154,14 +192,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         // Lưu tất cả packaging_stock vào mảng chung ngoài foreach
         foreach ($packaging_stock as &$option) {
-            if($option['is_change'] == 1) {
+            if ($option['is_change'] == 1) {
                 $all_packaging_stock[] = $option;
-
             }
         }
-
     }
-    
+
     // 1. Tạo đơn hàng mới
     $sql = "INSERT INTO orders (user_id, status, shipping_address, note, created_at, payment_method_id)
             VALUES (?, ?, ?, ?, NOW(), ?)";
