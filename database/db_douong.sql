@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 24, 2025 at 11:44 AM
+-- Generation Time: Apr 30, 2025 at 10:22 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -104,10 +104,7 @@ INSERT INTO `brand` (`brand_id`, `name`, `image`, `is_deleted`) VALUES
 (63, 'wake-up', 'wake-up-1503202185914.jpg', 0),
 (64, 'trung-nguyen', 'trung-nguyen-0504202116614.jpg', 0),
 (65, 'maccoffee', 'maccoffee-13032021225237.jpg', 0),
-(66, 'ong-bau', 'ong-bau-22032021132457.jpg', 0),
-(71, 'kkk', '10f24jac005-silver-birch-ao-khoac-nam-1-jpg-3nvj.jpg', 1),
-(72, 'kkk', '10f24jac005-black-ao-khoac-nam-1-jpg-x1gs.jpg', 1),
-(73, 'kkk', '10f24jac005-dried-sage-ao-khoac-nam-1-jpg-7q20.jpg', 1);
+(66, 'ong-bau', 'ong-bau-22032021132457.jpg', 0);
 
 -- --------------------------------------------------------
 
@@ -127,7 +124,8 @@ CREATE TABLE `cart` (
 
 INSERT INTO `cart` (`cart_id`, `user_id`, `created_at`) VALUES
 (1, 7, '2025-04-16 09:08:32'),
-(30, 12, '2025-04-19 10:50:55');
+(30, 12, '2025-04-19 10:50:55'),
+(31, 2, '2025-04-29 15:41:11');
 
 -- --------------------------------------------------------
 
@@ -155,7 +153,9 @@ INSERT INTO `cart_details` (`cart_detail_id`, `cart_id`, `packaging_option_id`, 
 (4, 30, 317, 23, 44000.00),
 (5, 30, 374, 17, 300000.00),
 (6, 30, 140, 1, 39000.00),
-(7, 30, 96, 1, 7800.00);
+(7, 30, 96, 1, 7800.00),
+(8, 31, 259, 1, 7200.00),
+(9, 31, 1, 3, 18800.00);
 
 -- --------------------------------------------------------
 
@@ -184,10 +184,7 @@ INSERT INTO `categories` (`category_id`, `name`, `image`, `is_deleted`) VALUES
 (7, 'Nước trà', 'nuoc-tra.png', 0),
 (8, 'Nước yến', 'nuoc-yen.jpg', 0),
 (9, 'Rượu', 'ruou.png', 0),
-(10, 'Sữa', 'sua.png', 0),
-(11, 'kkk', '10F23SWE001_BLACK_ao-sweater-nam-3-nmkb.jpg', 1),
-(12, 'kkk', '10F23SWE001_BLACK_ao-sweater-nam-3-nmkb.jpg', 1),
-(13, 'kkk', '10F23SWE001_BLUE-QUARTZ_ao-sweater-nam-3-hfyp.jpg', 1);
+(10, 'Sữa', 'sua.png', 0);
 
 -- --------------------------------------------------------
 
@@ -200,24 +197,22 @@ CREATE TABLE `import_order` (
   `supplier_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `total_price` decimal(30,2) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `created_at` datetime DEFAULT current_timestamp(),
+  `status` varchar(50) DEFAULT 'Chờ xác nhận'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `import_order`
 --
 
-INSERT INTO `import_order` (`import_order_id`, `supplier_id`, `user_id`, `total_price`, `created_at`) VALUES
-(1, 3, 2, 253168200.00, '2025-04-11 09:00:00'),
-(2, 3, 3, 542322900.00, '2025-04-06 09:00:00'),
-(3, 19, 5, 399501900.00, '2025-04-17 22:56:47'),
-(4, 4, 3, 552864600.00, '2025-04-17 23:10:41'),
-(5, 2, 4, 189994500.00, '2025-04-17 23:42:22'),
-(6, 11, 1, 766005000.00, '2025-04-18 01:13:39'),
-(7, 12, 3, 258581700.00, '2025-04-18 01:19:04'),
-(10, 1, 13, 358581700.00, '2025-04-20 00:00:00'),
-(11, 4, 13, 120.00, '2025-04-20 00:00:00'),
-(12, 14, 13, 15000000.00, '2025-04-22 00:00:00');
+INSERT INTO `import_order` (`import_order_id`, `supplier_id`, `user_id`, `total_price`, `created_at`, `status`) VALUES
+(1, 3, 2, 253168200.00, '2025-04-11 09:00:00', 'Đã xác nhận'),
+(2, 3, 3, 542322900.00, '2025-04-06 09:00:00', 'Đã xác nhận'),
+(3, 19, 5, 399501900.00, '2025-04-17 22:56:47', 'Đã xác nhận'),
+(4, 4, 3, 552864600.00, '2025-04-17 23:10:41', 'Đã xác nhận'),
+(5, 2, 4, 189994500.00, '2025-04-17 23:42:22', 'Đã xác nhận'),
+(6, 11, 1, 766005000.00, '2025-04-18 01:13:39', 'Đã xác nhận'),
+(7, 12, 3, 258581700.00, '2025-04-18 01:19:04', 'Đã xác nhận');
 
 -- --------------------------------------------------------
 
@@ -619,12 +614,7 @@ INSERT INTO `import_order_details` (`import_order_detail_id`, `import_order_id`,
 (432, 7, 159, 97, 40500.00, 3928500.00, 393),
 (433, 7, 160, 67, 54000.00, 3618000.00, 394),
 (434, 7, 161, 89, 37800.00, 3364200.00, 395),
-(435, 7, 162, 74, 36000.00, 2664000.00, 396),
-(492, 11, 163, 0, 9000.00, 0.00, 397),
-(493, 11, 163, 120, 1.00, 120.00, 398),
-(494, 12, 164, 0, 15000.00, 0.00, 399),
-(495, 12, 164, 0, 45000.00, 0.00, 400),
-(496, 12, 164, 100, 150000.00, 15000000.00, 401);
+(435, 7, 162, 74, 36000.00, 2664000.00, 396);
 
 -- --------------------------------------------------------
 
@@ -648,17 +638,15 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`order_id`, `user_id`, `status`, `total_price`, `shipping_address`, `note`, `created_at`, `payment_method_id`) VALUES
-(260, 7, 'Chờ xử lý', 289800.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-23 00:00:00', 1),
+(260, 7, 'Đã xác nhận', 289800.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-23 00:00:00', 1),
 (261, 11, 'Chờ xử lý', 512000.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-02-13 00:00:00', 3),
 (262, 9, 'Chờ xử lý', 368000.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-14 00:00:00', 1),
 (263, 8, 'Chờ xử lý', 114900.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-01-29 00:00:00', 2),
 (264, 11, 'Chờ xử lý', 627400.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-01-27 00:00:00', 1),
 (265, 7, 'Chờ xử lý', 3005000.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-02-27 00:00:00', 2),
-(266, 7, 'Chờ xử lý', 974000.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-01-31 00:00:00', 3),
 (267, 8, 'Chờ xử lý', 441000.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-01-25 00:00:00', 1),
 (268, 8, 'Chờ xử lý', 638610.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-31 00:00:00', 3),
 (269, 12, 'Chờ xử lý', 374570.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-01-06 00:00:00', 3),
-(270, 10, 'Chờ xử lý', 135000.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-01-04 00:00:00', 2),
 (271, 9, 'Chờ xử lý', 557370.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-01-22 00:00:00', 3),
 (272, 9, 'Chờ xử lý', 148920.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-06 00:00:00', 1),
 (273, 8, 'Chờ xử lý', 298360.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-02 00:00:00', 2),
@@ -668,7 +656,11 @@ INSERT INTO `orders` (`order_id`, `user_id`, `status`, `total_price`, `shipping_
 (277, 9, 'Chờ xử lý', 340500.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-10 00:00:00', 1),
 (278, 11, 'Chờ xử lý', 507100.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-22 00:00:00', 1),
 (279, 8, 'Chờ xử lý', 495000.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-06 00:00:00', 2),
-(280, 12, 'Chờ xử lý', 118200.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-09 00:00:00', 1);
+(281, 10, 'Chờ xử lý', 415.00, '123', '', '2025-04-24 16:57:25', 1),
+(283, 11, 'Chờ xử lý', 1200200.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2024-03-27 00:00:00', 1),
+(284, 7, 'Chờ xử lý', 3777500.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2024-03-15 00:00:00', 1),
+(285, 11, 'Chờ xử lý', 1123400.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-26 00:00:00', 3),
+(286, 8, 'Chờ xử lý', 2167.71, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-23 00:00:00', 3);
 
 -- --------------------------------------------------------
 
@@ -708,9 +700,6 @@ INSERT INTO `order_details` (`order_detail_id`, `order_id`, `product_id`, `packa
 (266, 265, 34, 97, 4, 45000.00),
 (267, 265, 7, 22, 3, 300000.00),
 (268, 265, 7, 21, 5, 385000.00),
-(269, 266, 84, 244, 2, 420000.00),
-(270, 266, 63, 180, 2, 67000.00),
-(271, 266, 166, 407, 2, 0.00),
 (272, 267, 8, 24, 3, 91000.00),
 (273, 267, 4, 4, 3, 21000.00),
 (274, 267, 18, 48, 5, 21000.00),
@@ -720,9 +709,6 @@ INSERT INTO `order_details` (`order_detail_id`, `order_id`, `product_id`, `packa
 (278, 269, 18, 49, 2, 122000.00),
 (279, 269, 119, 322, 2, 44000.00),
 (280, 269, 133, 346, 1, 42570.00),
-(281, 270, 165, 403, 1, 0.00),
-(282, 270, 66, 188, 5, 6000.00),
-(283, 270, 3, 7, 5, 21000.00),
 (284, 271, 137, 356, 2, 29205.00),
 (285, 271, 144, 374, 1, 297000.00),
 (286, 271, 144, 373, 4, 50490.00),
@@ -750,9 +736,31 @@ INSERT INTO `order_details` (`order_detail_id`, `order_id`, `product_id`, `packa
 (308, 279, 120, 324, 1, 50000.00),
 (309, 279, 40, 114, 4, 63000.00),
 (310, 279, 71, 205, 1, 193000.00),
-(311, 280, 92, 265, 3, 27000.00),
-(312, 280, 166, 407, 3, 0.00),
-(313, 280, 13, 34, 2, 18600.00);
+(314, 281, 1, 11, 5, 83.00),
+(321, 283, 112, 314, 3, 44000.00),
+(322, 283, 106, 297, 3, 28000.00),
+(323, 283, 7, 20, 4, 99500.00),
+(324, 283, 57, 161, 4, 10200.00),
+(325, 283, 76, 218, 1, 10800.00),
+(326, 283, 133, 347, 3, 178200.00),
+(327, 284, 46, 130, 3, 9500.00),
+(328, 284, 30, 87, 5, 484000.00),
+(329, 284, 122, 327, 3, 15500.00),
+(330, 284, 31, 89, 2, 107000.00),
+(331, 284, 26, 75, 4, 262000.00),
+(332, 284, 30, 84, 1, 20500.00),
+(333, 285, 111, 311, 5, 11000.00),
+(334, 285, 57, 161, 1, 10200.00),
+(335, 285, 65, 187, 3, 245000.00),
+(336, 285, 57, 161, 1, 10200.00),
+(337, 285, 82, 237, 4, 65000.00),
+(338, 285, 42, 119, 5, 10600.00),
+(339, 286, 35, 101, 2, 175.00),
+(340, 286, 64, 182, 4, 13.00),
+(341, 286, 4, 5, 2, 125.00),
+(342, 286, 23, 67, 1, 690.00),
+(343, 286, 9, 28, 2, 349.00),
+(344, 286, 138, 360, 3, 42.57);
 
 -- --------------------------------------------------------
 
@@ -776,255 +784,255 @@ CREATE TABLE `packaging_options` (
 --
 
 INSERT INTO `packaging_options` (`packaging_option_id`, `product_id`, `packaging_type`, `stock`, `image`, `price`, `unit_quantity`, `is_deleted`) VALUES
-(1, 2, 'Lon', 1728, NULL, 0, '1 lon', 0),
-(2, 2, 'Lốc', 288, 'loc-6-lon-tiger-bac.jpg', 110000, '6 lon', 0),
-(3, 2, 'Thùng', 72, 'thung-24-lon-bia-tiger-bac.jpg', 400000, '24 lon', 0),
-(4, 4, 'Lon', 1460, NULL, 0, '1 lon', 0),
-(5, 4, 'Lốc', 241, 'loc-6-lon-bia-tiger-platinum-wheat-lager.jpg', 125000, '6 lon', 0),
-(6, 4, 'Thùng', 73, 'thung-20-lon-bia-tiger-platinum-wheat-lager.jpg', 386000, '20 lon', 0),
-(7, 3, 'Lon', 1320, NULL, 0, '1 lon', 0),
-(8, 3, 'Lốc', 330, '4-lon-bia-tiger-soju-cheeky-plum.jpg', 83000, '4 lon', 0),
-(9, 3, 'Thùng', 66, 'thung-20-lon-bia-tiger-soju-cheeky-plum.jpg', 405000, '20 lon', 0),
-(10, 1, 'Lon', 2258, NULL, 0, '1 lon', 0),
-(11, 1, 'Lốc', 565, '4-lon-bia-tiger-soju-wonder-melon.jpg', 83000, '4 lon', 0),
-(12, 1, 'Thùng', 113, 'thung-20-lon-bia-tiger-soju-wonder-melon.jpg', 405000, '20 lon', 0),
-(13, 5, 'Lon', 2520, NULL, 0, '1 lon', 0),
-(14, 5, 'Lốc', 420, '6-lon-bia-sai-gon-lager-330ml.jpg', 70500, '6 lon', 0),
-(15, 5, 'Thùng', 104, 'thung-24-lon-bia-sai-gon-lager-330ml.jpg', 260000, '24 lon', 0),
-(16, 6, 'Lon', 1726, NULL, 0, '1 lon', 0),
-(17, 6, 'Lốc', 288, '6-lon-bia-sai-gon-export-premium-330ml-.jpg', 72000, '6 lon', 0),
-(18, 6, 'Thùng', 72, 'thung-24-lon-bia-sai-gon-export-premium-330ml.jpg', 279000, '24 lon', 0),
-(19, 7, 'Lon', 2542, NULL, 0, '1 lon', 0),
-(20, 7, 'Lốc', 424, '6-lon-bia-sai-gon-chill-330m.jpg', 99500, '6 lon', 0),
-(21, 7, 'Thùng', 106, 'thung-24-lon-bia-sai-gon-chill-330ml.jpg', 385000, '24 lon', 0),
-(22, 7, 'Thùng A', 141, 'thung-18-lon-bia-sai-gon-chill-330ml.jpg', 300000, '18 lon', 0),
-(23, 8, 'Lon', 1344, NULL, 0, '1 lon', 0),
-(24, 8, 'Lốc', 224, '6-lon-bia-sai-gon-special-sleek-330ml.jpg', 91000, '6 lon', 0),
-(25, 8, 'Thùng', 55, 'thung-24-lon-bia-sai-gon-special-sleek-330m.jpg', 345000, '24 lon', 0),
-(26, 9, 'Lon', 1272, NULL, 0, '1 lon', 0),
-(27, 9, 'Lốc', 212, '6-lon-bia-heineken-silver-250ml.jpg', 94000, '6 lon', 0),
-(28, 9, 'Thùng', 53, 'thung-24-lon-bia-heineken-silver-250ml.jpg', 349000, '24 lon', 0),
-(29, 11, 'Lon', 1392, NULL, 0, '1 lon', 0),
-(30, 11, 'Lốc', 232, '412208-3-1_202501031413302535.jpg', 116000, '6 lon', 0),
-(31, 11, 'Thùng', 56, '412208-4_202501031416211106.jpg', 445000, '24 lon', 0),
-(32, 12, 'Lon', 3388, NULL, 0, '1 lon', 0),
+(1, 2, 'Lon', 0, NULL, 17325, '1 lon', 0),
+(2, 2, 'Lốc', 0, 'loc-6-lon-tiger-bac.jpg', 103950, '6 lon', 0),
+(3, 2, 'Thùng', 144, 'thung-24-lon-bia-tiger-bac.jpg', 396000, '24 lon', 0),
+(4, 4, 'Lon', 0, NULL, 20062, '1 lon', 0),
+(5, 4, 'Lốc', 0, 'loc-6-lon-bia-tiger-platinum-wheat-lager.jpg', 120374, '6 lon', 0),
+(6, 4, 'Thùng', 146, 'thung-20-lon-bia-tiger-platinum-wheat-lager.jpg', 382140, '20 lon', 0),
+(7, 3, 'Lon', 0, NULL, 21050, '1 lon', 0),
+(8, 3, 'Lốc', 1, '4-lon-bia-tiger-soju-cheeky-plum.jpg', 84200, '4 lon', 0),
+(9, 3, 'Thùng', 132, 'thung-20-lon-bia-tiger-soju-cheeky-plum.jpg', 400950, '20 lon', 0),
+(10, 1, 'Lon', 0, NULL, 21050, '1 lon', 0),
+(11, 1, 'Lốc', 0, '4-lon-bia-tiger-soju-wonder-melon.jpg', 84200, '4 lon', 0),
+(12, 1, 'Thùng', 225, 'thung-20-lon-bia-tiger-soju-wonder-melon.jpg', 400950, '20 lon', 0),
+(13, 5, 'Lon', 0, NULL, 11261, '1 lon', 0),
+(14, 5, 'Lốc', 0, '6-lon-bia-sai-gon-lager-330ml.jpg', 67568, '6 lon', 0),
+(15, 5, 'Thùng', 209, 'thung-24-lon-bia-sai-gon-lager-330ml.jpg', 257400, '24 lon', 0),
+(16, 6, 'Lon', 0, NULL, 12084, '1 lon', 0),
+(17, 6, 'Lốc', 0, '6-lon-bia-sai-gon-export-premium-330ml-.jpg', 72505, '6 lon', 0),
+(18, 6, 'Thùng', 144, 'thung-24-lon-bia-sai-gon-export-premium-330ml.jpg', 276210, '24 lon', 0),
+(19, 7, 'Lon', 0, NULL, 16675, '1 lon', 0),
+(20, 7, 'Lốc', 0, '6-lon-bia-sai-gon-chill-330m.jpg', 100052, '6 lon', 0),
+(21, 7, 'Thùng', 212, 'thung-24-lon-bia-sai-gon-chill-330ml.jpg', 381150, '24 lon', 0),
+(22, 7, 'Thùng A', 0, 'thung-18-lon-bia-sai-gon-chill-330ml.jpg', 300156, '18 lon', 0),
+(23, 8, 'Lon', 0, NULL, 14943, '1 lon', 0),
+(24, 8, 'Lốc', 0, '6-lon-bia-sai-gon-special-sleek-330ml.jpg', 89657, '6 lon', 0),
+(25, 8, 'Thùng', 111, 'thung-24-lon-bia-sai-gon-special-sleek-330m.jpg', 341550, '24 lon', 0),
+(26, 9, 'Lon', 0, NULL, 15116, '1 lon', 0),
+(27, 9, 'Lốc', 0, '6-lon-bia-heineken-silver-250ml.jpg', 90696, '6 lon', 0),
+(28, 9, 'Thùng', 106, 'thung-24-lon-bia-heineken-silver-250ml.jpg', 345510, '24 lon', 0),
+(29, 11, 'Lon', 0, NULL, 19274, '1 lon', 0),
+(30, 11, 'Lốc', 0, '412208-3-1_202501031413302535.jpg', 115644, '6 lon', 0),
+(31, 11, 'Thùng', 114, '412208-4_202501031416211106.jpg', 440550, '24 lon', 0),
+(32, 12, 'Lon', 0, NULL, 0, '1 lon', 0),
 (33, 12, 'Thùng', 121, 'slide-3_202411040946382291.jpg', 355000, '28 lon', 0),
-(34, 13, 'Lon', 2200, NULL, 0, '1 lon', 0),
-(35, 13, 'Lốc', 367, '6-lon-bia-budweiser-330ml-202110111020026125.jpg', 110000, '6 lon', 0),
+(34, 13, 'Lon', 0, NULL, 0, '1 lon', 0),
+(35, 13, 'Lốc', 0, '6-lon-bia-budweiser-330ml-202110111020026125.jpg', 110000, '6 lon', 0),
 (36, 13, 'Thùng A', 110, '412208_202412280909557313.jpg', 295000, '20 lon', 0),
-(37, 14, 'Chai', 2160, NULL, 0, '1 chai', 0),
+(37, 14, 'Chai', 0, NULL, 0, '1 chai', 0),
 (38, 14, 'Thùng', 90, 'thung-24-chai-budweiser-330ml-202103162327047901.jpg', 499000, '24 chai', 0),
-(39, 15, 'Lon', 3336, NULL, 0, '1 lon', 0),
-(40, 15, 'Lốc', 556, '6-lon-bia-333-330ml-202103162311002405.jpg', 72500, '6 lon', 0),
+(39, 15, 'Lon', 0, NULL, 0, '1 lon', 0),
+(40, 15, 'Lốc', 0, '6-lon-bia-333-330ml-202103162311002405.jpg', 72500, '6 lon', 0),
 (41, 15, 'Thùng', 139, 'thung-24-lon-bia-333-330ml-202003251341353307.jpg', 279000, '24 lon', 0),
-(42, 16, 'Chai', 3048, NULL, 0, '1 chai', 0),
-(43, 16, 'Lốc', 508, '6-chai-bia-corona-extra-300ml-202310071329406112.jpg', 195000, '6 chai', 0),
+(42, 16, 'Chai', 0, NULL, 0, '1 chai', 0),
+(43, 16, 'Lốc', 0, '6-chai-bia-corona-extra-300ml-202310071329406112.jpg', 195000, '6 chai', 0),
 (44, 16, 'Thùng', 127, 'thung-24-chai-bia-corona-extra-300ml-202309182038488193.jpg', 780000, '24 chai', 0),
-(45, 17, 'Lon', 2592, NULL, 0, '1 lon', 0),
-(46, 17, 'Lốc', 432, 'strongbow-kiwi-va-thanh-long-lon-320ml-clone-202407101334461833.jpg', 122000, '6 lon', 0),
+(45, 17, 'Lon', 0, NULL, 0, '1 lon', 0),
+(46, 17, 'Lốc', 0, 'strongbow-kiwi-va-thanh-long-lon-320ml-clone-202407101334461833.jpg', 122000, '6 lon', 0),
 (47, 17, 'Thùng', 107, 'loc-6-lon-strongbow-kiwi-va-thanh-long-lon-320ml-clone-202407101338018343.jpg', 477000, '24 lon', 0),
-(48, 18, 'Lon', 2376, NULL, 0, '1 lon', 0),
-(49, 18, 'Lốc', 396, 'loc-6-lon-strongbow-thom-va-luu-lon-320ml-202407101319115896.jpg', 122000, '6 lon', 0),
+(48, 18, 'Lon', 0, NULL, 0, '1 lon', 0),
+(49, 18, 'Lốc', 0, 'loc-6-lon-strongbow-thom-va-luu-lon-320ml-202407101319115896.jpg', 122000, '6 lon', 0),
 (50, 18, 'Thùng', 99, 'loc-6-lon-strongbow-thom-va-luu-lon-320ml-clone-202407101323141511.jpg', 477000, '24 lon', 0),
-(54, 19, 'Lon', 2328, NULL, 0, '1 lon', 0),
-(55, 19, 'Lốc', 388, 'x-7_202411232125073563.jpg', 122000, '6 lon', 0),
+(54, 19, 'Lon', 0, NULL, 0, '1 lon', 0),
+(55, 19, 'Lốc', 0, 'x-7_202411232125073563.jpg', 122000, '6 lon', 0),
 (56, 19, 'Thùng', 96, 'x-2_202411222212549896.jpg', 477000, '24 lon', 0),
-(57, 20, 'Lon', 1236, NULL, 0, '1 lon', 0),
-(58, 20, 'Lốc', 204, '6-lon-bia-budweiser-500ml-202103162341105242.jpg', 175000, '6 lon', 0),
+(57, 20, 'Lon', 0, NULL, 0, '1 lon', 0),
+(58, 20, 'Lốc', 0, '6-lon-bia-budweiser-500ml-202103162341105242.jpg', 175000, '6 lon', 0),
 (59, 20, 'Thùng', 103, 'thung-12-lon-bia-budweiser-500ml-202103162311285122.jpg', 349000, '12 lon', 0),
-(60, 21, 'Lon', 3456, NULL, 0, '1 lon', 0),
+(60, 21, 'Lon', 0, NULL, 0, '1 lon', 0),
 (61, 21, 'Thùng', 144, 'bia-333-pilsner-extra-smooth-lon-330ml-clone-202407171025584332.jpg', 335000, '24 lon', 0),
-(62, 22, 'Lon', 2448, NULL, 0, '1 chai', 0),
-(63, 22, 'Lốc', 408, '6-chai-bia-hoegaarden-rosee-248ml-202103162255108112.jpg', 119000, '6 chai', 0),
+(62, 22, 'Lon', 0, NULL, 0, '1 chai', 0),
+(63, 22, 'Lốc', 0, '6-chai-bia-hoegaarden-rosee-248ml-202103162255108112.jpg', 119000, '6 chai', 0),
 (64, 22, 'Thùng', 102, 'thung-24-chai-bia-hoegaarden-rosee-248ml-202103170012177723.jpg', 460000, '24 chai', 0),
-(65, 23, 'Lon', 2376, NULL, 0, '1 lon', 0),
-(66, 23, 'Lốc', 396, '6-lon-hoegaarden-white-330ml-202103162340330676.jpg', 181000, '6 lon', 0),
+(65, 23, 'Lon', 0, NULL, 0, '1 lon', 0),
+(66, 23, 'Lốc', 0, '6-lon-hoegaarden-white-330ml-202103162340330676.jpg', 181000, '6 lon', 0),
 (67, 23, 'Thùng', 99, 'thung-24-lon-hoegaarden-white-330ml-202307281021092236.jpg', 690000, '24 lon', 0),
-(68, 24, 'Chai', 1464, NULL, 0, '1 chai', 0),
-(69, 24, 'Lốc', 244, '6-chai-bia-hoegaarden-330ml-202105291336192265.jpg', 191000, '6 chai', 0),
+(68, 24, 'Chai', 0, NULL, 0, '1 chai', 0),
+(69, 24, 'Lốc', 0, '6-chai-bia-hoegaarden-330ml-202105291336192265.jpg', 191000, '6 chai', 0),
 (70, 24, 'Thùng', 61, 'thung-24-chai-bia-hoegaarden-330ml-202103162232104264.jpg', 800000, '24 chai', 0),
-(71, 25, 'Lon', 1728, NULL, 0, '1 lon', 0),
-(72, 25, 'Lốc', 288, '6-lon-bia-huda-330ml-202309191329088559.jpg', 72500, '6 lon', 0),
+(71, 25, 'Lon', 0, NULL, 0, '1 lon', 0),
+(72, 25, 'Lốc', 0, '6-lon-bia-huda-330ml-202309191329088559.jpg', 72500, '6 lon', 0),
 (73, 25, 'Thùng', 72, 'thung-24-lon-bia-huda-330ml-202309191319343524.jpg', 275000, '24 lon', 0),
-(74, 26, 'Lon', 1776, NULL, 0, '1 lon', 0),
+(74, 26, 'Lon', 0, NULL, 0, '1 lon', 0),
 (75, 26, 'Thùng', 74, 'frame-3-4_202501031028028896.jpg', 262000, '24 lon', 0),
-(76, 27, 'Lon', 1368, NULL, 0, '1 lon', 0),
+(76, 27, 'Lon', 0, NULL, 0, '1 lon', 0),
 (77, 27, 'Thùng', 55, 'frame-3-2_202501031005435306.jpg', 265000, '24 lon', 0),
-(78, 28, 'Lon', 1848, NULL, 0, '1 lon', 0),
-(79, 28, 'Lốc', 308, '6-lon-bia-larue-special-330ml-202303172038334130.jpg', 71500, '6 lon', 0),
+(78, 28, 'Lon', 0, NULL, 0, '1 lon', 0),
+(79, 28, 'Lốc', 0, '6-lon-bia-larue-special-330ml-202303172038334130.jpg', 71500, '6 lon', 0),
 (80, 28, 'Thùng', 77, 'thung-24-lon-bia-larue-special-330ml-202303130900306319.jpg', 268000, '24 lon', 0),
-(81, 29, 'Lon', 3288, NULL, 0, '1 lon', 0),
-(82, 29, 'Lốc', 548, 'loc-6-lon-bia-blanc-1664-330ml-202407111440578192.jpg', 117000, '6 lon', 0),
+(81, 29, 'Lon', 0, NULL, 0, '1 lon', 0),
+(82, 29, 'Lốc', 0, 'loc-6-lon-bia-blanc-1664-330ml-202407111440578192.jpg', 117000, '6 lon', 0),
 (83, 29, 'Thùng', 137, 'thung-24-lon-bia-blanc-1664-330ml-202403011442206439.jpg', 410000, '24 lon', 0),
-(84, 30, 'Lon', 2159, NULL, 0, '1 lon', 0),
-(85, 30, 'Lốc', 360, 'thung-6-lon-nuoc-tao-len-men-somersby-blackberry-vi-mam-xoi-lon-330ml-tang-1-ong-lays-100g-vi-bat-ki-202408270949151109.jpg', 122000, '6 lon', 0),
-(86, 30, 'Thùng', 180, 'thung-12-lon-nuoc-tao-len-men-somersby-blackberry-vi-mam-xoi-330ml-202211171010197682.jpg', 242000, '12 lon', 0),
+(84, 30, 'Lon', 0, NULL, 0, '1 lon', 0),
+(85, 30, 'Lốc', 0, 'thung-6-lon-nuoc-tao-len-men-somersby-blackberry-vi-mam-xoi-lon-330ml-tang-1-ong-lays-100g-vi-bat-ki-202408270949151109.jpg', 122000, '6 lon', 0),
+(86, 30, 'Thùng', 0, 'thung-12-lon-nuoc-tao-len-men-somersby-blackberry-vi-mam-xoi-330ml-202211171010197682.jpg', 242000, '12 lon', 0),
 (87, 30, 'Thùng', 90, 'nuoc-tao-len-men-somersby-blackberry-vi-mam-xoi-lon-330ml-clone-202401261601096353.jpg', 484000, '24 lon', 0),
-(88, 31, 'Lon', 2520, NULL, 0, '1 lon', 0),
-(89, 31, 'Lốc', 420, '6-lon-bia-trai-cay-san-miguel-vi-vai-330ml-202104290934520276.jpg', 107000, '6 lon', 0),
+(88, 31, 'Lon', 0, NULL, 0, '1 lon', 0),
+(89, 31, 'Lốc', 0, '6-lon-bia-trai-cay-san-miguel-vi-vai-330ml-202104290934520276.jpg', 107000, '6 lon', 0),
 (90, 31, 'Thùng', 103, 'thung-24-lon-bia-trai-cay-san-miguel-vi-vai-330ml-202105061025057813.jpg', 398000, '24 lon', 0),
-(91, 32, 'Lon', 1512, NULL, 0, '1 lon', 0),
-(92, 32, 'Lốc', 378, 'slide_202410021413525790.jpg', 94000, '4 lon', 0),
+(91, 32, 'Lon', 0, NULL, 0, '1 lon', 0),
+(92, 32, 'Lốc', 0, 'slide_202410021413525790.jpg', 94000, '4 lon', 0),
 (93, 32, 'Thùng', 126, 'bia-san-miguel-red-horse-thung-12-lon-cao-500ml-201812011311509389.jpg', 279000, '12 lon', 0),
-(94, 33, 'Lon', 2928, NULL, 0, '1 lon', 0),
+(94, 33, 'Lon', 0, NULL, 0, '1 lon', 0),
 (95, 33, 'Thùng', 122, 'thung-24-lon-bia-bivina-export-330ml-202306210939090700.jpg', 229000, '24 lon', 0),
-(96, 34, 'Chai', 2952, NULL, 0, '1 chai', 0),
-(97, 34, 'Lốc', 492, 'rh6y45_202410121036392022.jpg', 45000, '6 chai', 0),
+(96, 34, 'Chai', 0, NULL, 0, '1 chai', 0),
+(97, 34, 'Lốc', 0, 'rh6y45_202410121036392022.jpg', 45000, '6 chai', 0),
 (98, 34, 'Thùng', 123, 'thung-24-chai-nuoc-ngot-coca-cola-390ml-202401031354327265.jpg', 175000, '24 chai', 0),
-(99, 35, 'Chai', 3504, NULL, 0, '1 chai', 0),
-(100, 35, 'Lốc', 584, 'j65yh65tg_202410100954258310.jpg', 45000, '6 chai', 0),
+(99, 35, 'Chai', 0, NULL, 0, '1 chai', 0),
+(100, 35, 'Lốc', 0, 'j65yh65tg_202410100954258310.jpg', 45000, '6 chai', 0),
 (101, 35, 'Thùng', 146, 'thung-24-chai-nuoc-ngot-coca-cola-390ml-202401031354327265.jpg', 175000, '24 chai', 0),
-(102, 36, 'Lon', 2664, NULL, 0, '1 lon', 0),
-(103, 36, 'Lốc', 444, 'untitled-2_202410100917022096.jpg', 39000, '6 lon', 0),
+(102, 36, 'Lon', 0, NULL, 0, '1 lon', 0),
+(103, 36, 'Lốc', 0, 'untitled-2_202410100917022096.jpg', 39000, '6 lon', 0),
 (104, 36, 'Thùng', 111, 'nuoc-ngot-coke-zero-sleek-lon-320ml-thung-24-lon_202503260844576684.jpg', 138000, '24 lon', 0),
-(105, 37, 'Lon', 2952, NULL, 0, '1 lon', 0),
-(106, 37, 'Lốc', 492, '6-lon-nuoc-ngot-coca-cola-light-330ml-202209111902227891.jpg', 61000, '6 lon', 0),
+(105, 37, 'Lon', 0, NULL, 0, '1 lon', 0),
+(106, 37, 'Lốc', 0, '6-lon-nuoc-ngot-coca-cola-light-330ml-202209111902227891.jpg', 61000, '6 lon', 0),
 (107, 37, 'Thùng', 123, 'thung-24-lon-nuoc-ngot-coca-cola-light-330ml-202209130026545869.jpg', 239000, '24 lon', 0),
-(108, 38, 'Lon', 3168, NULL, 0, '1 lon', 0),
-(109, 38, 'Lốc', 528, '6-lon-nuoc-ngot-coca-cola-320ml-202303181532309738.jpg', 49000, '6 lon', 0),
+(108, 38, 'Lon', 0, NULL, 0, '1 lon', 0),
+(109, 38, 'Lốc', 0, '6-lon-nuoc-ngot-coca-cola-320ml-202303181532309738.jpg', 49000, '6 lon', 0),
 (110, 38, 'Thùng', 132, 'thung-24-lon-nuoc-ngot-coca-cola-320ml-202304170912479439.jpg', 180000, '24 lon', 0),
-(111, 39, 'Chai', 558, NULL, 0, '1 chai', 0),
+(111, 39, 'Chai', 0, NULL, 0, '1 chai', 0),
 (112, 39, 'Lốc', 93, '543ed_202410101053449397.jpg', 119000, '6 chai', 0),
-(113, 40, 'Lon', 2352, NULL, 0, '1 lon', 0),
-(114, 40, 'Lốc', 392, '6-lon-nuoc-ngot-pepsi-khong-calo-320ml-202405140930319101.jpg', 63000, '6 lon', 0),
-(115, 40, 'Thùng', 98, 'thung-24-lon-nuoc-ngot-pepsi-khong-calo-320ml-202405140932308541.jpg', 249000, '24 lon', 0),
-(116, 41, 'Lon', 2448, NULL, 0, '1 lon', 0),
-(117, 41, 'Lốc', 408, '6-lon-nuoc-ngot-pepsi-cola-320ml-202405140913350279.jpg', 63000, '6 lon', 0),
+(113, 40, 'Lon', 0, NULL, 0, '1 lon', 0),
+(114, 40, 'Lốc', 0, '6-lon-nuoc-ngot-pepsi-khong-calo-320ml-202405140930319101.jpg', 63000, '6 lon', 0),
+(115, 40, 'Thùng', 102, 'thung-24-lon-nuoc-ngot-pepsi-khong-calo-320ml-202405140932308541.jpg', 249000, '24 lon', 0),
+(116, 41, 'Lon', 0, NULL, 0, '1 lon', 0),
+(117, 41, 'Lốc', 0, '6-lon-nuoc-ngot-pepsi-cola-320ml-202405140913350279.jpg', 63000, '6 lon', 0),
 (118, 41, 'Thùng', 102, 'thung-24-lon-nuoc-ngot-pepsi-cola-320ml-202405140910323798.jpg', 249000, '24 lon', 0),
-(119, 42, 'Lon', 2231, NULL, 0, '1 lon', 0),
-(120, 42, 'Lốc', 372, '6-lon-nuoc-ngot-pepsi-khong-calo-vi-chanh-320ml-202403141047526251.jpg', 63000, '6 lon', 0),
+(119, 42, 'Lon', 0, NULL, 0, '1 lon', 0),
+(120, 42, 'Lốc', 0, '6-lon-nuoc-ngot-pepsi-khong-calo-vi-chanh-320ml-202403141047526251.jpg', 63000, '6 lon', 0),
 (121, 42, 'Thùng', 93, 'thung-24-lon-nuoc-ngot-pepsi-khong-calo-vi-chanh-320ml-202403141042047286.jpg', 249000, '24 lon', 0),
-(122, 43, 'Chai', 2904, NULL, 0, '1 chai', 0),
-(123, 43, 'Lốc', 484, '6-chai-nuoc-ngot-pepsi-khong-calo-390ml-202405131646146534.jpg', 45000, '6 chai', 0),
+(122, 43, 'Chai', 0, NULL, 0, '1 chai', 0),
+(123, 43, 'Lốc', 0, '6-chai-nuoc-ngot-pepsi-khong-calo-390ml-202405131646146534.jpg', 45000, '6 chai', 0),
 (124, 43, 'Thùng', 121, 'thung-24-chai-nuoc-ngot-pepsi-khong-calo-390ml-202405131648242013.jpg', 175000, '24 chai', 0),
-(125, 44, 'Chai', 3384, NULL, 0, '1 chai', 0),
-(126, 44, 'Lốc', 564, '6-chai-nuoc-ngot-pepsi-cola-390ml-202405131544132338.jpg', 46000, '6 chai', 0),
+(125, 44, 'Chai', 0, NULL, 0, '1 chai', 0),
+(126, 44, 'Lốc', 0, '6-chai-nuoc-ngot-pepsi-cola-390ml-202405131544132338.jpg', 46000, '6 chai', 0),
 (127, 44, 'Thùng', 141, 'thung-24-chai-nuoc-ngot-pepsi-cola-390ml-202405131540090674.jpg', 182000, '24 chai', 0),
-(128, 45, 'Chai', 1020, NULL, 0, '1 chai', 0),
+(128, 45, 'Chai', 0, NULL, 0, '1 chai', 0),
 (129, 45, 'Thùng', 85, 'thung-12-chai-nuoc-ngot-pepsi-cola-15-lit-202405131533460165.jpg', 230000, '12 chai', 0),
-(130, 46, 'Lon', 2688, NULL, 0, '1 lon', 0),
-(131, 46, 'Lốc', 448, 'x-4_202411192106150084.jpg', 39000, '6 lon', 0),
+(130, 46, 'Lon', 0, NULL, 0, '1 lon', 0),
+(131, 46, 'Lốc', 0, 'x-4_202411192106150084.jpg', 39000, '6 lon', 0),
 (132, 46, 'Thùng', 112, 'z-3_202411041457060787.jpg', 138000, '24 lon', 0),
-(133, 47, 'Lon', 1248, NULL, 0, '1 lon', 0),
-(134, 47, 'Lốc', 208, '-202211252250350400.jpg', 39000, '6 lon', 0),
+(133, 47, 'Lon', 0, NULL, 0, '1 lon', 0),
+(134, 47, 'Lốc', 0, '-202211252250350400.jpg', 39000, '6 lon', 0),
 (135, 47, 'Thùng', 52, 'z-7_202411041506073838.jpg', 138000, '24 lon', 0),
-(136, 48, 'Lon', 3552, NULL, 0, '1 lon', 0),
-(137, 48, 'Lốc', 592, 'z-25_202411041512084868.jpg', 39000, '6 lon', 0),
+(136, 48, 'Lon', 0, NULL, 0, '1 lon', 0),
+(137, 48, 'Lốc', 0, 'z-25_202411041512084868.jpg', 39000, '6 lon', 0),
 (138, 48, 'Thùng', 148, 'z-24_202411041513527461.jpg', 138000, '24 lon', 0),
-(139, 49, 'Lon', 2638, NULL, 0, '1 lon', 0),
-(140, 49, 'Lốc', 440, 'z-12_202411041615087225.jpg', 39000, '6 lon', 0),
+(139, 49, 'Lon', 0, NULL, 0, '1 lon', 0),
+(140, 49, 'Lốc', 0, 'z-12_202411041615087225.jpg', 39000, '6 lon', 0),
 (141, 49, 'Thùng', 110, 'z-11_202411041615591527.jpg', 138000, '24 lon', 0),
-(142, 50, 'Lon', 2640, NULL, 0, '1 lon', 0),
-(143, 50, 'Lốc', 440, '6-lon-nuoc-ngot-soda-chanh-7-up-320ml-202308160848544121.jpg', 60000, '6 lon', 0),
+(142, 50, 'Lon', 0, NULL, 0, '1 lon', 0),
+(143, 50, 'Lốc', 0, '6-lon-nuoc-ngot-soda-chanh-7-up-320ml-202308160848544121.jpg', 60000, '6 lon', 0),
 (144, 50, 'Thùng', 110, 'thung-24-lon-nuoc-ngot-soda-chanh-7-up-320ml-202308160850478764.jpg', 230000, '24 lon', 0),
-(145, 51, 'Lon', 1464, NULL, 0, '1 lon', 0),
-(146, 51, 'Lốc', 244, '6-lon-nuoc-ngot-7-up-vi-chanh-320ml-202312252111462336.jpg', 61000, '6 lon', 0),
+(145, 51, 'Lon', 0, NULL, 0, '1 lon', 0),
+(146, 51, 'Lốc', 0, '6-lon-nuoc-ngot-7-up-vi-chanh-320ml-202312252111462336.jpg', 61000, '6 lon', 0),
 (147, 51, 'Thùng', 61, 'thung-24-lon-nuoc-ngot-7-up-vi-chanh-320ml-202312252116245308.jpg', 240000, '24 lon', 0),
-(148, 52, 'Chai', 1414, NULL, 0, '1 chai', 0),
-(149, 52, 'Lốc', 236, '6-chai-nuoc-ngot-7-up-vi-chanh-390ml-202407131705125343.jpg', 46000, '6 chai', 0),
+(148, 52, 'Chai', 0, NULL, 0, '1 chai', 0),
+(149, 52, 'Lốc', 0, '6-chai-nuoc-ngot-7-up-vi-chanh-390ml-202407131705125343.jpg', 46000, '6 chai', 0),
 (150, 52, 'Thùng', 59, 'thung-24-chai-nuoc-ngot-7-up-vi-chanh-390ml-202407091545538869.jpg', 182000, '24 chai', 0),
-(151, 52, 'Chai', 1416, NULL, 0, '1 chai', 0),
+(151, 52, 'Chai', 0, NULL, 0, '1 chai', 0),
 (152, 53, 'Thùng', 52, 'thung-12-chai-nuoc-ngot-7-up-vi-chanh-15-lit-202312252136117150.jpg', 230000, '12 chai', 0),
-(153, 54, 'Lon', 3144, NULL, 0, '1 lon', 0),
-(154, 54, 'Lốc', 524, '195224_202411192119415521.jpg', 39000, '6 lon', 0),
+(153, 54, 'Lon', 0, NULL, 0, '1 lon', 0),
+(154, 54, 'Lốc', 0, '195224_202411192119415521.jpg', 39000, '6 lon', 0),
 (155, 54, 'Thùng', 131, 'thung-24-lon-nuoc-ngot-sprite-huong-chanh-320ml-202407121623253988.jpg', 138000, '24 lon', 0),
-(156, 55, 'Chai', 588, NULL, 0, '1 chai', 0),
-(157, 55, 'Lốc', 98, '6-chai-nuoc-ngot-sprite-huong-chanh-15-lit-202308121643425033.jpg', 119000, '6 chai', 0),
-(158, 56, 'Lon', 3432, NULL, 0, '1 lon', 0),
-(159, 56, 'Lốc', 572, '6-lon-soda-schweppes-330ml-202401091731044088.jpg', 40000, '6 lon', 0),
+(156, 55, 'Chai', 0, NULL, 0, '1 chai', 0),
+(157, 55, 'Lốc', 100, '6-chai-nuoc-ngot-sprite-huong-chanh-15-lit-202308121643425033.jpg', 119000, '6 chai', 0),
+(158, 56, 'Lon', 0, NULL, 0, '1 lon', 0),
+(159, 56, 'Lốc', 0, '6-lon-soda-schweppes-330ml-202401091731044088.jpg', 40000, '6 lon', 0),
 (160, 56, 'Thùng', 143, 'thung-24-lon-soda-schweppes-330ml-202401091735165254.jpg', 153000, '24 lon', 0),
-(161, 57, 'Lon', 3024, NULL, 0, '1 lon', 0),
-(162, 57, 'Lốc', 504, '6-lon-nuoc-ngot-mirinda-vi-cam-320ml-202312252200360166.jpg', 61000, '6 lon', 0),
+(161, 57, 'Lon', 0, NULL, 0, '1 lon', 0),
+(162, 57, 'Lốc', 0, '6-lon-nuoc-ngot-mirinda-vi-cam-320ml-202312252200360166.jpg', 61000, '6 lon', 0),
 (163, 57, 'Thùng', 126, 'thung-24-lon-nuoc-ngot-mirinda-huong-cam-320ml-202312252205201062.jpg', 240000, '24 lon', 0),
-(164, 58, 'Lon', 2112, NULL, 0, '1 lon', 0),
-(165, 58, 'Lốc', 352, '6-lon-nuoc-ngot-mirinda-vi-soda-kem-320ml-202312260911089105.jpg', 61000, '6 lon', 0),
+(164, 58, 'Lon', 0, NULL, 0, '1 lon', 0),
+(165, 58, 'Lốc', 0, '6-lon-nuoc-ngot-mirinda-vi-soda-kem-320ml-202312260911089105.jpg', 61000, '6 lon', 0),
 (166, 58, 'Thùng', 88, 'thung-24-lon-nuoc-ngot-mirinda-vi-soda-kem-320ml-202312260920012511.jpg', 240000, '24 lon', 0),
-(167, 59, 'Lon', 1632, NULL, 0, '1 lon', 0),
-(168, 59, 'lốc', 272, '6-lon-nuoc-ngot-mirinda-huong-xa-xi-320ml-202312252224294658.jpg', 61000, '6 lon', 0),
+(167, 59, 'Lon', 0, NULL, 0, '1 lon', 0),
+(168, 59, 'lốc', 0, '6-lon-nuoc-ngot-mirinda-huong-xa-xi-320ml-202312252224294658.jpg', 61000, '6 lon', 0),
 (169, 59, 'Thùng', 68, 'thung-24-lon-nuoc-ngot-mirinda-huong-xa-xi-320ml-202312252228594666.jpg', 240000, '24 lon', 0),
-(170, 60, 'Chai', 2208, NULL, 0, '1 chai', 0),
-(171, 60, 'Lốc', 368, '6-chai-tra-o-long-tea-plus-350ml-202302271012519321.jpg', 50000, '6 chai', 0),
+(170, 60, 'Chai', 0, NULL, 0, '1 chai', 0),
+(171, 60, 'Lốc', 0, '6-chai-tra-o-long-tea-plus-350ml-202302271012519321.jpg', 50000, '6 chai', 0),
 (172, 60, 'Thùng', 92, 'frame-2-6-1_202412101432419855.jpg', 198000, '24 chai', 0),
-(173, 61, 'Chai', 2808, NULL, 0, '1 chai', 0),
-(174, 61, 'Lốc', 468, 'tra-o-long-xanh-huong-chanh-tea-plus-450ml-clone-202405151655119605.jpg', 62500, '6 chai', 0),
+(173, 61, 'Chai', 0, NULL, 0, '1 chai', 0),
+(174, 61, 'Lốc', 0, 'tra-o-long-xanh-huong-chanh-tea-plus-450ml-clone-202405151655119605.jpg', 62500, '6 chai', 0),
 (175, 61, 'Thùng', 117, 'loc-6-chai-tra-o-long-xanh-huong-chanh-tea-plus-450ml-clone-202405151658588893.jpg', 249000, '24 chai', 0),
-(176, 62, 'chai', 1752, NULL, 0, '1 chai', 0),
-(177, 62, 'lốc', 292, 'slide-2_202410281556099557.jpg', 62500, '6 chai', 0),
+(176, 62, 'chai', 0, NULL, 0, '1 chai', 0),
+(177, 62, 'lốc', 0, 'slide-2_202410281556099557.jpg', 62500, '6 chai', 0),
 (178, 62, 'thùng', 73, 'slide_202410281556538384.jpg', 249000, '24 chai', 0),
-(179, 63, 'chai', 2136, NULL, 0, '1 chai', 0),
-(180, 63, 'lốc', 356, '6-chai-tra-thanh-nhiet-drthanh-330ml-202103290819533934.jpg', 67000, '6 chai', 0),
+(179, 63, 'chai', 0, NULL, 0, '1 chai', 0),
+(180, 63, 'lốc', 0, '6-chai-tra-thanh-nhiet-drthanh-330ml-202103290819533934.jpg', 67000, '6 chai', 0),
 (181, 63, 'thùng', 89, 'thung-24-chai-tra-thanh-nhiet-drthanh-330ml-202103081048353680.jpg', 265000, '24 chai', 0),
-(182, 64, 'chai', 3168, NULL, 0, '1 chai', 0),
-(183, 64, 'lốc', 528, '6-chai-tra-thanh-nhiet-drthanh-455ml-202103290421187551.jpg', 76000, '6 chai', 0),
+(182, 64, 'chai', 0, NULL, 0, '1 chai', 0),
+(183, 64, 'lốc', 0, '6-chai-tra-thanh-nhiet-drthanh-455ml-202103290421187551.jpg', 76000, '6 chai', 0),
 (184, 64, 'thùng', 132, 'muy6j_202410140900075508.jpg', 300000, '24 chai', 0),
-(185, 65, 'chai', 3384, NULL, 0, '1 chai', 0),
-(186, 65, 'lốc', 564, '6-chai-tra-xanh-khong-do-vi-chanh-455ml-202103290825331304.jpg', 62000, '6 chai', 0),
+(185, 65, 'chai', 0, NULL, 0, '1 chai', 0),
+(186, 65, 'lốc', 0, '6-chai-tra-xanh-khong-do-vi-chanh-455ml-202103290825331304.jpg', 62000, '6 chai', 0),
 (187, 65, 'thùng', 141, 'thung-24-chai-tra-xanh-khong-do-vi-chanh-455ml-202406270829049236.jpg', 245000, '24 chai', 0),
-(188, 66, 'chai', 1680, NULL, 0, '1 chai', 0),
-(189, 66, 'lốc', 280, '6-chai-tra-xanh-c2-huong-chanh-230ml-202212051659416703.jpg', 25000, '6 chai', 0),
+(188, 66, 'chai', 0, NULL, 0, '1 chai', 0),
+(189, 66, 'lốc', 0, '6-chai-tra-xanh-c2-huong-chanh-230ml-202212051659416703.jpg', 25000, '6 chai', 0),
 (190, 66, 'thùng', 70, 'thung-24-chai-tra-xanh-c2-huong-chanh-230ml-202212051702208119.jpg', 95000, '24 chai', 0),
-(191, 67, 'chai', 3072, NULL, 0, '1 chai', 0),
-(192, 67, 'lốc', 512, 'loc-6-chai-tra-den-c2-huong-dao-230ml-202111271341434630.jpg', 25000, '6 chai', 0),
+(191, 67, 'chai', 0, NULL, 0, '1 chai', 0),
+(192, 67, 'lốc', 0, 'loc-6-chai-tra-den-c2-huong-dao-230ml-202111271341434630.jpg', 25000, '6 chai', 0),
 (193, 67, 'thùng', 128, 'thung-24-chai-tra-den-c2-huong-dao-230ml-202310230828541688.jpg', 95000, '24 chai', 0),
-(194, 68, 'chai', 3479, NULL, 0, '1 chai', 0),
-(195, 68, 'lốc', 580, '6-chai-tra-xanh-c2-huong-chanh-360ml-201909270927566578.jpg', 46000, '6 chai', 0),
+(194, 68, 'chai', 0, NULL, 0, '1 chai', 0),
+(195, 68, 'lốc', 0, '6-chai-tra-xanh-c2-huong-chanh-360ml-201909270927566578.jpg', 46000, '6 chai', 0),
 (196, 68, 'thùng', 145, 'thung-24-chai-tra-xanh-c2-huong-chanh-360ml-201912091023304107.jpg', 175000, '24 chai', 0),
-(197, 69, 'chai', 2472, NULL, 0, '1 chai', 0),
-(198, 69, 'lốc', 412, '6-chai-hong-tra-c2-vi-vai-455ml_202504110850017115.jpg', 39000, '6 chai', 0),
+(197, 69, 'chai', 0, NULL, 0, '1 chai', 0),
+(198, 69, 'lốc', 0, '6-chai-hong-tra-c2-vi-vai-455ml_202504110850017115.jpg', 39000, '6 chai', 0),
 (199, 69, 'thùng', 103, 'thung-24-chai-hong-tra-c2-vi-vai-455ml_202504110848502097.jpg', 150000, '24 chai', 0),
-(200, 70, 'chai', 1248, NULL, 0, '1 chai', 0),
-(201, 70, 'lốc', 208, '6-chai-tra-den-dua-luoi-bac-ha-c2-freeze-455ml-202303151101552897.jpg', 58000, '6 chai', 0),
+(200, 70, 'chai', 0, NULL, 0, '1 chai', 0),
+(201, 70, 'lốc', 0, '6-chai-tra-den-dua-luoi-bac-ha-c2-freeze-455ml-202303151101552897.jpg', 58000, '6 chai', 0),
 (202, 70, 'thùng', 52, 'thung-24-chai-tra-den-dua-luoi-bac-ha-c2-freeze-455ml-202303151101204685.jpg', 226000, '24 chai', 0),
-(203, 71, 'lon', 1367, NULL, 0, '1 lon', 0),
-(204, 71, 'lốc', 228, '6-lon-tra-bi-dao-wonderfarm-310ml-202103290403574758.jpg', 49000, '6 lon', 0),
+(203, 71, 'lon', 0, NULL, 0, '1 lon', 0),
+(204, 71, 'lốc', 0, '6-lon-tra-bi-dao-wonderfarm-310ml-202103290403574758.jpg', 49000, '6 lon', 0),
 (205, 71, 'thùng', 57, 'thung-24-lon-tra-bi-dao-wonderfarm-310ml-202103290404279934.jpg', 193000, '24 lon', 0),
-(206, 72, 'chai', 1944, NULL, 0, '1 chai', 0),
-(207, 72, 'lốc', 324, 'tra-bi-dao-wonderfarm-chai-440ml-clone-202407171914009151.jpg', 56000, '6 chai', 0),
+(206, 72, 'chai', 0, NULL, 0, '1 chai', 0),
+(207, 72, 'lốc', 0, 'tra-bi-dao-wonderfarm-chai-440ml-clone-202407171914009151.jpg', 56000, '6 chai', 0),
 (208, 72, 'thùng', 81, 'loc-6-chai-tra-bi-dao-wonderfarm-440ml-clone-202407171920131616.jpg', 220000, '24 chai', 0),
-(209, 73, 'chai', 1656, NULL, 0, '1 chai', 0),
-(210, 73, 'lốc', 276, '6-chai-tra-bi-dao-wonderfarm-280ml-202103290407303221.jpg', 42500, '6 chai', 0),
+(209, 73, 'chai', 0, NULL, 0, '1 chai', 0),
+(210, 73, 'lốc', 0, '6-chai-tra-bi-dao-wonderfarm-280ml-202103290407303221.jpg', 42500, '6 chai', 0),
 (211, 73, 'thùng', 69, 'thung-24-chai-tra-bi-dao-wonderfarm-280ml-202103290407075474.jpg', 170000, '24 chai', 0),
-(212, 74, 'chai', 2352, NULL, 0, '1 chai', 0),
-(213, 74, 'lốc', 392, 'loc-6-chai-tra-mat-ong-boncha-vi-o-long-dao-chai-450ml-202404221908486109.jpg', 59000, '6 chai', 0),
+(212, 74, 'chai', 0, NULL, 0, '1 chai', 0),
+(213, 74, 'lốc', 0, 'loc-6-chai-tra-mat-ong-boncha-vi-o-long-dao-chai-450ml-202404221908486109.jpg', 59000, '6 chai', 0),
 (214, 74, 'thùng', 98, 'thung-24-chai-tra-mat-ong-boncha-vi-o-long-dao-chai-450ml-202404221909009761.jpg', 235000, '24 chai', 0),
-(215, 75, 'chai', 1848, NULL, 0, '1 chai', 0),
-(216, 75, 'lốc', 308, '6-chai-tra-mat-ong-boncha-vi-viet-quat-450ml-202401271402415702.jpg', 59000, '6 chai', 0),
+(215, 75, 'chai', 0, NULL, 0, '1 chai', 0),
+(216, 75, 'lốc', 0, '6-chai-tra-mat-ong-boncha-vi-viet-quat-450ml-202401271402415702.jpg', 59000, '6 chai', 0),
 (217, 75, 'thùng', 77, '6-chai-tra-mat-ong-boncha-vi-viet-quat-450ml-clone-202401121616157573.jpg', 235000, '24 chai', 0),
-(218, 76, 'lon', 1560, NULL, 0, '1 lon', 0),
-(219, 76, 'Lốc', 260, '6-lon-nuoc-tang-luc-redbull-250ml-202103272201250743.jpg', 55000, '6 lon', 0),
+(218, 76, 'lon', 0, NULL, 0, '1 lon', 0),
+(219, 76, 'Lốc', 0, '6-lon-nuoc-tang-luc-redbull-250ml-202103272201250743.jpg', 55000, '6 lon', 0),
 (220, 76, 'Thùng', 65, '24-lon-nuoc-tang-luc-redbull-250ml-202103282348189198.jpg', 215000, '24 lon', 0),
-(221, 77, 'Lon', 2256, NULL, 0, '1 lon', 0),
-(222, 77, 'lốc', 376, '6-lon-nuoc-tang-luc-redbull-thai-kem-va-vitamin-250ml-202403091724125899.jpg', 55000, '6 lon', 0),
+(221, 77, 'Lon', 0, NULL, 0, '1 lon', 0),
+(222, 77, 'lốc', 0, '6-lon-nuoc-tang-luc-redbull-thai-kem-va-vitamin-250ml-202403091724125899.jpg', 55000, '6 lon', 0),
 (223, 77, 'thùng', 93, 'thung-24-lon-nuoc-tang-luc-redbull-thai-kem-va-vitamin-250ml-202403091724212175.jpg', 215000, '24 lon', 0),
-(224, 78, 'chai', 2304, NULL, 0, '1 chai', 0),
-(225, 78, 'lốc', 384, '6-chai-nuoc-tang-luc-sting-gold-330ml-202103272139112743.jpg', 64000, '6 chai', 0),
+(224, 78, 'chai', 0, NULL, 0, '1 chai', 0),
+(225, 78, 'lốc', 0, '6-chai-nuoc-tang-luc-sting-gold-330ml-202103272139112743.jpg', 64000, '6 chai', 0),
 (226, 78, 'thùng', 96, '24-chai-nuoc-tang-luc-sting-gold-330ml-202407091628328734.jpg', 255000, '24 chai', 0),
-(227, 79, 'chai', 1368, NULL, 0, '1 chai', 0),
-(228, 79, 'lốc', 228, '6-chai-sting-huong-dau-330ml-202103272146121296.jpg', 67000, '6 chai', 0),
+(227, 79, 'chai', 0, NULL, 0, '1 chai', 0),
+(228, 79, 'lốc', 0, '6-chai-sting-huong-dau-330ml-202103272146121296.jpg', 67000, '6 chai', 0),
 (229, 79, 'thùng', 57, '24-chai-nuoc-tang-luc-sting-huong-dau-330ml-202103300950550501.jpg', 265000, '24 chai', 0),
-(230, 80, 'Lon', 1272, NULL, 0, '1 lon', 0),
-(231, 80, 'lốc', 211, '6-lon-nuoc-tang-luc-sting-gold-330ml-202103272136595116.jpg', 67000, '6 lon', 0),
+(230, 80, 'Lon', 0, NULL, 0, '1 lon', 0),
+(231, 80, 'lốc', 0, '6-lon-nuoc-tang-luc-sting-gold-330ml-202103272136595116.jpg', 67000, '6 lon', 0),
 (232, 80, 'thùng', 53, '24-lon-nuoc-tang-luc-sting-gold-320ml-202407111450192542.jpg', 265000, '24 lon', 0),
-(233, 81, 'Lon', 2232, NULL, 0, '1 lon', 0),
-(234, 81, 'lốc', 372, '6-lon-nuoc-tang-luc-sting-huong-dau-320ml-202111061732537179.jpg', 55000, '6 lon', 0),
+(233, 81, 'Lon', 0, NULL, 0, '1 lon', 0),
+(234, 81, 'lốc', 0, '6-lon-nuoc-tang-luc-sting-huong-dau-320ml-202111061732537179.jpg', 55000, '6 lon', 0),
 (235, 81, 'thùng', 93, '24-lon-nuoc-tang-luc-sting-huong-dau-320ml-202407091625327728.jpg', 221000, '24 lon', 0),
-(236, 82, 'chai', 2088, NULL, 0, '1 chai', 0),
-(237, 82, 'lốc', 348, '6-chai-nuoc-bu-khoang-revive-muoi-khoang-500ml-202103312248177034.jpg', 65000, '6 chai', 0),
+(236, 82, 'chai', 0, NULL, 0, '1 chai', 0),
+(237, 82, 'lốc', 0, '6-chai-nuoc-bu-khoang-revive-muoi-khoang-500ml-202103312248177034.jpg', 65000, '6 chai', 0),
 (238, 82, 'thùng', 87, 'thung-24-chai-nuoc-bu-khoang-revive-muoi-khoang-500ml-202407121558394200.jpg', 252000, '24 chai', 0),
-(239, 83, 'chai', 1800, NULL, 0, '1 chai', 0),
-(240, 83, 'lốc', 300, '6-chai-nuoc-bu-khoang-revive-chanh-muoi-390ml-202103272142426493.jpg', 60500, '6 chai', 0),
+(239, 83, 'chai', 0, NULL, 0, '1 chai', 0),
+(240, 83, 'lốc', 0, '6-chai-nuoc-bu-khoang-revive-chanh-muoi-390ml-202103272142426493.jpg', 60500, '6 chai', 0),
 (241, 83, 'thùng', 75, 'thung-24-chai-nuoc-bu-khoang-revive-chanh-muoi-390ml-202407121630583041.jpg', 235000, '24 chai', 0),
-(242, 84, 'Lon', 1512, NULL, 0, '1 lon', 0),
-(243, 84, 'lốc', 252, '6-lon-nuoc-tang-luc-monster-energy-355ml-202103272049543278.jpg', 110000, '6 lon', 0),
-(244, 84, 'thùng', 63, '24-lon-nuoc-tang-luc-monster-energy-355ml-202103272055551940.jpg', 420000, '24 lon', 0),
-(245, 85, 'Lon', 1248, NULL, 0, '1 lon', 0),
-(246, 85, 'lốc', 208, '6-lon-nuoc-tang-luc-monster-energy-ultra-355ml-202103272059257521.jpg', 110000, '6 lon', 0),
+(242, 84, 'Lon', 0, NULL, 0, '1 lon', 0),
+(243, 84, 'lốc', 0, '6-lon-nuoc-tang-luc-monster-energy-355ml-202103272049543278.jpg', 110000, '6 lon', 0),
+(244, 84, 'thùng', 65, '24-lon-nuoc-tang-luc-monster-energy-355ml-202103272055551940.jpg', 420000, '24 lon', 0),
+(245, 85, 'Lon', 0, NULL, 0, '1 lon', 0),
+(246, 85, 'lốc', 0, '6-lon-nuoc-tang-luc-monster-energy-ultra-355ml-202103272059257521.jpg', 110000, '6 lon', 0),
 (247, 85, 'thùng', 50, '24-lon-nuoc-tang-luc-monster-energy-ultra-355ml-202103272058317494.jpg', 420000, '24 lon', 0),
-(248, 86, 'lon', 2112, NULL, 0, '1 lon', 0),
-(249, 86, 'lốc', 352, '232335_202410311731146260.jpg', 45000, '6 lon', 0),
+(248, 86, 'lon', 0, NULL, 0, '1 lon', 0),
+(249, 86, 'lốc', 0, '232335_202410311731146260.jpg', 45000, '6 lon', 0),
 (250, 86, 'thùng', 87, 'thung-24-lon-nuoc-tang-luc-lipovitan-mat-ong-250ml-202306242224456842.jpg', 170000, '24 lon', 0),
-(251, 87, 'chai', 1968, NULL, 0, '1 chai', 0),
-(252, 87, 'lốc', 328, '6-chai-nuoc-tang-luc-number1-330ml-202103300903421408.jpg', 47000, '6 chai', 0),
+(251, 87, 'chai', 0, NULL, 0, '1 chai', 0),
+(252, 87, 'lốc', 0, '6-chai-nuoc-tang-luc-number1-330ml-202103300903421408.jpg', 47000, '6 chai', 0),
 (253, 87, 'thùng', 81, 'bhji_202410140927105012.jpg', 188000, '24 chai', 0),
 (254, 88, 'chai', 0, NULL, 0, '1 chai', 0),
 (255, 88, 'thùng', 0, 'frame-3475096_202502101332191728.jpg', 114000, '24 chai', 0),
@@ -1039,7 +1047,7 @@ INSERT INTO `packaging_options` (`packaging_option_id`, `product_id`, `packaging
 (264, 92, 'chai', 0, NULL, 0, '1 chai', 0),
 (265, 92, 'lốc', 61, '6-chai-nuoc-khoang-la-vie-350ml-202112310823096348.jpg', 27000, '6 chai', 0),
 (266, 92, 'thùng', 0, 'thung-24-chai-nuoc-khoang-la-vie-350ml-202112310823372509.jpg', 85000, '24 chai', 0),
-(267, 93, 'chai', -2, NULL, 0, '1 chai', 0),
+(267, 93, 'chai', 0, NULL, 0, '1 chai', 0),
 (268, 93, 'lốc', 93, 'slide-5_202410161048454594.jpg', 30000, '6 chai', 0),
 (269, 93, 'thùng', 0, 'slide-3_202410161047556527.jpg', 95000, '24 chai', 0),
 (270, 94, 'chai', 0, NULL, 0, '1 chai', 0),
@@ -1060,81 +1068,81 @@ INSERT INTO `packaging_options` (`packaging_option_id`, `product_id`, `packaging
 (291, 102, 'lốc', 71, 'nuoc-yen-dong-trung-ha-thao-ky-tu-va-hat-chia-song-yen-huong-hat-sen-185ml-clone-202408221421570614.jpg', 169000, '6 chai', 0),
 (292, 103, 'hộp', 57, NULL, 0, '1 hộp', 0),
 (293, 104, 'Hộp', 100, NULL, 0, '1 hộp', 0),
-(294, 105, 'chai', 3312, NULL, 0, '1 chai', 0),
-(295, 105, 'lốc', 552, '1469306996-3_202412230945228374.jpg', 210000, '6 chai', 0),
+(294, 105, 'chai', 0, NULL, 0, '1 chai', 0),
+(295, 105, 'lốc', 0, '1469306996-3_202412230945228374.jpg', 210000, '6 chai', 0),
 (296, 105, 'thùng', 69, 'thung-48-chai-che-duong-nhan-to-yen-va-trung-thao-green-bird-185ml-202306120924463382.jpg', 1680000, '48 chai', 0),
-(297, 106, 'chai', 4512, NULL, 0, '1 chai', 0),
-(298, 106, 'lốc', 752, 'loc-6-chai-nuoc-yen-collagen-green-bird-185ml-202204190906362298.jpg', 174000, '6 chai', 0),
+(297, 106, 'chai', 0, NULL, 0, '1 chai', 0),
+(298, 106, 'lốc', 0, 'loc-6-chai-nuoc-yen-collagen-green-bird-185ml-202204190906362298.jpg', 174000, '6 chai', 0),
 (299, 106, 'thùng', 94, 'thung-48-chai-nuoc-yen-sao-collagen-green-bird-185ml-202111270845056757.jpg', 1296000, '48 chai', 0),
-(300, 107, 'chai', 3072, NULL, 0, '1 chai', 0),
-(301, 107, 'lốc', 512, '1469306996-5_202412231000516828.jpg', 174000, '6 chai', 0),
+(300, 107, 'chai', 0, NULL, 0, '1 chai', 0),
+(301, 107, 'lốc', 0, '1469306996-5_202412231000516828.jpg', 174000, '6 chai', 0),
 (302, 107, 'thùng', 64, 'thung-48-chai-nuoc-yen-sao-dong-trung-ha-thao-green-bird-185ml-202006191057260649.jpg', 1296000, '48 chai', 0),
-(303, 108, 'chai', 3504, NULL, 0, '1 chai', 0),
-(304, 108, 'lốc', 584, '1469306996-8_202412231013423807.jpg', 162000, '6 chai', 0),
+(303, 108, 'chai', 0, NULL, 0, '1 chai', 0),
+(304, 108, 'lốc', 0, '1469306996-8_202412231013423807.jpg', 162000, '6 chai', 0),
 (305, 108, 'thùng', 73, 'thung-48-chai-nuoc-yen-sao-hat-chia-green-bird-185ml-202006191100565441.jpg', 1200000, '48 chai', 0),
 (308, 109, 'chai', 71, NULL, 0, '1 chai', 0),
-(309, 110, 'lon', 504, NULL, 0, '1 lon', 0),
+(309, 110, 'lon', 0, NULL, 0, '1 lon', 0),
 (310, 110, 'lốc', 84, 'hop-6-hu-to-yen-chung-san-duong-phen-winsnest-420ml-202012191044399438.jpg', 189000, '6 lon', 0),
-(311, 111, 'lon', 1980, NULL, 0, '1 lon', 0),
-(312, 111, 'lốc', 330, '412208-4-1_202412161540278584.jpg', 49000, '6 lon', 0),
+(311, 111, 'lon', 0, NULL, 0, '1 lon', 0),
+(312, 111, 'lốc', 0, '412208-4-1_202412161540278584.jpg', 49000, '6 lon', 0),
 (313, 111, 'thùng', 66, '412208_202501161542418774.jpg', 240000, '30 lon', 0),
 (314, 112, 'chai', 59, NULL, 0, '1 chai', 0),
 (315, 113, 'chai', 67, NULL, 0, '1 chai', 0),
-(316, 114, 'chai', 91, NULL, 0, '1 chai', 0),
+(316, 114, 'chai', 96, NULL, 0, '1 chai', 0),
 (317, 115, 'chai', 92, NULL, 0, '1 chai', 0),
 (318, 116, 'chai', 90, NULL, 0, '1 chai', 0),
-(319, 117, 'chai', 1176, NULL, 0, '1 chai', 0),
+(319, 117, 'chai', 0, NULL, 0, '1 chai', 0),
 (320, 117, 'thùng', 98, '12-chai-nuoc-cam-ep-twister-tropicana-1-lit-202312261718527283.jpg', 270000, '12 chai', 0),
 (321, 118, 'hộp', 82, NULL, 0, '1 hộp', 0),
 (322, 119, 'hộp', 89, NULL, 0, '1 hộp', 0),
-(323, 120, 'chai', 2208, NULL, 0, '1 chai', 0),
-(324, 120, 'lốc', 368, '6-chai-nuoc-trai-cay-ice-vi-dao-490ml-202103270855598253.jpg', 50000, '6 chai', 0),
+(323, 120, 'chai', 0, NULL, 0, '1 chai', 0),
+(324, 120, 'lốc', 0, '6-chai-nuoc-trai-cay-ice-vi-dao-490ml-202103270855598253.jpg', 50000, '6 chai', 0),
 (325, 120, 'thùng', 92, 'thung-24-chai-nuoc-trai-cay-ice-vi-dao-490ml-202103270856475399.jpg', 195000, '24 chai', 0),
 (326, 121, 'hộp', 89, NULL, 0, '1 hộp', 0),
 (327, 122, 'hộp', 81, NULL, 0, '1 hộp', 0),
 (328, 123, 'hộp', 56, NULL, 0, '1 hộp', 0),
-(329, 124, 'chai', 588, NULL, 0, '1 chai', 0),
+(329, 124, 'chai', 0, NULL, 0, '1 chai', 0),
 (330, 124, 'lốc', 98, '145393_202411200946235513.jpg', 126000, '6 chai', 0),
-(331, 125, 'chai', 2400, NULL, 0, '1 chai', 0),
-(332, 125, 'lốc', 400, '6-chai-nuoc-suong-sao-a1-food-280ml-202311021058378149.jpg', 60000, '6 chai', 0),
+(331, 125, 'chai', 0, NULL, 0, '1 chai', 0),
+(332, 125, 'lốc', 0, '6-chai-nuoc-suong-sao-a1-food-280ml-202311021058378149.jpg', 60000, '6 chai', 0),
 (333, 125, 'thùng', 100, '6-chai-nuoc-suong-sao-a1-food-280ml-clone-202310181616061092.jpg', 190000, '24 chai', 0),
-(334, 126, 'lon', 1464, NULL, 0, '1 lon', 0),
-(335, 126, 'lốc', 244, '225632-2_202411201122096668.jpg', 57000, '6 lon', 0),
+(334, 126, 'lon', 0, NULL, 0, '1 lon', 0),
+(335, 126, 'lốc', 0, '225632-2_202411201122096668.jpg', 57000, '6 lon', 0),
 (336, 126, 'thùng', 61, '225630_202411201102331704.jpg', 206000, '24 lon', 0),
 (337, 127, 'chai', 64, NULL, 0, '1 chai', 0),
 (338, 128, 'chai', 97, NULL, 0, '1 chai', 0),
 (339, 129, 'chai', 53, NULL, 0, '1 chai', 0),
 (340, 130, 'chai', 69, NULL, 0, '1 chai', 0),
 (341, 131, 'chai', 98, NULL, 0, '1 chai', 0),
-(342, 132, 'chai', 2160, NULL, 0, '1 chai', 0),
-(343, 132, 'lốc', 360, 'frame-1-2-1_202412040916024601.jpg', 75000, '6 chai', 0),
+(342, 132, 'chai', 0, NULL, 0, '1 chai', 0),
+(343, 132, 'lốc', 0, 'frame-1-2-1_202412040916024601.jpg', 75000, '6 chai', 0),
 (344, 132, 'thùng', 89, '79240_202412040924016561.jpg', 290000, '24 chai', 0),
-(345, 133, 'chai', 4, NULL, 10890, '1 chai', 0),
-(346, 133, 'lốc', 24, '6-chai-sua-trai-cay-nutriboost-huong-banh-quy-kem-297ml-202307291745336895.jpg', 42570, '6 chai', 0),
+(345, 133, 'chai', 0, NULL, 10890, '1 chai', 0),
+(346, 133, 'lốc', 0, '6-chai-sua-trai-cay-nutriboost-huong-banh-quy-kem-297ml-202307291745336895.jpg', 42570, '6 chai', 0),
 (347, 133, 'thùng', 97, 'thung-24-chai-sua-trai-cay-nutriboost-huong-banh-quy-kem-297ml-202307291745442914.jpg', 178200, '24 chai', 0),
-(348, 134, 'chai', 4, NULL, 10890, '1 chai', 0),
-(349, 134, 'lốc', 20, 'loc-6-chai-sua-trai-cay-nutriboost-huong-dau-297ml-202103290151490562.jpg', 42570, '6 chai', 0),
+(348, 134, 'chai', 0, NULL, 10890, '1 chai', 0),
+(349, 134, 'lốc', 0, 'loc-6-chai-sua-trai-cay-nutriboost-huong-dau-297ml-202103290151490562.jpg', 42570, '6 chai', 0),
 (350, 134, 'thùng', 85, 'thung-24-chai-sua-trai-cay-nutriboost-huong-dau-297ml-202112281501517996.jpg', 198000, '24 chai', 0),
-(351, 135, 'chai', 2, NULL, 10890, '1 chai', 0),
-(352, 135, 'lốc', 14, 'loc-6-chai-sua-trai-cay-nutriboost-huong-cam-297ml-202103290219146560.jpg', 49500, '6 chai', 0),
+(351, 135, 'chai', 0, NULL, 10890, '1 chai', 0),
+(352, 135, 'lốc', 0, 'loc-6-chai-sua-trai-cay-nutriboost-huong-cam-297ml-202103290219146560.jpg', 49500, '6 chai', 0),
 (353, 135, 'thùng', 55, 'thung-24-chai-sua-trai-cay-nutriboost-huong-cam-297ml-202202122203008831.jpg', 187110, '24 chai', 0),
-(354, 136, 'chai', 16, NULL, 29205, '1 chai', 0),
+(354, 136, 'chai', 0, NULL, 29205, '1 chai', 0),
 (355, 136, 'lốc', 94, 'loc-6-chai-sua-trai-cay-nutriboost-huong-dau-1-lit-202103290213130900.jpg', 160380, '6 chai', 0),
-(356, 137, 'chai', 16, NULL, 29205, '1 chai', 0),
+(356, 137, 'chai', 0, NULL, 29205, '1 chai', 0),
 (357, 137, 'lốc', 94, 'loc-6-chai-sua-trai-cay-nutriboost-huong-cam-1-lit-202103290214217215.jpg', 160380, '6 chai', 0),
-(358, 138, 'hộp', 2, NULL, 9306, '1 hộp', 0),
-(359, 138, 'lốc', 7, 'loc-4-hop-thach-trai-cay-yomost-huong-dau-180ml-202406181624456681.jpg', 37125, '4 hộp', 0),
+(358, 138, 'hộp', 0, NULL, 9306, '1 hộp', 0),
+(359, 138, 'lốc', 0, 'loc-4-hop-thach-trai-cay-yomost-huong-dau-180ml-202406181624456681.jpg', 37125, '4 hộp', 0),
 (360, 138, 'thùng', 78, 'thung-48-hop-thach-trai-cay-yomost-huong-dau-180ml-202406181625341197.jpg', 42570, '48 hộp', 0),
-(361, 140, 'chai', 2, NULL, 4455, '1 chai', 0),
-(362, 139, 'lốc', 16, '6-chai-tra-sua-kirin-tea-break-345ml-202103312255324275.jpg', 66330, '6 chai', 0),
+(361, 140, 'chai', 0, NULL, 4455, '1 chai', 0),
+(362, 139, 'lốc', 0, '6-chai-tra-sua-kirin-tea-break-345ml-202103312255324275.jpg', 66330, '6 chai', 0),
 (363, 139, 'thùng', 62, 'thung-24-chai-tra-sua-kirin-tea-break-345ml-202101190949343300.jpg', 245520, '24 chai', 0),
-(365, 140, 'lốc', 7, 'sua-trai-cay-oggi-vitadairy-huong-cam-hop-110ml-202406260959212521.jpg', 16830, '4 hộp', 0),
+(365, 140, 'lốc', 0, 'sua-trai-cay-oggi-vitadairy-huong-cam-hop-110ml-202406260959212521.jpg', 16830, '4 hộp', 0),
 (366, 140, 'thùng', 86, 'thung-48-hop-sua-trai-cay-oggi-vitadairy-huong-cam-hop-110ml-202406261019128518.jpg', 170280, '48 hộp', 0),
-(367, 141, 'lốc', 6, 'cdntgddvnproductsimages2947204883bhx-202304131320228561_202412190917240756.jpg', 28710, '4 hộp', 0),
+(367, 141, 'lốc', 0, 'cdntgddvnproductsimages2947204883bhx-202304131320228561_202412190917240756.jpg', 28710, '4 hộp', 0),
 (368, 141, 'thùng', 69, '204883-thumb-moi_202412181655464750.jpg', 267300, '48 hộp', 0),
-(369, 142, 'lốc', 5, 'cdntgddvnproductsimages2947198351bhx-202304030934104441_202412190915277318.jpg', 28710, '4 hộp', 0),
+(369, 142, 'lốc', 0, 'cdntgddvnproductsimages2947198351bhx-202304030934104441_202412190915277318.jpg', 28710, '4 hộp', 0),
 (370, 142, 'thùng', 57, 'cdntgddvnproductsimages2947198351bhx-202304030933521994_202412190854142197.jpg', 267300, '48 hộp', 0),
-(371, 143, 'lốc', 7, 'cdntgddvnproductsimages2947198343bhx-202304121052114211_202412181500481106.jpg', 28710, '4 hộp', 0),
+(371, 143, 'lốc', 0, 'cdntgddvnproductsimages2947198343bhx-202304121052114211_202412181500481106.jpg', 28710, '4 hộp', 0),
 (372, 143, 'thùng', 88, 'cdntgddvnproductsimages2947198345bhx-202304121052215626_202412190909167931.jpg', 267300, '48 hộp', 0),
 (373, 144, 'hộp', 11, 'hop-5-goi-nuoc-cot-ca-phe-sua-nescafe-75ml-202310071649230451.jpg', 50490, '5 gói', 0),
 (374, 144, 'thùng', 66, 'z-1_202410311815288274.jpg', 297000, '30 gói', 0),
@@ -1155,21 +1163,7 @@ INSERT INTO `packaging_options` (`packaging_option_id`, `product_id`, `packaging
 (393, 159, 'hộp', 194, NULL, 44550, '1 hộp', 0),
 (394, 160, 'hộp', 134, NULL, 59400, '1 hộp', 0),
 (395, 161, 'hộp', 178, NULL, 41580, '1 hộp', 0),
-(396, 162, 'hộp', 148, NULL, 39600, '1 hộp', 0),
-(397, 163, 'Lon', 1, NULL, 9000, '1 Lon', 1),
-(398, 163, 'thùng', 120, 'Screenshot 2024-07-13 101253.png', 1, '100 thùng', 1),
-(399, 164, 'Lon', 0, NULL, 16500, '1 Lon', 0),
-(400, 164, 'Lốc', 0, '370145777_160906270410937_200939643841065096_n.jpg', 49500, '6 Lốc', 0),
-(401, 164, 'Thùng', 99, '370145777_160906270410937_200939643841065096_n.jpg', 165000, '24 Thùng', 0),
-(402, 165, 'lon', 0, NULL, 0, '1 lon', 0),
-(403, 165, 'lốc', 0, '387182044_164023060099258_4730212562705775853_n.jpg', 0, '6', 0),
-(404, 165, 'thùng', 0, '387182044_164023060099258_4730212562705775853_n.jpg', 0, '24', 0),
-(405, 166, 'lon', 0, NULL, 0, '1 lon', 0),
-(406, 166, 'lốc', 0, NULL, 0, '6lon', 0),
-(407, 166, 'thùng', 0, NULL, 0, '24lon', 0),
-(408, 167, 'lon', 3, NULL, 16500, '1 lon', 0),
-(409, 167, 'lốc', 4, NULL, 27500, '6 lon', 0),
-(410, 167, 'thùng', 21, NULL, 55000, '24 lon', 0);
+(396, 162, 'hộp', 148, NULL, 39600, '1 hộp', 0);
 
 -- --------------------------------------------------------
 
@@ -1209,7 +1203,7 @@ CREATE TABLE `permissions` (
 INSERT INTO `permissions` (`permission_id`, `name`) VALUES
 (1, 'Quản lý sản phẩm'),
 (2, 'Quản lý đơn hàng'),
-(3, 'Quản lý người dùng'),
+(3, 'Quản lý khách hàng'),
 (4, 'Quản lý đơn nhập'),
 (5, 'Xem báo cáo'),
 (6, 'Quản lý quyền'),
@@ -1401,13 +1395,7 @@ INSERT INTO `products` (`product_id`, `name`, `description`, `price`, `category_
 (159, 'Cà phê đen đá MacCoffee Café Phố 160g', 'Dòng sản phẩm được ưa chuộng của MacCoffee bởi hương vị cà phê đặc trưng đậm đà tinh tế, sánh quyện cùng hương thơm nồng nàn quyến rũ cho bạn tỉnh táo, bừng tỉnh năng lượng cho khởi đầu ngày mới tràn đầy hứng khởi. Sản phẩm cà phê hòa tan tiện lợi, chất lượng và đảm bảo an toàn', 45000, 2, '160g', 65, 'Việt Nam', 0),
 (160, 'Cà phê sữa đá MacCoffee Café Phố 240g', 'Chắt lọc từ những hạt cà phê ngon nhất cùng bí quyết và công nghệ sản xuất hiện đại, quy trình sản xuất cà phê hòa tan khép kín, cà phê sữa đá MacCoffee Café Phố 240g chính hãng cà phê hòa tan MacCoffee đạt tiêu chuẩn an toàn thực phẩm, mang đến cho bạn khởi đầu ngày mới tỉnh táo và năng lượng', 60000, 2, '240g', 65, 'Việt Nam', 0),
 (161, 'Cà phê muối Ông Bầu 220g', 'Cà phê muối Ông Bầu 220g là sản phẩm cà phê Việt đậm đà, kết hợp vị muối độc đáo. Vị mặn của muối làm tôn lên hương vị cà phê và sữa, tạo ra trải nghiệm thú vị. Sản phẩm tiện lợi với 10 gói mỗi gói 22g, chỉ cần 30 giây để thưởng thức một ly cà phê muối thơm ngon tại nhà.', 42000, 2, '220g', 66, 'Việt Nam', 0),
-(162, 'Cà phê sữa đá Ông Bầu 240g', 'Cà phê sữa đá Ông Bầu 240g', 40000, 2, '240g', 66, 'Việt Nam', 0),
-(163, 'kkk', 'no', 0, 9, '330ml', 4, '1', 1),
-(164, 'test', 'không có', 0, 2, '330ml', 2, 'việt nam', 0),
-(165, 't2', '', 0, 3, '0', 4, '0', 1),
-(166, 't3', '', 0, 2, '0', 4, '0', 1),
-(167, 't4', '', 0, 3, '0', 6, '0', 1),
-(168, '1', '123', 0, 2, '1', 5, 'Việt Nam', 1);
+(162, 'Cà phê sữa đá Ông Bầu 240g', 'Cà phê sữa đá Ông Bầu 240g', 40000, 2, '240g', 66, 'Việt Nam', 0);
 
 -- --------------------------------------------------------
 
@@ -2061,18 +2049,19 @@ INSERT INTO `profitmargin` (`margin_percent`) VALUES
 
 CREATE TABLE `roles` (
   `role_id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL
+  `name` varchar(100) NOT NULL,
+  `is_deleted` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `roles`
 --
 
-INSERT INTO `roles` (`role_id`, `name`) VALUES
-(1, 'user'),
-(2, 'admin'),
-(3, 'manager'),
-(4, 'staff');
+INSERT INTO `roles` (`role_id`, `name`, `is_deleted`) VALUES
+(1, 'user', 0),
+(2, 'admin', 0),
+(3, 'manager', 0),
+(4, 'staff', 0);
 
 -- --------------------------------------------------------
 
@@ -2119,10 +2108,6 @@ INSERT INTO `role_permission_details` (`role_permission_detail_id`, `role_id`, `
 (25, 3, 4, 'read'),
 (26, 3, 4, 'write'),
 (27, 3, 5, 'read'),
-(28, 4, 1, 'read'),
-(29, 4, 2, 'read'),
-(30, 4, 2, 'write'),
-(31, 4, 4, 'read'),
 (32, 2, 7, 'read'),
 (33, 2, 7, 'write'),
 (34, 2, 7, 'delete'),
@@ -2133,17 +2118,20 @@ INSERT INTO `role_permission_details` (`role_permission_detail_id`, `role_id`, `
 (39, 3, 7, 'write'),
 (40, 3, 8, 'read'),
 (41, 3, 8, 'write'),
-(42, 4, 7, 'read'),
-(43, 4, 8, 'read'),
 (44, 2, 9, 'read'),
 (45, 2, 9, 'write'),
 (46, 2, 9, 'delete'),
 (47, 3, 9, 'read'),
-(48, 4, 9, 'read'),
 (49, 2, 10, 'read'),
 (50, 2, 10, 'write'),
 (51, 2, 10, 'delete'),
-(52, 3, 10, 'read');
+(52, 3, 10, 'read'),
+(62, 4, 1, 'read'),
+(63, 4, 2, 'read'),
+(64, 4, 2, 'write'),
+(65, 4, 7, 'read'),
+(66, 4, 8, 'read'),
+(67, 4, 9, 'read');
 
 -- --------------------------------------------------------
 
@@ -2183,7 +2171,8 @@ INSERT INTO `supplier` (`supplier_id`, `name`, `email`, `address`, `is_deleted`)
 (17, 'Công ty TNHH Bình Minh', 'binhminh@supplier.vn', '10 Nguyễn Kiệm, Q.Phú Nhuận, TP.HCM', 0),
 (18, 'Công ty TNHH M&T Distributors', 'mt@supplier.vn', '55 Võ Thị Sáu, Q1, TP.HCM', 0),
 (19, 'Công ty TNHH Alpha Zone', 'alphazone@supplier.vn', '17 Nguyễn Hữu Cảnh, Q.Bình Thạnh, TP.HCM', 0),
-(20, 'Công ty CP Phúc Hưng', 'phuchung@supplier.vn', '29 Phạm Ngũ Lão, Q1, TP.HCM', 0);
+(20, 'Công ty CP Phúc Hưng', 'phuchung@supplier.vn', '29 Phạm Ngũ Lão, Q1, TP.HCM', 0),
+(23, 'db_do_uong', 'clonyyyyy1@gmail.com', 'ba hom', 1);
 
 -- --------------------------------------------------------
 
@@ -2198,27 +2187,31 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `phone` varchar(20) DEFAULT NULL,
   `address` text DEFAULT NULL,
-  `role_id` int(11) DEFAULT NULL
+  `role_id` int(11) DEFAULT NULL,
+  `is_deleted` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `phone`, `address`, `role_id`) VALUES
-(1, 'staff1', '$2y$10$VLADBEKTpoLK1GhLGlmDNO1LElvM1ZycI4DJUra8eUg7lVBT22Sli', 'staff1@example.com', '0900000001', 'Hà Nội', 4),
-(2, 'staff2', '$2y$10$s84z.ItSf37Bpb.fJLx.uubUEjyRi6yEloRtAjAFd/LckGfGHriH.', 'staff2@example.com', '0900000002', 'TP.HCM', 4),
-(3, 'staff3', '$2y$10$pyDAhMZj9gN7VrKEA9R2OekTdmM5v3Vc5B3bXiANQkyqunhXYbjWe', 'staff3@example.com', '0900000003', 'Đà Nẵng', 4),
-(4, 'staff4', '$2y$10$2/zWLIlYrygsgB9vKVgHpuxfbn8LoW0.m4WNhAVc1Ax9MuQ8gTjgy', 'staff4@example.com', '0900000004', 'Cần Thơ', 4),
-(5, 'staff5', '$2y$10$809pNue9ZWfQxstH85Sjo.rvA9Po36P/HP3SGnoloQ9KLeMKLER72', 'staff5@example.com', '0900000005', 'Hải Phòng', 4),
-(6, 'staff6', '$2y$10$B9LbsiXn9c2AoiX2NCvyx..c52f3ZuLvnXzussKh8G0qH8m1vCXsK', 'staff6@example.com', '0900000006', 'Huế', 4),
-(7, 'user1', '$2y$10$qGUuz0BD.7XtKHXLc03nDOa1tMHPgVDEkU4BiwCTKQ1YZJQHURtJK', 'user1@example.com', '0123456781', 'Address 1', 1),
-(8, 'user2', '$2y$10$D0jTe9e2zEvM7BIrCPvBpeXqkSfx1GhI/1twRaLZ7DfnHqX6SGgZW', 'user2@example.com', '0123456782', 'Address 2', 1),
-(9, 'user3', '$2y$10$TScOEql3UvUfzUEXrclmB.tvD3nVtLBN2aL0TmWQYr1PvVYJJYl5y', 'user3@example.com', '0123456783', 'Address 3', 1),
-(10, 'user4', '$2y$10$P2UE7KiONH3Ggz.9Hn9GP..Crk7SxqJ/kQ27fBkJRMj.PY9fTpmjq', 'user4@example.com', '0123456784', 'Address 4', 1),
-(11, 'user5', '$2y$10$LVY2huOvFZlpeAFESn7R4eA0r2nWHClWnCKrPCgkN99ZB0Bvdyff2', 'user5@example.com', '0123456785', 'Address 5', 1),
-(12, 'vinh', '$2y$10$S28C55QRwVhXfHVFVJcRbehLXSiC3c6YDSB7iCMKgVpqo/YZFaPom', '000@gmail.com', '0123', '0', 1),
-(13, 'admin1', '$2y$10$hLHu2sVDSIpB7G3oEWJy4Of1W5OCqips29Far5cs8iT9e4zGkHP8a', 'admin1@example.com', '0123456789', '123 Admin Street', 2);
+INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `phone`, `address`, `role_id`, `is_deleted`) VALUES
+(1, 'staff1', '$2y$10$VLADBEKTpoLK1GhLGlmDNO1LElvM1ZycI4DJUra8eUg7lVBT22Sli', 'staff1@example.com', '0900000001', 'Hà Nội', 4, 0),
+(2, 'staff2', '$2y$10$s84z.ItSf37Bpb.fJLx.uubUEjyRi6yEloRtAjAFd/LckGfGHriH.', 'staff2@example.com', '0900000002', 'TP.HCM', 4, 0),
+(3, 'staff3', '$2y$10$pyDAhMZj9gN7VrKEA9R2OekTdmM5v3Vc5B3bXiANQkyqunhXYbjWe', 'staff3@example.com', '0900000003', 'Đà Nẵng', 4, 0),
+(4, 'staff4', '$2y$10$2/zWLIlYrygsgB9vKVgHpuxfbn8LoW0.m4WNhAVc1Ax9MuQ8gTjgy', 'staff4@example.com', '0900000004', 'Cần Thơ', 4, 0),
+(5, 'staff5', '$2y$10$809pNue9ZWfQxstH85Sjo.rvA9Po36P/HP3SGnoloQ9KLeMKLER72', 'staff5@example.com', '0900000005', 'Hải Phòng', 4, 0),
+(6, 'staff6', '$2y$10$B9LbsiXn9c2AoiX2NCvyx..c52f3ZuLvnXzussKh8G0qH8m1vCXsK', 'staff6@example.com', '0900000006', 'Huế', 4, 0),
+(7, 'user1', '$2y$10$ZIDMFngXoFUKnoFX6lTnSu.nACiwP7G8ZnbyxXyvYR0VPpxcxAOGm', 'user1@example.com', '0123456781', 'Address 1', 1, 0),
+(8, 'user2', '$2y$10$D0jTe9e2zEvM7BIrCPvBpeXqkSfx1GhI/1twRaLZ7DfnHqX6SGgZW', 'user2@example.com', '0123456782', 'Address 2', 1, 0),
+(9, 'user3', '$2y$10$TScOEql3UvUfzUEXrclmB.tvD3nVtLBN2aL0TmWQYr1PvVYJJYl5y', 'user3@example.com', '0123456783', 'Address 3', 1, 0),
+(10, 'user4', '$2y$10$P2UE7KiONH3Ggz.9Hn9GP..Crk7SxqJ/kQ27fBkJRMj.PY9fTpmjq', 'user4@example.com', '0123456784', 'Address 4', 1, 0),
+(11, 'user5', '$2y$10$LVY2huOvFZlpeAFESn7R4eA0r2nWHClWnCKrPCgkN99ZB0Bvdyff2', 'user5@example.com', '0123456785', 'Address 5', 1, 0),
+(12, 'vinh', '$2y$10$S28C55QRwVhXfHVFVJcRbehLXSiC3c6YDSB7iCMKgVpqo/YZFaPom', '000@gmail.com', '0123', '245/3/2 đường A, quận 5', 1, 0),
+(13, 'admin1', '$2y$10$hLHu2sVDSIpB7G3oEWJy4Of1W5OCqips29Far5cs8iT9e4zGkHP8a', 'admin1@example.com', '0845632968', '123 Admin Street', 2, 0),
+(14, 'test', '$2y$10$M5CbWQnqeKgHMtRkqcOlZePGSX.65UZSBs1sGvfJyI6RRv48Va/Ii', 'test@gmail.com', '0123456789', 'nhincai gi troi', 2, 0),
+(15, 'manager1', '$2y$10$063jHsDi6gMGitUphjWYb.5soGUdkNclCN.PubO6zS.1roS7wdy.u', 'manager1@gmail.com', '0198755412', 'ba hom', 3, 0),
+(16, 'usertest', '$2y$10$V9eI.mTVcnsY7G88LQWdbut.S5to9pR9nz7WBfX2PYFE6Tm.LN7oC', 'usertest@gmail.com', '0456789123', 'địa chỉ của khách hàng', 1, 0);
 
 --
 -- Indexes for dumped tables
@@ -2354,55 +2347,55 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `brand`
 --
 ALTER TABLE `brand`
-  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
 
 --
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `cart_details`
 --
 ALTER TABLE `cart_details`
-  MODIFY `cart_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `cart_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `import_order`
 --
 ALTER TABLE `import_order`
-  MODIFY `import_order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `import_order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `import_order_details`
 --
 ALTER TABLE `import_order_details`
-  MODIFY `import_order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=500;
+  MODIFY `import_order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=524;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=281;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=294;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=314;
+  MODIFY `order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=370;
 
 --
 -- AUTO_INCREMENT for table `packaging_options`
 --
 ALTER TABLE `packaging_options`
-  MODIFY `packaging_option_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=413;
+  MODIFY `packaging_option_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=419;
 
 --
 -- AUTO_INCREMENT for table `payment_method`
@@ -2420,37 +2413,37 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=169;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
 
 --
 -- AUTO_INCREMENT for table `product_images`
 --
 ALTER TABLE `product_images`
-  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=635;
+  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=637;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `role_permission_details`
 --
 ALTER TABLE `role_permission_details`
-  MODIFY `role_permission_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `role_permission_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `supplier`
 --
 ALTER TABLE `supplier`
-  MODIFY `supplier_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `supplier_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- Constraints for dumped tables
