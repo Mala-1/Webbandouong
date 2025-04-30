@@ -78,7 +78,7 @@ $classDoanhThu = ($doanhThuThangNay['total_revenue'] - $doanhThuThangTruoc['tota
                             <?= number_format($doanhThuThangNay['total_revenue'], 0) ?>đ
                         </h3>
                         <small>
-                            +<?= round((($doanhThuThangNay['total_revenue'] - $doanhThuThangTruoc['total_revenue']) / $doanhThuThangTruoc['total_revenue']) * 100, 2) ?>%
+                            <?= round((($doanhThuThangNay['total_revenue'] - $doanhThuThangTruoc['total_revenue']) / $doanhThuThangTruoc['total_revenue']) * 100, 2) ?>%
                             so với cùng kỳ tháng trước
                         </small>
                     </div>

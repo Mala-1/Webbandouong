@@ -753,7 +753,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                         <input type="number" class="form-control quantity-input" value="${product.quantity}" min="1">
                     </td>
                     <td>
-                        <input type="text" class="form-control price-input" value="${parseInt(product.price).toLocaleString('vi-VN')}" readonly>
+                        <input type="hidden" class="form-control price-input" value="${parseInt(product.price)}" readonly>
+                        <input type="text" class="form-control" value="${parseInt(product.price).toLocaleString('vi-VN')}" readonly>
                     </td>
                     <td>
                         <button type="button" class="btn btn-danger btn-sm btn-remove-product">
@@ -769,24 +770,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         }
     });
 
-    function updateEditTotalPrice() {
-        let total = 0;
-        const rows = document.querySelectorAll('#editOrderDetailsTable tr:not(#editAddRowTrigger)');
-        rows.forEach(row => {
-            const quantityInput = row.querySelector('input.quantity-input');
-            const priceCell = row.querySelector('td:nth-child(4)');
-            if (quantityInput && priceCell) {
-                const quantity = parseInt(quantityInput.value) || 0;
-                const price = parseInt(priceCell.textContent.replace(/\D/g, '')) || 0;
-                total += quantity * price;
-            }
-        });
-        document.getElementById('editTotalPrice').textContent = total.toLocaleString('vi-VN') + ' VNĐ';
-    }
-
-
-
-
     // 🎯 Xử lý nút Xoá dòng trong bảng chi tiết
     document.addEventListener('click', function(e) {
         if (e.target.closest('.btn-remove-product')) {
@@ -801,6 +784,35 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             updateEditTotalPrice();
         }
     });
+
+    document.addEventListener('input', function(e) {
+        const input = e.target;
+
+        // Chỉ xử lý nếu là ô nhập số lượng và type là number
+        if (input.classList.contains('quantity-input') && input.type === 'number') {
+            updateEditTotalPrice(); // hoặc updateTotalPrice()
+        }
+    });
+
+    function updateEditTotalPrice() {
+        let total = 0;
+        const rows = document.querySelectorAll('#editOrderDetailsTable tr:not(#editAddRowTrigger)');
+        rows.forEach(row => {
+            const quantityInput = row.querySelector('input.quantity-input');
+            const priceCell = row.querySelector('input.price-input');
+            if (quantityInput && priceCell) {
+                const quantity = parseInt(quantityInput.value) || 0;
+                const price = parseInt(priceCell.value.replace(/\D/g, '')) || 0;
+                total += quantity * price;
+            }
+        });
+        document.getElementById('editTotalPrice').textContent = total.toLocaleString('vi-VN') + ' VNĐ';
+    }
+
+
+
+
+
 
     document.addEventListener("DOMContentLoaded", function() {
         const editModal = document.querySelector("#editOrderModal");
@@ -1288,33 +1300,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
         }
     });
 
-    document.addEventListener('click', function(e) {
-        if (e.target && e.target.id === 'editBtnAddRow') {
-            const tableBody = document.getElementById('editOrderDetailsTable');
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td>
-                    <input type="hidden" name="product_id_edit[]" value="">
-                    <input type="text" class="form-control" name="product_name_edit[]" readonly>
-                </td>
-                <td class="d-flex align-items-center gap-2 justify-content-center">
-                    <input type="hidden" name="packaging_option_id_edit[]" value="">
-                    <input type="text" class="form-control text-capitalize" name="packaging_option_edit[]" readonly>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="openPackagingSelector(this)">Chọn</button>
-                </td>
-                <td>
-                    <input type="number" class="form-control quantity-input" name="quantity_edit[]" placeholder="Số lượng" min="1">
-                </td>
-                <td>
-                    <input type="text" class="form-control" name="price_edit[]" readonly>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm remove-row-edit"><i class="fa-solid fa-trash-can"></i></button>
-                </td>
-            `;
-            tableBody.insertBefore(newRow, document.getElementById('editAddRowTrigger'));
-        }
-    });
+
 
     // xuất pdf
     document.getElementById("btnExportOrderPdf").addEventListener("click", function() {

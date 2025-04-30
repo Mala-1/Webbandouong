@@ -105,7 +105,7 @@ foreach ($orders as $order):
                 'packaging_option_id' => $details[1] ?? null,
                 'name' => $details[2] ?? '',
                 'quantity' => $details[3] ?? 0,
-                'price' => $details[4] ?? 0,
+                'price' => (int) $details[4] ?? 0,
                 'packaging_type' => $details[5] ?? '',
                 'unit_quantity' => $details[6] ?? ''
             ];
@@ -115,7 +115,7 @@ foreach ($orders as $order):
 
     <tr>
         <td><?= $order['order_id'] ?></td>
-        <td><?= htmlspecialchars($order['user_id']) ?></td>
+        <td><?= htmlspecialchars($order['username']) ?></td>
         <td><?= htmlspecialchars($order['status']) ?></td>
         <td><?= number_format($order['total_price'], 0, ',', '.') ?> VNĐ</td>
         <td><?= htmlspecialchars($order['payment_method_name'] ?? 'Không xác định') ?></td> <!-- ✅ Thêm phương thức thanh toán -->
