@@ -936,7 +936,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
     // ✅ Event delegation cho nút thêm dòng mới và nút xóa
     tableBody.addEventListener("click", function(e) {
         if (e.target && e.target.id === "btnAddRow") {
-            console.log('debug')
             const newRow = document.createElement("tr");
             newRow.innerHTML = `
                 <td>
@@ -1003,6 +1002,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             currentTargetRow.querySelector('input[name="packaging_option_id_edit[]"]').value = packagingId;
             currentTargetRow.querySelector('input[name="packaging_option_edit[]"]').value = packaging;
             currentTargetRow.querySelector('input[name="price_edit[]"]').value = parseInt(price).toLocaleString('vi-VN');
+            currentTargetRow.querySelector('.price-input').value = parseInt(price);
             const quantityInput = currentTargetRow.querySelector('input[name="quantity_edit[]"]');
             if (quantityInput) {
                 quantityInput.removeAttribute('readonly');
@@ -1140,8 +1140,6 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                 });
             }
             
-            console.log(details);
-            return;
         });
 
         if (details.length === 0) {
@@ -1310,11 +1308,11 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
                 <td>
-                    <input type="hidden" name="product_id_edit[]" value="">
+                    <input type="hidden" name="product_id_edit[]" class="product-id" value="">
                     <input type="text" class="form-control" name="product_name_edit[]" readonly>
                 </td>
                 <td class="d-flex align-items-center gap-2 justify-content-center">
-                    <input type="hidden" name="packaging_option_id_edit[]" value="">
+                    <input type="hidden" name="packaging_option_id_edit[]" class="packaging-option-id" value="">
                     <input type="text" class="form-control text-capitalize" name="packaging_option_edit[]" readonly>
                     <button type="button" class="btn btn-outline-primary btn-sm" onclick="openPackagingSelector(this)">Chọn</button>
                 </td>
@@ -1322,6 +1320,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                     <input type="number" class="form-control quantity-input" name="quantity_edit[]" placeholder="Số lượng" min="1">
                 </td>
                 <td>
+                    <input type="hidden" class="form-control price-input" readonly>
                     <input type="text" class="form-control" name="price_edit[]" readonly>
                 </td>
                 <td>
