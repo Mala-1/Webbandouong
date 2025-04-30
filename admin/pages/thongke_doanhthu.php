@@ -39,8 +39,19 @@
 <script>
 let productChart, categoryChart;
 
-function renderChart(canvasId, type, labels, data, colors = null) {
+const prettyColors = [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+    '#9966FF', '#FF9F40', '#C9CBCF', '#FF6B6B',
+    '#00A5CF', '#6A4C93', '#2EC4B6', '#FFBF69',
+    '#8D99AE', '#F25F5C', '#247BA0', '#70C1B3'
+];
+
+function renderChart(canvasId, type, labels, data) {
     const ctx = document.getElementById(canvasId).getContext('2d');
+
+    const colors = labels.map((_, i) => prettyColors[i % prettyColors.length]);
+    const borders = labels.map(() => '#000'); // viền đen
+
     return new Chart(ctx, {
         type: type,
         data: {
@@ -48,17 +59,27 @@ function renderChart(canvasId, type, labels, data, colors = null) {
             datasets: [{
                 label: 'Số lượng bán',
                 data: data,
-                backgroundColor: colors || ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-                borderColor: '#000',
+                backgroundColor: colors,
+                borderColor: borders,
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
-            scales: type === 'bar' ? { y: { beginAtZero: true } } : {}
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            },
+            scales: type === 'bar' ? {
+                y: {
+                    beginAtZero: true
+                }
+            } : {}
         }
     });
 }
+
 
 function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', {

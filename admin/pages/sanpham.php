@@ -82,7 +82,7 @@ $brands = $db->select('SELECT * FROM brand WHERE is_deleted = 0');
 
         <!-- Thanh tìm kiếm -->
         <div class="flex-grow-1">
-            <form class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search">
+            <form class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search" id="form-search-name">
                 <input class="product-name form-control me-2" type="search" placeholder="Tìm kiếm tên sản phẩm" aria-label="Search">
                 <button type="button" class="btn-search btn btn-sm p-0 border-0 bg-transparent">
                     <i class="fas fa-search fa-lg"></i>
@@ -663,20 +663,39 @@ $brands = $db->select('SELECT * FROM brand WHERE is_deleted = 0');
 
     // lọc
 
-    document.querySelector('.btn-search').addEventListener('click', () => {
-        const name = document.querySelector('.product-name').value.trim();
+    const searchForm = document.getElementById('form-search-name');
+    const searchInput = searchForm.querySelector('.product-name');
+    const searchButton = searchForm.querySelector('.btn-search');
 
+    // Hàm xử lý tìm kiếm
+    function handleProductNameSearch() {
+        const name = searchInput.value.trim();
         const params = new URLSearchParams(currentFilterParams);
+
         if (name) {
-            params.set('product_name', name.trim());
+            params.set('product_name', name);
         } else {
-            params.delete('product_name'); // nếu xóa nội dung input thì bỏ luôn khỏi query
+            params.delete('product_name');
         }
 
         currentFilterParams = '&' + params.toString();
+        loadProducts(1, currentFilterParams);
+    }
 
-        loadProducts(1, currentFilterParams); // gọi lại trang đầu tiên với lọc
+    // Click nút tìm
+    searchButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        handleProductNameSearch();
     });
+
+    // Nhấn Enter trong input
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleProductNameSearch();
+        }
+    });
+
 
     function debounce(func, delay) {
         let timeout;

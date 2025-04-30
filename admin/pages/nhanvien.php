@@ -19,7 +19,7 @@ $canDeleteUser = in_array('delete', $permissions['Quản lý nhân viên'] ?? []
 
     <!-- Thanh tìm kiếm -->
     <div class="flex-grow-1">
-        <form class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search">
+        <form onsubmit="return false;" class="d-flex justify-content-center mx-auto" style="max-width: 400px; width: 100%;" role="search">
             <input class="user-search form-control me-2" type="search" placeholder="Tìm kiếm tên người dùng" aria-label="Search" name="search-username">
             <button type="button" class="btn-search btn btn-sm p-0 border-0 bg-transparent">
                 <i class="fas fa-search fa-lg"></i>
