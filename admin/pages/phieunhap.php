@@ -43,11 +43,33 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     <!-- Tìm kiếm nâng cao -->
     <form method="GET" action=""
         class="form-search d-flex gap-2 align-items-center container mt-3 flex-wrap justify-content-center">
+
         <input type="number" class="min-price form-control w-auto" style="width: 120px;" name="price_min"
             placeholder="Tổng giá từ">
+
         <input type="number" class="max-price form-control w-auto" style="width: 120px;" name="price_max"
             placeholder="Tổng giá đến">
+
+        <!-- Từ ngày -->
+        <div class="form-group d-flex align-items-center ms-2">
+            <label for="from_date" class="form-label mb-1 me-2">Từ ngày</label>
+            <input type="date" class="form-control w-auto" style="width: 180px;" name="from_date" id="from_date">
+        </div>
+
+        <!-- Đến ngày -->
+        <div class="form-group d-flex align-items-center">
+            <label for="to_date" class="form-label mb-1 me-2">Đến ngày</label>
+            <input type="date" class="form-control w-auto" style="width: 180px;" name="to_date" id="to_date">
+        </div>
+
+        <select name="status" class="form-select w-auto">
+            <option value="">Tất cả tình trạng</option>
+            <option value="Chờ xác nhận">Chờ xác nhận</option>
+            <option value="Đã xác nhận">Đã xác nhận</option>
+        </select>
+
     </form>
+
 
     <!-- Bảng danh sách phiếu nhập -->
     <div class="table-responsive mt-4 pe-3">
@@ -443,7 +465,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     }
 
     // Tải danh sách phiếu nhập khi trang được load
-    loadReceipts(1);
+    loadReceipts(1, currentFilterParams);
 
     document.addEventListener("pagination:change", function(e) {
         const {
@@ -531,17 +553,13 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
     }
 
     function handleFilterChange() {
-        const receiptId = document.querySelector('.receipt-id').value.trim();
-        const priceMin = document.querySelector('.min-price').value.trim();
-        const priceMax = document.querySelector('.max-price').value.trim();
+        const form = document.querySelector('.form-search');
+        const formData = new FormData(form);
 
-        currentFilterParams = "";
-
-        if (receiptId) currentFilterParams += `&search_id=${encodeURIComponent(receiptId)}`;
-        if (priceMin) currentFilterParams += `&price_min=${encodeURIComponent(priceMin)}`;
-        if (priceMax) currentFilterParams += `&price_max=${encodeURIComponent(priceMax)}`;
+        currentFilterParams = new URLSearchParams(formData).toString();
 
         loadReceipts(1, currentFilterParams);
+
     }
 
     // 🎯 Lắng nghe sự kiện tìm kiếm tự động và theo phím bấm
@@ -813,7 +831,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
             if (data.success) {
                 alert(data.message);
                 bootstrap.Modal.getInstance(document.getElementById("addReceiptModal")).hide();
-                loadReceipts(1); // reload danh sách
+                loadReceipts(1, currentFilterParams); // reload danh sách
 
                 document.getElementById("supplier_id").value = "";
                 document.getElementById("supplier_name").value = "";
@@ -1027,7 +1045,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn nhập'] ?? []);
             if (data.success) {
                 alert("✅ Cập nhật phiếu nhập thành công!");
                 bootstrap.Modal.getInstance(document.getElementById("editReceiptModal")).hide();
-                loadReceipts(1); // Reload danh sách phiếu nhập
+                loadReceipts(1, currentFilterParams); // Reload danh sách phiếu nhập
             } else {
                 alert("❌ Lỗi: " + data.message);
             }

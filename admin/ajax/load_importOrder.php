@@ -17,6 +17,9 @@ $offset = ($page - 1) * $limit;
 $search_id = $_GET['search_id'] ?? '';
 $price_min = $_GET['price_min'] ?? '';
 $price_max = $_GET['price_max'] ?? '';
+$from_date = $_GET['from_date'] ?? '';
+$to_date = $_GET['to_date'] ?? '';
+$status = $_GET['status'] ?? '';
 
 $whereClauses = [];
 $params = [];
@@ -35,6 +38,19 @@ if ($price_max !== '') {
     $whereClauses[] = 'io.total_price <= ?';
     $params[] = $price_max;
 }
+if ($from_date !== '') {
+    $whereClauses[] = 'DATE(io.created_at) >= ?';
+    $params[] = $from_date;
+}
+if ($to_date !== '') {
+    $whereClauses[] = 'DATE(io.created_at) <= ?';
+    $params[] = $to_date;
+}
+if ($status !== '') {
+    $whereClauses[] = 'io.status = ?';
+    $params[] = $status;
+}
+
 
 // Gộp điều kiện WHERE
 $whereSql = count($whereClauses) > 0 ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
