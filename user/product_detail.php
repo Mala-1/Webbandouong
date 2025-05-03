@@ -138,7 +138,17 @@
                             END AS price
                         FROM products p
                         LEFT JOIN packaging_options po ON po.product_id = p.product_id
-                        WHERE p.product_id = ? AND po.is_deleted = 0", [$product_id]);
+                        WHERE p.product_id = ? AND po.is_deleted = 0 AND (
+                                po.stock > 0 
+                                OR EXISTS (
+                                    SELECT 1
+                                    FROM packaging_options po2
+                                    WHERE po2.product_id = po.product_id
+                                    AND CAST(SUBSTRING_INDEX(po2.unit_quantity, ' ', 1) AS UNSIGNED) > CAST(SUBSTRING_INDEX(po.unit_quantity, ' ', 1) AS UNSIGNED)
+                                    AND po2.stock > 0
+                                    AND (po2.is_deleted = 0 OR po2.is_deleted IS NULL)
+                                )
+                            )", [$product_id]);
 
 
     function formatProductName($packaging_type, $unit_quantity, $product_name)
@@ -304,7 +314,7 @@
     <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
         const isLoggedIn = <?= isset($_SESSION['user_id']) ? 'true' : 'false' ?>;
-        
+
         const packagingStocks = {
             <?php foreach ($products as $product): ?>
                 <?= $product['packaging_option_id'] ?>: <?= $product['stock'] ?? 0 ?>,
@@ -468,13 +478,6 @@
                 return;
             }
 
-            const availableStock = packagingStocks[selectedOptionId] ?? 0;
-
-            if (quantity > availableStock) {
-                alert(`Chỉ còn ${availableStock} sản phẩm trong kho.`);
-                return;
-            }
-
             const packaging_option_id = <?= $packaging_option_id ?>;
 
             fetch('../ajax/add_to_cart.php', {
@@ -499,7 +502,7 @@
                             popup.classList.remove("show");
                         }, 2000);
                     } else {
-                        alert(data.message || "Có lỗi xảy ra!");
+                        alert(data.message);
                     }
                 });
         });
@@ -521,13 +524,6 @@
                 return;
             }
 
-            const availableStock = packagingStocks[selectedOptionId] ?? 0;
-
-            if (quantity > availableStock) {
-                alert(`Chỉ còn ${availableStock} sản phẩm trong kho.`);
-                return;
-            }
-
             const packaging_option_id = <?= $packaging_option_id ?>;
 
             fetch('../ajax/add_to_cart.php', {
@@ -545,6 +541,8 @@
                 .then(data => {
                     if (data.success) {
                         window.location.href = "../user/cart.php";
+                    } else {
+                        alert(data.message);
                     }
                 });
         });

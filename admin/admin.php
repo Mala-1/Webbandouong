@@ -17,7 +17,7 @@ if (!$userId) {
 }
 
 // Lấy role_id của user
-$sqlRole = "SELECT role_id FROM users WHERE user_id = ? AND user_id != 1";
+$sqlRole = "SELECT role_id FROM users WHERE user_id = ? AND role_id != 1";
 $userData = $db->select($sqlRole, [$userId]);
 $roleId = $userData[0]['role_id'] ?? null;
 

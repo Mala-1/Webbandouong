@@ -117,3 +117,15 @@ button:hover {
         font-size: 16px;
     }
 }
+
+#confirmBankTransferBtn.active {
+    background-color: #198754 !important;
+    /* Màu nền xanh thành công */
+    color: #fff !important;
+    box-shadow: 0 0 10px rgba(25, 135, 84, 0.5);
+    transform: scale(1.02);
+}
+
+#payment-form button[type="submit"]:disabled {
+    cursor: not-allowed;
+}
