@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 01, 2025 at 06:33 AM
+-- Generation Time: May 05, 2025 at 05:48 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -206,13 +206,13 @@ CREATE TABLE `import_order` (
 --
 
 INSERT INTO `import_order` (`import_order_id`, `supplier_id`, `user_id`, `total_price`, `created_at`, `status`) VALUES
-(1, 3, 2, 253168200.00, '2025-04-11 09:00:00', 'Đã xác nhận'),
-(2, 3, 3, 542322900.00, '2025-04-06 09:00:00', 'Đã xác nhận'),
-(3, 19, 5, 399501900.00, '2025-04-17 22:56:47', 'Đã xác nhận'),
-(4, 4, 3, 552864600.00, '2025-04-17 23:10:41', 'Đã xác nhận'),
-(5, 2, 4, 189994500.00, '2025-04-17 23:42:22', 'Đã xác nhận'),
-(6, 11, 1, 766005000.00, '2025-04-18 01:13:39', 'Đã xác nhận'),
-(7, 12, 3, 258581700.00, '2025-04-18 01:19:04', 'Đã xác nhận');
+(1, 3, 15, 253168200.00, '2025-04-11 09:00:00', 'Đã xác nhận'),
+(2, 3, 15, 542322900.00, '2025-04-06 09:00:00', 'Đã xác nhận'),
+(3, 19, 15, 399501900.00, '2025-04-17 22:56:47', 'Đã xác nhận'),
+(4, 4, 15, 552864600.00, '2025-04-17 23:10:41', 'Đã xác nhận'),
+(5, 2, 15, 189994500.00, '2025-04-17 23:42:22', 'Đã xác nhận'),
+(6, 11, 15, 766005000.00, '2025-04-18 01:13:39', 'Đã xác nhận'),
+(7, 12, 15, 258581700.00, '2025-04-18 01:19:04', 'Đã xác nhận');
 
 -- --------------------------------------------------------
 
@@ -404,6 +404,7 @@ INSERT INTO `import_order_details` (`import_order_detail_id`, `import_order_id`,
 
 CREATE TABLE `orders` (
   `order_id` int(11) NOT NULL,
+  `order_code` varchar(100) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   `status` varchar(50) NOT NULL,
   `total_price` decimal(30,2) NOT NULL,
@@ -417,36 +418,36 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`order_id`, `user_id`, `status`, `total_price`, `shipping_address`, `note`, `created_at`, `payment_method_id`) VALUES
-(294, 10, 'Chờ xử lý', 598390.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-05 00:00:00', 2),
-(295, 12, 'Chờ xử lý', 8919200.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-08 00:00:00', 2),
-(296, 11, 'Chờ xử lý', 1588600.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-13 00:00:00', 3),
-(297, 10, 'Chờ xử lý', 2421350.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-11 00:00:00', 3),
-(298, 9, 'Chờ xử lý', 1958477.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-05 00:00:00', 2),
-(299, 10, 'Chờ xử lý', 1191920.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-23 00:00:00', 1),
-(300, 10, 'Chờ xử lý', 2076676.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-11 00:00:00', 1),
-(301, 10, 'Chờ xử lý', 3057752.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-01-19 00:00:00', 3),
-(302, 12, 'Chờ xử lý', 3839480.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-02-12 00:00:00', 3),
-(303, 10, 'Chờ xử lý', 2239600.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-02-25 00:00:00', 2),
-(304, 10, 'Chờ xử lý', 9158500.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-24 00:00:00', 2),
-(305, 12, 'Chờ xử lý', 1405125.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-16 00:00:00', 1),
-(306, 8, 'Chờ xử lý', 854300.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-09 00:00:00', 1),
-(307, 12, 'Chờ xử lý', 597010.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-16 00:00:00', 3),
-(308, 7, 'Chờ xử lý', 1630400.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-28 00:00:00', 2),
-(309, 7, 'Chờ xử lý', 5206793.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-07 00:00:00', 3),
-(310, 9, 'Chờ xử lý', 2066080.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-15 00:00:00', 1),
-(311, 12, 'Chờ xử lý', 405200.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-05 00:00:00', 1),
-(312, 11, 'Chờ xử lý', 425025.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-17 00:00:00', 1),
-(313, 12, 'Chờ xử lý', 1240186.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-20 00:00:00', 2),
-(314, 8, 'Chờ xử lý', 600500.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-13 00:00:00', 1),
-(315, 7, 'Chờ xử lý', 5618000.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-24 00:00:00', 3),
-(316, 12, 'Chờ xử lý', 1534850.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-27 00:00:00', 2),
-(317, 10, 'Chờ xử lý', 561100.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-22 00:00:00', 2),
-(318, 8, 'Đã xác nhận', 1854800.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-08 00:00:00', 3),
-(319, 8, 'Chờ xử lý', 1710450.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-05-05 00:00:00', 1),
-(320, 8, 'Chờ xử lý', 1713830.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-05-01 00:00:00', 2),
-(321, 8, 'Chờ xử lý', 823710.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-05 00:00:00', 3),
-(322, 9, 'Chờ xử lý', 1163650.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-01 00:00:00', 3);
+INSERT INTO `orders` (`order_id`, `order_code`, `user_id`, `status`, `total_price`, `shipping_address`, `note`, `created_at`, `payment_method_id`) VALUES
+(294, NULL, 10, 'Chờ xử lý', 598390.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-05 00:00:00', 2),
+(295, NULL, 12, 'Chờ xử lý', 8919200.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-08 00:00:00', 2),
+(296, NULL, 11, 'Chờ xử lý', 1588600.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-13 00:00:00', 1),
+(297, NULL, 10, 'Chờ xử lý', 2421350.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-11 00:00:00', 1),
+(298, NULL, 9, 'Chờ xử lý', 1958477.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-05 00:00:00', 2),
+(299, NULL, 10, 'Chờ xử lý', 1191920.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-23 00:00:00', 1),
+(300, NULL, 10, 'Chờ xử lý', 2076676.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-11 00:00:00', 1),
+(301, NULL, 10, 'Chờ xử lý', 3057752.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-01-19 00:00:00', 1),
+(302, NULL, 12, 'Chờ xử lý', 3839480.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-02-12 00:00:00', 1),
+(303, NULL, 10, 'Chờ xử lý', 2239600.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-02-25 00:00:00', 2),
+(304, NULL, 10, 'Chờ xử lý', 9158500.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-24 00:00:00', 2),
+(305, NULL, 12, 'Chờ xử lý', 1405125.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-16 00:00:00', 1),
+(306, NULL, 8, 'Chờ xử lý', 854300.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-03-09 00:00:00', 1),
+(307, NULL, 12, 'Chờ xử lý', 597010.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-16 00:00:00', 1),
+(308, NULL, 7, 'Chờ xử lý', 1630400.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-28 00:00:00', 2),
+(309, NULL, 7, 'Chờ xử lý', 5206793.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-07 00:00:00', 1),
+(310, NULL, 9, 'Chờ xử lý', 2066080.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-15 00:00:00', 1),
+(311, NULL, 12, 'Chờ xử lý', 405200.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-05 00:00:00', 1),
+(312, NULL, 11, 'Chờ xử lý', 425025.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-17 00:00:00', 1),
+(313, NULL, 12, 'Chờ xử lý', 1240186.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-20 00:00:00', 2),
+(314, NULL, 8, 'Chờ xử lý', 600500.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-13 00:00:00', 1),
+(315, NULL, 7, 'Chờ xử lý', 5618000.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-24 00:00:00', 1),
+(316, NULL, 12, 'Chờ xử lý', 1534850.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-27 00:00:00', 2),
+(317, NULL, 10, 'Chờ xử lý', 561100.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-22 00:00:00', 2),
+(318, NULL, 8, 'Đã xác nhận', 1854800.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-08 00:00:00', 1),
+(319, NULL, 8, 'Chờ xử lý', 1710450.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-05-05 00:00:00', 1),
+(320, NULL, 8, 'Chờ xử lý', 1713830.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-05-01 00:00:00', 2),
+(321, NULL, 8, 'Chờ xử lý', 823710.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-05 00:00:00', 1),
+(322, NULL, 9, 'Chờ xử lý', 1163650.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-01 00:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -1062,8 +1063,7 @@ CREATE TABLE `payment_method` (
 
 INSERT INTO `payment_method` (`payment_method_id`, `name`) VALUES
 (1, 'Thanh toán khi nhận hàng (COD)'),
-(2, 'Chuyển khoản ngân hàng'),
-(3, 'Thanh toán qua ví Momo');
+(2, 'Chuyển khoản ngân hàng');
 
 -- --------------------------------------------------------
 
@@ -2083,11 +2083,11 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `phone`, `addre
 (5, 'staff5', '$2y$10$809pNue9ZWfQxstH85Sjo.rvA9Po36P/HP3SGnoloQ9KLeMKLER72', 'staff5@example.com', '0900000005', 'Hải Phòng', 4, 0),
 (6, 'staff6', '$2y$10$B9LbsiXn9c2AoiX2NCvyx..c52f3ZuLvnXzussKh8G0qH8m1vCXsK', 'staff6@example.com', '0900000006', 'Huế', 4, 0),
 (7, 'user1', '$2y$10$ZIDMFngXoFUKnoFX6lTnSu.nACiwP7G8ZnbyxXyvYR0VPpxcxAOGm', 'user1@example.com', '0123456781', 'Address 1', 1, 0),
-(8, 'user2', '$2y$10$D0jTe9e2zEvM7BIrCPvBpeXqkSfx1GhI/1twRaLZ7DfnHqX6SGgZW', 'user2@example.com', '0123456782', 'Address 2', 1, 0),
-(9, 'user3', '$2y$10$TScOEql3UvUfzUEXrclmB.tvD3nVtLBN2aL0TmWQYr1PvVYJJYl5y', 'user3@example.com', '0123456783', 'Address 3', 1, 0),
-(10, 'user4', '$2y$10$P2UE7KiONH3Ggz.9Hn9GP..Crk7SxqJ/kQ27fBkJRMj.PY9fTpmjq', 'user4@example.com', '0123456784', 'Address 4', 1, 0),
-(11, 'user5', '$2y$10$LVY2huOvFZlpeAFESn7R4eA0r2nWHClWnCKrPCgkN99ZB0Bvdyff2', 'user5@example.com', '0123456785', 'Address 5', 1, 0),
-(12, 'vinh', '$2y$10$S28C55QRwVhXfHVFVJcRbehLXSiC3c6YDSB7iCMKgVpqo/YZFaPom', '000@gmail.com', '0123', '245/3/2 đường A, quận 5', 1, 0),
+(8, 'user2', '$2y$10$I87mVXfP4XenLZpVBKGCHuPLIgyV2lHgED4NObe/1F6vXnSIKHcoy', 'user2@example.com', '0123456782', 'Address 2', 1, 0),
+(9, 'user3', '$2y$10$h/M6BlWaQJBxCNPC6tmy7udk4OUXx4CK4b3rNnND8z/AND5IS6N0.', 'user3@example.com', '0123456783', 'Address 3', 1, 0),
+(10, 'user4', '$2y$10$eY36pPoQRYQL1gf9cu5BrOCXzYvgmrXXC8As8ZYx/3U3/fNAmfrx6', 'user4@example.com', '0123456784', 'Address 4', 1, 0),
+(11, 'user5', '$2y$10$Fs6LfTXDoI2t8kXDcrQnYuakc7uaO.w.eBq9Iys9KOAYC8ldpvJIW', 'user5@example.com', '0123456785', 'Address 5', 1, 0),
+(12, 'vinh', '$2y$10$S28C55QRwVhXfHVFVJcRbehLXSiC3c6YDSB7iCMKgVpqo/YZFaPom', 'vinh@gmail.com', '0845632968', '245/3/2 đường A, quận 5', 1, 0),
 (13, 'admin1', '$2y$10$hLHu2sVDSIpB7G3oEWJy4Of1W5OCqips29Far5cs8iT9e4zGkHP8a', 'admin1@example.com', '0845632968', '123 Admin Street', 2, 0),
 (14, 'test', '$2y$10$M5CbWQnqeKgHMtRkqcOlZePGSX.65UZSBs1sGvfJyI6RRv48Va/Ii', 'test@gmail.com', '0123456789', 'nhincai gi troi', 2, 0),
 (15, 'manager1', '$2y$10$063jHsDi6gMGitUphjWYb.5soGUdkNclCN.PubO6zS.1roS7wdy.u', 'manager1@gmail.com', '0198755412', 'ba hom', 3, 0),
