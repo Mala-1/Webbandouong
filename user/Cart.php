@@ -412,11 +412,11 @@ $orders = $db->select($sql, [$userId]);
                 order.products.forEach(product => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-            <td>${product.name}</td>
-            <td class="text-capitalize">${product.packaging_type} - ${product.unit_quantity}</td>
-            <td>${product.quantity}</td>
-            <td>${parseInt(product.price).toLocaleString('vi-VN')} VNĐ</td>
-        `;
+                        <td>${product.name}</td>
+                        <td class="text-capitalize">${product.packaging_type} - ${product.unit_quantity}</td>
+                        <td>${product.quantity}</td>
+                        <td>${parseInt(product.price).toLocaleString('vi-VN')} VNĐ</td>
+                    `;
                     tbody.appendChild(row);
                 });
 
@@ -430,50 +430,76 @@ $orders = $db->select($sql, [$userId]);
             }
             const form = document.querySelector('form[action="checkOut.php"]');
 
-            form.addEventListener("submit", function(e) {
-                e.preventDefault(); // Ngăn submit mặc định
+            if (form) {
+                form.addEventListener("submit", function(e) {
+                    e.preventDefault(); // Ngăn submit mặc định
 
-                const selectedItems = [];
-                document.querySelectorAll('input[name="selected_items[]"]:checked').forEach(cb => {
-                    const row = cb.closest("tr");
-                    const cartDetailId = cb.value;
-                    const quantity = row.querySelector(".productQuantity").value;
+                    const selectedItems = [];
+                    document.querySelectorAll('input[name="selected_items[]"]:checked').forEach(cb => {
+                        const row = cb.closest("tr");
+                        const cartDetailId = cb.value;
+                        const quantity = row.querySelector(".productQuantity").value;
 
-                    selectedItems.push({
-                        cart_detail_id: cartDetailId,
-                        quantity: parseInt(quantity)
+                        selectedItems.push({
+                            cart_detail_id: cartDetailId,
+                            quantity: parseInt(quantity)
+                        });
                     });
+
+                    if (selectedItems.length === 0) {
+                        alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
+                        return;
+                    }
+
+                    fetch("../ajax/check_cart_stock.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                items: selectedItems
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                form.submit();
+                            } else {
+                                alert(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Lỗi kiểm tra tồn kho:", error);
+                            alert("Đã xảy ra lỗi khi kiểm tra tồn kho.");
+                        });
                 });
 
-                if (selectedItems.length === 0) {
-                    alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
-                    return;
-                }
+            }
 
-                fetch("../ajax/check_cart_stock.php", {
+            // xuất pdf
+            document.getElementById("btnExportOrderPdf").addEventListener("click", function() {
+                const btn = document.querySelector(".btn-view-order");
+                if (!btn) return;
+
+                const orderDetails = JSON.parse(btn.getAttribute("data-order-details"));
+
+                fetch("../admin/ajax/export_order_pdf.php", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({
-                            items: selectedItems
-                        })
+                        body: JSON.stringify(orderDetails)
                     })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            form.submit(); 
-                        } else {
-                            alert(data.message);
-                        }
+                    .then(response => {
+                        if (!response.ok) throw new Error("Không thể xuất PDF");
+                        return response.blob();
                     })
-                    .catch(error => {
-                        console.error("Lỗi kiểm tra tồn kho:", error);
-                        alert("Đã xảy ra lỗi khi kiểm tra tồn kho.");
-                    });
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        window.open(url, "_blank");
+                    })
+                    .catch(err => alert("Lỗi khi xuất PDF: " + err.message));
             });
-
-
         });
     </script>
     <script>

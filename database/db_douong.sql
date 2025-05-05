@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 05, 2025 at 05:48 PM
+-- Generation Time: May 05, 2025 at 06:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.1.25
 
@@ -437,7 +437,7 @@ INSERT INTO `orders` (`order_id`, `order_code`, `user_id`, `status`, `total_pric
 (309, NULL, 7, 'Chờ xử lý', 5206793.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-07 00:00:00', 1),
 (310, NULL, 9, 'Chờ xử lý', 2066080.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-15 00:00:00', 1),
 (311, NULL, 12, 'Chờ xử lý', 405200.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-05 00:00:00', 1),
-(312, NULL, 11, 'Chờ xử lý', 425025.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-17 00:00:00', 1),
+(312, NULL, 11, 'Đã xác nhận', 425025.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-17 00:00:00', 1),
 (313, NULL, 12, 'Chờ xử lý', 1240186.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-20 00:00:00', 2),
 (314, NULL, 8, 'Chờ xử lý', 600500.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-13 00:00:00', 1),
 (315, NULL, 7, 'Chờ xử lý', 5618000.00, 'Địa chỉ tự động', 'Tạo đơn tự động', '2025-04-24 00:00:00', 1),
@@ -576,12 +576,6 @@ INSERT INTO `order_details` (`order_detail_id`, `order_id`, `product_id`, `packa
 (475, 311, 84, 242, 5, 27000.00),
 (476, 311, 76, 218, 4, 10800.00),
 (477, 311, 17, 45, 2, 21000.00),
-(478, 312, 30, 84, 3, 20500.00),
-(479, 312, 88, 254, 3, 4900.00),
-(480, 312, 90, 260, 4, 43000.00),
-(481, 312, 77, 222, 2, 55000.00),
-(482, 312, 2, 1, 1, 17325.00),
-(483, 312, 135, 352, 1, 49500.00),
 (484, 313, 18, 49, 1, 122000.00),
 (485, 313, 106, 297, 4, 28000.00),
 (486, 313, 4, 4, 3, 20062.00),
@@ -641,7 +635,39 @@ INSERT INTO `order_details` (`order_detail_id`, `order_id`, `product_id`, `packa
 (540, 322, 1, 12, 1, 400950.00),
 (541, 322, 41, 117, 4, 63000.00),
 (542, 322, 102, 291, 1, 169000.00),
-(543, 322, 100, 282, 1, 36500.00);
+(543, 322, 100, 282, 1, 36500.00),
+(544, 312, 30, 84, 3, 20500.00),
+(545, 312, 88, 254, 3, 4900.00),
+(546, 312, 90, 260, 4, 43000.00),
+(547, 312, 77, 222, 2, 55000.00),
+(548, 312, 2, 1, 1, 17325.00),
+(549, 312, 135, 352, 1, 49500.00);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_stock_log`
+--
+
+CREATE TABLE `order_stock_log` (
+  `log_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `packaging_option_id` int(11) NOT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `order_stock_log`
+--
+
+INSERT INTO `order_stock_log` (`log_id`, `order_id`, `packaging_option_id`, `quantity`, `created_at`) VALUES
+(38, 312, 84, 3, '2025-05-05 22:56:23'),
+(39, 312, 254, 3, '2025-05-05 22:56:23'),
+(40, 312, 261, 1, '2025-05-05 22:56:23'),
+(41, 312, 222, 2, '2025-05-05 22:56:23'),
+(42, 312, 1, 1, '2025-05-05 22:56:23'),
+(43, 312, 352, 1, '2025-05-05 22:56:23');
 
 -- --------------------------------------------------------
 
@@ -2159,6 +2185,14 @@ ALTER TABLE `order_details`
   ADD KEY `packaging_option_id` (`packaging_option_id`);
 
 --
+-- Indexes for table `order_stock_log`
+--
+ALTER TABLE `order_stock_log`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `packaging_option_id` (`packaging_option_id`);
+
+--
 -- Indexes for table `packaging_options`
 --
 ALTER TABLE `packaging_options`
@@ -2269,7 +2303,13 @@ ALTER TABLE `orders`
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=544;
+  MODIFY `order_detail_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=550;
+
+--
+-- AUTO_INCREMENT for table `order_stock_log`
+--
+ALTER TABLE `order_stock_log`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `packaging_options`
@@ -2371,6 +2411,13 @@ ALTER TABLE `order_details`
   ADD CONSTRAINT `order_details_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
   ADD CONSTRAINT `order_details_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`),
   ADD CONSTRAINT `order_details_ibfk_3` FOREIGN KEY (`packaging_option_id`) REFERENCES `packaging_options` (`packaging_option_id`);
+
+--
+-- Constraints for table `order_stock_log`
+--
+ALTER TABLE `order_stock_log`
+  ADD CONSTRAINT `order_stock_log_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `order_stock_log_ibfk_2` FOREIGN KEY (`packaging_option_id`) REFERENCES `packaging_options` (`packaging_option_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `packaging_options`
