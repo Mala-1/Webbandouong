@@ -204,18 +204,17 @@ if ($detail) {
     // 4. Cập nhật số lượng và total_price nếu đã có
     $newQuantity = $detail['quantity'] + $quan;
     $totalPrice = $newQuantity * $price;
-
+    
     $db->execute(
         "UPDATE cart_details SET quantity = ?, price = ?, total_price = ? WHERE cart_id = ? AND packaging_option_id = ?",
         [$newQuantity, $price, $totalPrice, $cart_id, $packaging_option_id]
     );
 } else {
     // 5. Thêm mới vào cart_detail
-    $totalPrice = $quantity * $price;
-
+    $totalPrice = $quan * $price;
     $db->execute(
         "INSERT INTO cart_details (cart_id, packaging_option_id, quantity, price, total_price) VALUES (?, ?, ?, ?, ?)",
-        [$cart_id, $packaging_option_id, $quantity, $price, $totalPrice]
+        [$cart_id, $packaging_option_id, $quan, $price, $totalPrice]
     );
 }
 

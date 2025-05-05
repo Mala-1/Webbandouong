@@ -8,6 +8,8 @@ if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Bạn chưa đăng nhập']);
     exit;
 }
+$db = DBConnect::getInstance();
+$user_id = $_SESSION['user_id'];
 
 function formatProductName($packaging_type, $unit_quantity, $product_name)
 {
@@ -25,8 +27,6 @@ function formatProductName($packaging_type, $unit_quantity, $product_name)
     return "{$packaging} {$product_name}";
 }
 
-$db = DBConnect::getInstance();
-$user_id = $_SESSION['user_id'];
 
 $cart = $db->selectOne("SELECT cart_id FROM cart WHERE user_id = ?", [$user_id]);
 if (!$cart) {
@@ -46,64 +46,70 @@ function getUnitValue($unitStr)
     return isset($matches[0]) ? (int)$matches[0] : 1;
 }
 
+
+
+
+
+
+
+
+
+$total_price = 0;
+$order_details = [];
+$all_packaging_stock = [];
+
 foreach ($cartItems as $item) {
-    $packaging_option_id = $item['packaging_option_id'];
     $product_id = $item['product_id'];
-    $quantity = $item['quantity'] * getUnitValue($item['unit_quantity']);
+    if (!isset($all_packaging_stock[$product_id])) {
+        // Truy xuất tất cả packaging của sản phẩm
+        $options = $db->select('SELECT * FROM packaging_options WHERE is_deleted = 0 AND product_id = ?', [$product_id]);
 
-    // Lấy thông tin packaging_option đã chọn
-    $packaging_option = $db->selectOne('SELECT po.*, p.name FROM packaging_options po JOIN products p ON p.product_id = po.product_id WHERE po.packaging_option_id = ?', [$packaging_option_id]);
+        $all_packaging_stock[$product_id] = [];
 
-    $product_id = $packaging_option['product_id'];
-
-
-    // Lấy tất cả packaging_options của sản phẩm
-    $packaging = $db->select('SELECT * FROM packaging_options WHERE is_deleted = 0 AND product_id = ?', [$product_id]);
-
-    // Tạo mảng để lưu thông tin về các packaging_option
-    $packaging_stock = [];
-
-    foreach ($packaging as $option) {
-        $packaging_stock[] = [
-            'packaging_option_id' => $option['packaging_option_id'],
-            'unit_quantity' => getUnitValue($option['unit_quantity']),
-            'stock' => (int)$option['stock'],
-            'is_change' => 0, // Đánh dấu mặc định là không thay đổi
-        ];
-    }
-
-
-    // Sắp xếp packaging_stock theo unit_quantity giảm dần
-    usort($packaging_stock, function ($a, $b) {
-        return $b['unit_quantity'] - $a['unit_quantity'];
-    });
-    // Tính toán số lượng còn thiếu
-    $remaining_quantity = $quantity;
-
-    $totalStock = getUnitValue($packaging_option['stock']);
-    foreach ($packaging_stock as $p) {
-        if ($p['unit_quantity'] > getUnitValue($packaging_option['unit_quantity'])) {
-            $totalStock += $p['stock'] * $p['unit_quantity'] / getUnitValue($packaging_option['unit_quantity']);
+        foreach ($options as $option) {
+            $all_packaging_stock[$product_id][] = [
+                'packaging_option_id' => $option['packaging_option_id'],
+                'unit_quantity' => getUnitValue($option['unit_quantity']),
+                'stock' => (int)$option['stock'],
+                'original_stock' => (int)$option['stock'],
+                'is_change' => 0
+            ];
         }
+
+        // Sắp xếp giảm dần theo đơn vị (giống add_order)
+        usort($all_packaging_stock[$product_id], fn($a, $b) => $b['unit_quantity'] - $a['unit_quantity']);
     }
+}
 
+foreach ($cartItems as $item) {
 
+    $product_id = $item['product_id'];
+    $packaging_option_id = $item['packaging_option_id'];
+    $quantity = (int)$item['quantity'];
+    $price = (float)$item['price'];
+    $total_price += $quantity * $price;
+
+    $order_details[] = [
+        'product_id' => $product_id,
+        'packaging_option_id' => $packaging_option_id,
+        'quantity' => $quantity,
+        'price' => $price
+    ];
+
+    $packaging_option = $db->selectOne('SELECT po.*, p.name FROM packaging_options po JOIN products p ON p.product_id = po.product_id WHERE po.packaging_option_id = ?', [$packaging_option_id]);
+    $quantity *= getUnitValue($packaging_option['unit_quantity']);
+
+    $packaging_stock = &$all_packaging_stock[$product_id];
+    $remaining_quantity = $quantity;
     $check = false;
 
-    // 3. Duyệt qua các packaging_option và trừ stock
-    // Duyệt qua các packaging_option và trừ stock
-
     foreach ($packaging_stock as &$option) {
-
-        $unit_quantity = $option['unit_quantity'];
-        $stock = null;
         if ($option['stock'] == 0) continue;
 
+        $unit_quantity = $option['unit_quantity'];
         if ($unit_quantity <= $remaining_quantity && $unit_quantity >= getUnitValue($packaging_option['unit_quantity'])) {
             $stock_used = intdiv($remaining_quantity, $unit_quantity);
-            if ($stock_used > $option['stock']) {
-                $stock_used = $option['stock'];
-            }
+            $stock_used = min($stock_used, $option['stock']);
 
             $option['stock'] -= $stock_used;
             $remaining_quantity -= $stock_used * $unit_quantity;
@@ -115,91 +121,111 @@ foreach ($cartItems as $item) {
             }
         }
     }
+    unset($option); // 🧼 Bắt buộc sau foreach có &
 
+    if ($remaining_quantity > 0 && !$check) {
+        $is_empty = true;
 
+        usort($packaging_stock, fn($a, $b) => $a['unit_quantity'] <=> $b['unit_quantity']);
 
-
-    if ($remaining_quantity > 0) {
-
-
-        if ($check == false) {
-            $is_empty = true;
-            usort($packaging_stock, function ($a, $b) {
-                return $a['unit_quantity'] <=> $b['unit_quantity'];
-            });
-
-            $i = 0;
-            foreach ($packaging_stock as &$option) {
-                $unit_quantity = $option['unit_quantity'];
-                if ($option['stock'] == 0) {
-                    $i++;
-                    continue;
-                }
-
-
-                if ($unit_quantity > getUnitValue($packaging_option['unit_quantity'])) {
-                    $pre_unit_quantity = $option['unit_quantity'];
-                    $option['stock'] -= 1;
-                    $option['is_change'] = 1;
-                    for ($j = $i - 1; $j >= 0; $j--) {
-                        $packaging_stock[$j]['stock'] += floor($pre_unit_quantity / $packaging_stock[$j]['unit_quantity']);
-                        $pre_unit_quantity = $packaging_stock[$j]['unit_quantity'];
-                        $packaging_stock[$j]['is_change'] = 1;
-                        if ($packaging_stock[$j]['packaging_option_id'] == $packaging_option['packaging_option_id'] && $remaining_quantity <= $packaging_stock[$j]['stock'] * $packaging_stock[$j]['unit_quantity']) {
-                            $packaging_stock[$j]['stock'] -= $remaining_quantity / getUnitValue($packaging_option['unit_quantity']);
-                            $is_empty = false;
-                            break;
-                        } else {
-                            $packaging_stock[$j]['stock']--;
-                        }
-                    }
-                    break;
-                }
-
+        $i = 0;
+        foreach ($packaging_stock as &$option) {
+            if ($option['stock'] == 0) {
                 $i++;
+                continue;
             }
 
+            if ($option['unit_quantity'] > getUnitValue($packaging_option['unit_quantity'])) {
+                $pre_unit_quantity = $option['unit_quantity'];
+                $option['stock'] -= 1;
+                $option['is_change'] = 1;
 
-            // nếu ko còn loại đóng gói để tách thì lấy lon lẻ
-            if ($remaining_quantity > 0) {
+                for ($j = $i - 1; $j >= 0; $j--) {
+                    $packaging_stock[$j]['stock'] += floor($pre_unit_quantity / $packaging_stock[$j]['unit_quantity']);
+                    $pre_unit_quantity = $packaging_stock[$j]['unit_quantity'];
+                    $packaging_stock[$j]['is_change'] = 1;
 
-                usort($packaging_stock, function ($a, $b) {
-                    return $b['unit_quantity'] - $a['unit_quantity'];
-                });
-                foreach ($packaging_stock as &$option) {
-                    $unit_quantity = $option['unit_quantity'];
-                    if ($option['stock'] == 0) {
-                        $i++;
-                        continue;
+                    if (
+                        $packaging_stock[$j]['packaging_option_id'] == $packaging_option_id &&
+                        $remaining_quantity <= $packaging_stock[$j]['stock'] * $packaging_stock[$j]['unit_quantity']
+                    ) {
+                        $packaging_stock[$j]['stock'] -= $remaining_quantity / getUnitValue($packaging_option['unit_quantity']);
+                        $remaining_quantity = 0;
+                        $is_empty = false;
+                        break;
+                    } else {
+                        $packaging_stock[$j]['stock']--;
                     }
-                    if ($unit_quantity < getUnitValue($packaging_option['unit_quantity'])) {
-                        $stock_used = intdiv($remaining_quantity, $unit_quantity);
-                        if ($stock_used > $option['stock']) {
-                            $stock_used = $option['stock'];
-                        }
-                        $option['stock'] -= $stock_used;
-                        $remaining_quantity -= $stock_used * $unit_quantity;
-                        $option['is_change'] = 1;
+                }
+                break;
+            }
 
-                        if ($remaining_quantity == 0) {
-                            $is_empty = false;
-                            break;
-                        }
+            $i++;
+        }
+        unset($option); // 🧼
+
+
+
+        // fallback tách ra lon lẻ
+        if ($remaining_quantity > 0) {
+            usort($packaging_stock, fn($a, $b) => $b['unit_quantity'] - $a['unit_quantity']);
+            foreach ($packaging_stock as &$option) {
+
+                if ($option['stock'] == 0) continue;
+
+                if ($option['unit_quantity'] < getUnitValue($packaging_option['unit_quantity'])) {
+                    $stock_used = intdiv($remaining_quantity, $option['unit_quantity']);
+                    $stock_used = min($stock_used, $option['stock']);
+
+                    $option['stock'] -= $stock_used;
+                    $remaining_quantity -= $stock_used * $option['unit_quantity'];
+                    $option['is_change'] = 1;
+
+                    if ($remaining_quantity == 0) {
+                        $is_empty = false;
+                        break;
                     }
                 }
             }
 
+            unset($option); // 🧼
+        }
 
+        if ($is_empty) {
+            $selectedOption = array_filter($packaging_stock, function ($opt) use ($packaging_option_id) {
+                return $opt['packaging_option_id'] == $packaging_option_id;
+            });
+            $selectedOption = array_values($selectedOption)[0] ?? null;
+            $unitLeft = $selectedOption ? $selectedOption['stock'] * $selectedOption['unit_quantity'] : 0;
 
-            if ($is_empty == true) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => "Không đủ số lượng cho sản phẩm: " . formatProductName($item['packaging_type'], $item['unit_quantity'], $item['product_name']) . ". Chỉ còn $totalStock sản phẩm."
-                ]);
-                exit;
-            }
+            echo json_encode([
+                "success" => false,
+                "message" => "Không đủ số lượng cho sản phẩm: " .
+                    formatProductName(
+                        $item['packaging_type'],
+                        $item['unit_quantity'],
+                        $item['product_name']
+                    ) . ". Chỉ còn $unitLeft sản phẩm."
+            ]);
+            exit;
         }
     }
+
+    unset($packaging_stock); // Cẩn thận
+
 }
+unset($item); // 🧼
+
+
+
+
+
+
+
+
+
+
+
+
 
 echo json_encode(['success' => true]);

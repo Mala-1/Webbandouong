@@ -112,7 +112,7 @@
     $db = DBConnect::getInstance();
 
     $product_id = isset($_GET['product_id']) ? $_GET['product_id'] : 1;
-    $packaging_option_id = isset($_GET['packaging_option_id']) ? $_GET['packaging_option_id'] : 11;
+    $packaging_option_id = isset($_GET['packaging_option_id']) ? $_GET['packaging_option_id'] : 1;
 
     $products = $db->select("SELECT p.product_id,
                             p.name,

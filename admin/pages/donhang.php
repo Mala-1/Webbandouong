@@ -935,28 +935,32 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
 
     // ✅ Event delegation cho nút thêm dòng mới và nút xóa
     tableBody.addEventListener("click", function(e) {
-        if (e.target && e.target.id === "btnAddRow") {
+        const addBtn = e.target.closest('#btnAddRow');
+        const removeBtn = e.target.closest('.remove-row');
+
+        if (addBtn) {
             const newRow = document.createElement("tr");
             newRow.innerHTML = `
-                <td>
-                    <input type="hidden" name="product_id[]" value="">
-                    <input type="text" class="form-control" name="product_name[]" readonly>
-                </td>
-                <td class="d-flex align-items-center gap-2 justify-content-center">
-                    <input type="hidden" name="packaging_option_id[]" value="">
-                    <input type="text" class="form-control text-capitalize" name="packaging_option[]" readonly>
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="openPackagingSelector(this)">Chọn</button>
-                </td>
-                <td><input type="number" class="form-control" name="quantity[]" placeholder="Số lượng"></td>
-                <td><input type="text" class="form-control" name="price[]" readonly></td>
-                <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa-solid fa-trash-can"></i></button></td>
-            `;
+            <td>
+                <input type="hidden" name="product_id[]" value="">
+                <input type="text" class="form-control" name="product_name[]" readonly>
+            </td>
+            <td class="d-flex align-items-center gap-2 justify-content-center">
+                <input type="hidden" name="packaging_option_id[]" value="">
+                <input type="text" class="form-control text-capitalize" name="packaging_option[]" readonly>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="openPackagingSelector(this)">Chọn</button>
+            </td>
+            <td><input type="number" class="form-control" name="quantity[]" placeholder="Số lượng"></td>
+            <td><input type="text" class="form-control" name="price[]" readonly></td>
+            <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa-solid fa-trash-can"></i></button></td>
+        `;
             tableBody.insertBefore(newRow, document.getElementById("addRowTrigger"));
-        } else if (e.target && e.target.classList.contains('remove-row')) {
-            e.target.closest('tr').remove();
-            updateTotalPrice(); // Cập nhật tổng giá khi xóa dòng
+        } else if (removeBtn) {
+            removeBtn.closest('tr').remove();
+            updateTotalPrice();
         }
     });
+
 
     // Lắng nghe sự kiện khi một packaging option được chọn từ modal
     window.selectPackaging = function(btn) {
@@ -1139,7 +1143,7 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
                     price
                 });
             }
-            
+
         });
 
         if (details.length === 0) {
@@ -1303,7 +1307,8 @@ $canDelete = in_array('delete', $permissions['Quản lý đơn hàng'] ?? []);
 
 
     document.addEventListener('click', function(e) {
-        if (e.target && e.target.id === 'editBtnAddRow') {
+        const addBtn = e.target.closest('#editBtnAddRow');
+        if (addBtn) {
             const tableBody = document.getElementById('editOrderDetailsTable');
             const newRow = document.createElement('tr');
             newRow.innerHTML = `

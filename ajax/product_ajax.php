@@ -193,7 +193,7 @@ foreach ($products as $product): ?>
                 </p>
                 <p class="fw-medium fs-5 ms-2"><?= number_format($product['price']) . 'đ' ?></p>
                 <a class="btn-buy text-decoration-none text-black d-block w-100 text-center py-2"
-                    href="product_detail.php?product_id=<?= $product['product_id'] ?>&packaging_option_id=<?= $product['packaging_option_id'] ?>">MUA</a>
+                    href="user/product_detail.php?product_id=<?= $product['product_id'] ?>&packaging_option_id=<?= $product['packaging_option_id'] ?>">MUA</a>
             </div>
         </div>
     </div>
