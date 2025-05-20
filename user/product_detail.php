@@ -89,6 +89,16 @@
         body {
             background-color: #e9edf0;
         }
+
+        .my-responsive-width {
+            width: auto !important;
+        }
+
+        @media (max-width: 992px) {
+            .my-responsive-width {
+                width: 100% !important;
+            }
+        }
     </style>
 </head>
 
@@ -188,123 +198,99 @@
     ?>
     <?php include '../includes/header.php'; ?>
     <div class="container mt-3">
-        <div>
-            <div class="row">
-                <div class="col-8 p-2">
-                    <div class="position-relative user-select-none bg-white border rounded p-4">
-                        <!-- nút trái -->
-                        <button class="btn-scroll scroll-left-img bg-secondary" onclick="scrollImg(-1)">
-                            <i class="fa-solid fa-chevron-left" style="color: #ffffff;"></i>
+        <div class="row">
+            <!-- Cột ảnh -->
+            <div class="col-12 col-md-8 p-2">
+                <div class="position-relative user-select-none bg-white border rounded p-4">
+                    <button class="btn-scroll scroll-left-img bg-secondary" onclick="scrollImg(-1)">
+                        <i class="fa-solid fa-chevron-left text-white"></i>
+                    </button>
+                    <button class="btn-scroll scroll-right-img bg-secondary" onclick="scrollImg(1)">
+                        <i class="fa-solid fa-chevron-right text-white"></i>
+                    </button>
+
+                    <div class="img-scroll overflow-hidden d-flex gap-3 p-2 mb-2 justify-content-lg-start">
+                        <?php foreach ($images as $image): ?>
+                            <div class="item">
+                                <img src="../assets/images/SanPham/<?= $image['image'] ?>" draggable="false" alt=""
+                                    class="img-fluid d-block mx-auto">
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột thông tin sản phẩm -->
+            <div class="col-12 col-md-4 p-2">
+                <div class="bg-white py-2 px-2 h-100 d-flex flex-column border rounded">
+                    <h3 class="mb-4 mt-1">
+                        <?php foreach ($products as $product):
+                            if ($product['packaging_option_id'] == $packaging_option_id) {
+                                echo formatProductName($product['packaging_type'], $product['unit_quantity'], $product['name']);
+                            }
+                        endforeach; ?>
+                    </h3>
+
+                    <div class="position-relative user-select-none">
+                        <button class="btn-scroll scroll-left bg-secondary" onclick="scrollPackagingOption(-1)">
+                            <i class="fa-solid fa-chevron-left text-white"></i>
                         </button>
-                        <!-- nút phải -->
-                        <button class="btn-scroll scroll-right-img bg-secondary" onclick="scrollImg(1)">
-                            <i class="fa-solid fa-chevron-right" style="color: #ffffff;"></i>
+                        <button class="btn-scroll scroll-right bg-secondary" onclick="scrollPackagingOption(1)">
+                            <i class="fa-solid fa-chevron-right text-white"></i>
                         </button>
 
-                        <div class="img-scroll overflow-hidden d-flex gap-3 p-2 mb-2 justify-content-lg-start">
-
-                            <?php foreach ($images as $image): ?>
-                                <div class="item">
-                                    <img src="../assets/images/SanPham/<?= $image['image'] ?>"
-                                        draggable="false" alt="" class="w-100 h-100">
-                                </div>
+                        <div
+                            class="packagion_option_scroll overflow-hidden d-flex gap-3 p-2 mb-2 justify-content-lg-start">
+                            <?php foreach ($products as $product): ?>
+                                <a class="packaging-option-item d-flex flex-column align-items-center border rounded text-decoration-none text-black user-select-none text-center w-100"
+                                    style="cursor: pointer; max-width: 120px;"
+                                    href="?product_id=<?= $product['product_id'] ?>&packaging_option_id=<?= $product['packaging_option_id'] ?>">
+                                    <img src="../assets/images/SanPham/<?= $product['image'] ?>" alt="" draggable="false"
+                                        class="img-fluid object-fit-contain mb-2">
+                                    <?php if ($product['packaging_option_id'] == $packaging_option_id): ?>
+                                        <i class="fa-regular fa-circle-dot"></i>
+                                    <?php else: ?>
+                                        <i class="fa-regular fa-circle"></i>
+                                    <?php endif; ?>
+                                    <span>
+                                        <?= number_format($product['price']) ?>đ
+                                    </span>
+                                </a>
                             <?php endforeach; ?>
-
-
                         </div>
+                    </div>
+
+                    <div class="my-3 d-flex align-items-center gap-2">
+                        <label>Số lượng</label>
+                        <input type="number" value="1" min="1" class="quantity form-control my-responsive-width">
+                    </div>
+
+                    <div class="mt-4 d-grid gap-2 d-md-flex flex-wrap justify-content-md-between">
+                        <a href="#"
+                            class="btn btn-outline-dark btnBuyNow w-100 w-md-50 d-flex align-items-center justify-content-center mb-2 mb-md-0">
+                            <i class="fa-solid fa-bolt me-2"></i> Mua ngay
+                        </a>
+                        <button
+                            class="add-to-cart btn w-100 w-md-50 bg-black text-white d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ hàng
+                        </button>
+                    </div>
+
+                    <div class="notice-add-to-cart position-absolute top-50 start-50 d-flex flex-column justify-content-center align-items-center p-5 rounded w-auto opacity-0"
+                        style="background-color: rgba(0, 0, 0, 0.8);">
+                        <i class="fa-solid fa-circle-check fa-3x mb-2" style="color: #ffffff;"></i>
+                        <span class="text-white text-center">Đã thêm vào giỏ hàng</span>
                     </div>
                 </div>
-                <div class="col-4 p-2">
-                    <div class="bg-white py-2 px-2 h-100 d-flex flex-column border rounded">
-                        <h3 class="mb-4 mt-1">
-                            <?php foreach ($products as $product):
-                                if ($product['packaging_option_id'] == $packaging_option_id) {
-                                    echo formatProductName($product['packaging_type'], $product['unit_quantity'], $product['name']);
-                                }
-                            endforeach; ?>
-                        </h3>
-                        <div class="position-relative user-select-none">
-                            <!-- nút trái -->
-                            <button class="btn-scroll scroll-left bg-secondary" onclick="scrollPackagingOption(-1)">
-                                <i class="fa-solid fa-chevron-left" style="color: #ffffff;"></i>
-                            </button>
-                            <!-- nút phải -->
-                            <button class="btn-scroll scroll-right bg-secondary" onclick="scrollPackagingOption(1)">
-                                <i class="fa-solid fa-chevron-right" style="color: #ffffff;"></i>
-                            </button>
+            </div>
 
-                            <div
-                                class="packagion_option_scroll overflow-hidden d-flex gap-3 p-2 mb-2 justify-content-lg-start">
-                                <?php foreach ($products as $product): ?>
-                                    <a class="packaging-option-item d-flex flex-column align-items-center border rounded text-decoration-none text-black user-select-none"
-                                        style="cursor: pointer;" href="?product_id=<?= $product['product_id'] ?>&packaging_option_id=<?= $product['packaging_option_id'] ?>">
-                                        <img src="../assets/images/SanPham/<?= $product['image'] ?>"
-                                            alt="" draggable="false" style="width: 110px; height: 110px;" class="object-fit-contain">
-                                        <?php if ($product['packaging_option_id'] == $packaging_option_id): ?>
-                                            <i class="fa-regular fa-circle-dot mt-2 mb-1"></i>
-                                        <?php else: ?>
-                                            <i class="fa-regular fa-circle mt-2 mb-1"></i>
-                                        <?php endif; ?>
-                                        <span class="m-0"><?= number_format($product['price']) ?>đ</span>
-                                    </a>
-                                <?php endforeach; ?>
-
-                            </div>
-                        </div>
-
-                        <div class="my-3 d-flex align-items-center gap-2">
-                            <label>Số lượng</label>
-                            <input type="number" value="1" min="1" class="quantity form-control w-auto">
-                        </div>
-
-                        <div class="mt-4 d-grid gap-2 d-md-flex justify-content-md-between align-items-center">
-                            <!-- Mua ngay -->
-                            <a href="#"
-                                class="btn btn-outline-dark btnBuyNow w-100 w-md-50 d-flex align-items-center justify-content-center">
-                                <i class="fa-solid fa-bolt me-2"></i> Mua ngay
-                            </a>
-
-                            <!-- Thêm vào giỏ -->
-                            <button
-                                class="add-to-cart btn w-100 w-md-50 bg-black text-white d-flex align-items-center justify-content-center">
-                                <i class="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ hàng
-                            </button>
-                        </div>
-                        <!-- modal thêm thành công -->
-                        <div class="notice-add-to-cart position-absolute top-50 start-50 d-flex flex-column justify-content-center align-items-center p-5 rounded w-auto opacity-0" style="background-color: rgba(0, 0, 0, 0.8);">
-                            <i class="fa-solid fa-circle-check fa-3x mb-2" style="color: #ffffff;"></i>
-                            <span class="text-white text-center">Đã thêm vào giỏ hàng</span>
-                        </div>
-
-
-                        <!-- Modal yêu cầu đăng nhập -->
-                        <div class="modal fade" id="loginRequiredModal" tabindex="-1" aria-labelledby="loginRequiredModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content text-center">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title w-100" id="loginRequiredModalLabel">Thông báo</h5>
-                                    </div>
-                                    <div class="modal-body">
-                                        Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng.
-                                    </div>
-                                    <div class="modal-footer justify-content-center">
-                                        <a href="../user/login.php" class="btn btn-primary">Đăng nhập</a>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-12 p-2">
-                    <div class=" bg-white rounded p-4 border">
-                        <h3 class="text-decoration-underline mb-3">Mô tả sản phẩm</h3>
-                        <p style="white-space: pre-line;"><?= $products[0]['description'] ?></p>
-
-                    </div>
+            <!-- Mô tả -->
+            <div class="col-12 p-2">
+                <div class="bg-white rounded p-4 border">
+                    <h3 class="text-decoration-underline mb-3">Mô tả sản phẩm</h3>
+                    <p style="white-space: pre-line;">
+                        <?= $products[0]['description'] ?>
+                    </p>
                 </div>
             </div>
         </div>

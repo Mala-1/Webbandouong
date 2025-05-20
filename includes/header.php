@@ -53,7 +53,7 @@ $categories = $db->select('SELECT * FROM categories WHERE is_deleted = 0', []);
                             <select name="category" class="form-select form-select-sm">
                                 <option value="">-- Tất cả --</option>
                                 <?php foreach ($categories as $category): ?>
-                                <option value="<?= $category['category_id'] ?>"><?= $category['name'] ?></option>
+                                    <option value="<?= $category['category_id'] ?>"><?= $category['name'] ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -77,27 +77,27 @@ $categories = $db->select('SELECT * FROM categories WHERE is_deleted = 0', []);
 
             <!-- 👤 Tài khoản người dùng -->
             <?php if (isset($_SESSION['user_id'])): ?>
-            <div class="dropdown">
-                <a href="#" class="btn btn-dark dropdown-toggle" role="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                    👤 <?= htmlspecialchars($_SESSION['username'] ?? 'Người dùng') ?>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="../user/profile.php"><i class="fas fa-user"></i> Hồ sơ</a></li>
-                    <li><a class="dropdown-item" href="../user/changepassword.php" class=" fas fa-key"></i> Đổi mật
-                            khẩu</a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item" href="../user/logout.php"><i class="fas fa-sign-out-alt"></i> Đăng
-                            xuất</a></li>
-                </ul>
-            </div>
+                <div class="dropdown">
+                    <a href="#" class="btn btn-dark dropdown-toggle" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        👤 <?= htmlspecialchars($_SESSION['username'] ?? 'Người dùng') ?>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="../user/profile.php"><i class="fas fa-user"></i> Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="../user/changepassword.php" class=" fas fa-key"></i> Đổi mật
+                                khẩu</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="../user/logout.php"><i class="fas fa-sign-out-alt"></i> Đăng
+                                xuất</a></li>
+                    </ul>
+                </div>
             <?php else: ?>
-            <a href="../user/login.php" class="nav-link text-light d-flex align-items-center gap-2">
-                Đăng nhập / Đăng ký
-            </a>
+                <a href="../user/login.php" class="nav-link text-light d-flex align-items-center gap-2">
+                    Đăng nhập / Đăng ký
+                </a>
             <?php endif; ?>
         </div>
     </nav>

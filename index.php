@@ -1,3 +1,8 @@
+<?php
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    ?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -16,11 +21,7 @@
 
 <body>
 
-    <?php
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    ?>
+    
     <?php if (isset($_SESSION['login_success'])): ?>
         <div class="alert alert-success text-center">
             <?= $_SESSION['login_success'] ?>
