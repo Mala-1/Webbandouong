@@ -45,9 +45,9 @@ try {
         exit;
     }
 
-    $cartItems = $db->select("SELECT cd.packaging_option_id, cd.quantity, po.*, p.name as product_name
+    $cartItems = $db->select("SELECT cd.*, po.*, p.name as product_name, cd.price as price
     FROM cart_details cd
-    JOIN packaging_options po ON cd.packaging_option_id = po.packaging_option_id
+    RIGHT JOIN packaging_options po ON cd.packaging_option_id = po.packaging_option_id
     JOIN products p ON p.product_id = po.product_id
     WHERE cd.cart_id = ?", [$cart['cart_id']]);
 
@@ -97,7 +97,7 @@ try {
         $product_id = $item['product_id'];
         $packaging_option_id = $item['packaging_option_id'];
         $quantity = (int)$item['quantity'];
-        $price = (float)$item['price'];
+        $price = (int)$item['price'];
         $total_price += $quantity * $price;
 
         $order_details[] = [
